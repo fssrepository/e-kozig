@@ -1,59 +1,20 @@
-# NavUpo
+# NAV Üpo
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.2.
+A legtöbb közigazgatási projekttel, mint a NAV Ügyfélportál a legnagyobb probléma, hogy a teljes integrált környzetet fejlesztik le titokban 1,5 évig, amit utána elég nehéz és drága módositani, ha
+a felhasználók elégedetlenek a végeredménnyel.
 
-## Development server
+Ha egy projekt felület prototípusát még az integrált fejlesztés előtt látják (adatbázis, szerver park stb.), akkor sokkal gyorsabban kiderülnek a problémák, és ezek lényegesen gyorsabban javíthatóak. (1-2 óra, hónapok helyett)
 
-To start a local development server, run:
+Amikor kialakul egy konszenzus, hogy a felhasználók, mit várnak, a NAV már a háttérfolyamatiba eléggé egyértelműen átvezetheti és a felhasználók előre tudják 6 hónapra, milyen változásokra kell készülniük.
 
-```bash
-ng serve
-```
+Egy 200 oldalas dokumentációhoz képest, ez jobban látszik, mind a fejlesztőknek, mind a könyvelőknek, mind a vállalkozóknak.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Ez a projekt egy demonstráció, AI-al lett generálva. (igaz még kell mellé egy programozó)
 
-## Code scaffolding
+Előzetes költségbecslés alapján akár 5-ödével is kevesebbe kerülhet ezzel a módszerrel egy NAV fejlesztés. Nem fogy el a pénz, és lehet fókuszálni a hibajavításokra.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+A github egy integrált környezet, ahol vita forumot lehet tartani, akár külsös és NAV-os fejlesztőket is be lehet vonni, illetve egy kis kódosló sulis képzéssel akár a könyevlői kamara is karban tudja tartani.
 
-```bash
-ng generate component component-name
-```
+A jelenlegi repo kezdeti változata kb. egy nap alatt készült el a semmiből. (soha nem használtam Copilot-ot elötte, így az AI néha összekutyult dolgokat - nem volt elég precíz a prompt)
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+A funkció lista nem teljes, a dokumentum kezelés képernyő lett újra gondolva életszerű (mock) adatokkal.
