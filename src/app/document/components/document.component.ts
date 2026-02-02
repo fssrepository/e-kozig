@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-document',
-  standalone: true,
   template: `
     <div class="documents">
       <h2>Documents</h2>
@@ -20,4 +19,4 @@ import { Component } from '@angular/core';
     `
   ]
 })
-export class Document {}
+export class DocumentComponent {}
