@@ -1,59 +1,19 @@
-# NavUpo
+# NAV Üpo
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.2.
+A legtöbb közigazgatási projekt – például a NAV Ügyfélportál – esetében az egyik legnagyobb probléma, hogy a teljes, integrált környezetet (felhasználói felület, adatbázis, szerverinfrastruktúra stb.) zárt körülmények között fejlesztik 1–1,5 éven keresztül. A rendszer ezt követően már nehezen és jelentős költséggel módosítható, amennyiben a felhasználók elégedetlenek a végeredménnyel.
 
-## Development server
+Amennyiben egy projekt felületi prototípusa már az integrált fejlesztési szakasz előtt a felhasználók elé kerül, a problémák sokkal korábban és gyorsabban azonosíthatók. Ezek javítása ebben a fázisban jellemzően 1–2 órát vesz igénybe, szemben a későbbi, akár hónapokig tartó módosításokkal.
 
-To start a local development server, run:
+Miután kialakul egy konszenzus arról, hogy a felhasználók milyen működést és funkciókat várnak el, a NAV ezeket az elvárásokat egyértelműen át tudja vezetni a háttérfolyamatokba. Ennek eredményeként a felhasználók akár 6 hónappal előre fel tudnak készülni a várható változásokra.
 
-```bash
-ng serve
-```
+Egy több száz oldalas dokumentációval szemben egy működő prototípus lényegesen szemléletesebb mind a fejlesztők, mind a könyvelők, mind pedig a vállalkozók számára.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+A bemutatott projekt egy demonstrációs célú megvalósítás, amely AI segítségével készült. (A végleges rendszerhez természetesen továbbra is szükség van fejlesztői közreműködésre.)
 
-## Code scaffolding
+Előzetes költségbecslések alapján ezzel a módszertannal egy NAV-fejlesztés akár 80%-kal alacsonyabb költséggel is megvalósítható. A rendelkezésre álló források nem merülnek ki idő előtt, és nagyobb hangsúly helyezhető a hibajavításokra és finomhangolásra.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+A GitHub integrált együttműködési környezetet biztosít, ahol vitafórumok hozhatók létre, külsős és NAV-os fejlesztők egyaránt bevonhatók, valamint megfelelő – alap szintű – képzéssel akár a könyvelői kamara is részt vehet a rendszer karbantartásában.
 
-```bash
-ng generate component component-name
-```
+A jelenlegi repository kezdeti verziója megközelítőleg egy nap alatt készült el a nulláról. (Korábban nem használtam Copilotot, ezért az AI bizonyos esetekben pontatlan megoldásokat generált a nem kellően precíz promptok miatt.)
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+A funkciólista nem teljes körű; a dokumentumkezelési felület újragondolásra került, életszerű (mock) adatok felhasználásával.

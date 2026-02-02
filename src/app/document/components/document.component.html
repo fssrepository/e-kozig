@@ -1,10 +1,26 @@
-<div class="documents">
-  <mat-form-field class="search" appearance="outline">
-    <input matInput [formControl]="searchCtrl" [matAutocomplete]="auto" placeholder="Search ügyfél">
-    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addChip($event.option.value)">
-      <mat-option *ngFor="let option of filteredOptions$ | async" [value]="option">{{ option }}</mat-option>
-    </mat-autocomplete>
-  </mat-form-field>
+<div class="documents" *ngIf="!selectedItem">
+  <div class="search-wrapper">
+    <mat-form-field class="search" appearance="outline">
+      <mat-chip-set class="search-chips" *ngIf="searchTerms.length > 0">
+        <mat-chip *ngFor="let term of searchTerms" removable (removed)="removeSearchTerm(term)">
+          {{ term }}
+          <button matChipRemove aria-label="Remove search term">✕</button>
+        </mat-chip>
+      </mat-chip-set>
+      <input matInput [formControl]="searchCtrl" placeholder="Dokumentum keresés pl.: ügyszám, iktatószám, ügyfél, űrlap ..." (keydown.enter)="filterBySearch()">
+    </mat-form-field>
+
+    <div class="search-panel" [class.open]="showSearchPanel" *ngIf="showSearchPanel">
+      <div class="search-result" *ngFor="let result of searchResults" (click)="selectSearchResult(result)">
+        <div class="result-ugyfel">{{ result.ugyfel }}</div>
+        <div class="result-desc">{{ result.formName }}</div>
+      </div>
+      <div class="search-footer">
+        <span class="footer-left">all search result for "{{ searchCtrl.value }}"</span>
+        <span class="footer-right">Press ENTER</span>
+      </div>
+    </div>
+  </div>
 
   <div class="filters">
     <div class="ugyfel-wrapper">
@@ -23,13 +39,107 @@
             </mat-chip>
           </mat-chip-set>
 
-          <input matInput [formControl]="ugyfelCtrl" [matAutocomplete]="uauto" placeholder="Search ügyfél">
+          <input matInput [formControl]="ugyfelCtrl" [matAutocomplete]="uauto" placeholder="Ügyfél keresés">
 
           <mat-autocomplete #uauto="matAutocomplete" (optionSelected)="selectUgyfel($event.option.value)">
             <mat-option *ngFor="let option of filteredUgyfels$ | async" [value]="option">{{ option }}</mat-option>
           </mat-autocomplete>
         </mat-form-field>
       </div>
+    </div>
+
+    <div class="date-wrapper">
+      <button mat-stroked-button class="date-btn" (click)="toggleDatePanel()" [attr.aria-expanded]="showDatePanel">
+        <mat-icon *ngIf="dateFromCtrl.value || dateToCtrl.value" class="tick">check</mat-icon>
+        <span class="label">Dátum:&nbsp;{{ dateLabel }}</span>
+        <mat-icon class="arrow" [class.open]="showDatePanel">expand_more</mat-icon>
+      </button>
+
+      <div class="date-panel" [class.open]="showDatePanel" *ngIf="showDatePanel">
+        <div class="date-chips" *ngIf="dateFromCtrl.value || dateToCtrl.value">
+          <mat-chip-set aria-label="Selected dates" class="chip-list">
+            <mat-chip *ngIf="dateFromCtrl.value" removable (removed)="removeDate('from')">
+              From: {{ formatShortDate(dateFromCtrl.value) }}
+              <button matChipRemove aria-label="Remove">✕</button>
+            </mat-chip>
+            <mat-chip *ngIf="dateToCtrl.value" removable (removed)="removeDate('to')">
+              To: {{ formatShortDate(dateToCtrl.value) }}
+              <button matChipRemove aria-label="Remove">✕</button>
+            </mat-chip>
+          </mat-chip-set>
+        </div>
+
+        <div class="date-inputs">
+          <mat-form-field appearance="outline">
+            <input matInput [matDatepicker]="fromPicker" placeholder="From" [formControl]="dateFromCtrl" (dateChange)="onDateChange()">
+            <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+            <mat-datepicker #fromPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <input matInput [matDatepicker]="toPicker" placeholder="To" [formControl]="dateToCtrl" (dateChange)="onDateChange()">
+            <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+            <mat-datepicker #toPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-wrapper">
+      <button mat-stroked-button class="form-btn" (click)="toggleFormPanel()" [attr.aria-expanded]="showFormPanel">
+        <mat-icon *ngIf="selectedForms.length > 0" class="tick">check</mat-icon>
+        <span class="label">Űrlap:&nbsp;{{ selectedForms.length === 0 ? '' : (selectedForms.length === 1 ? selectedForms[0] : selectedForms[0] + ' +' + (selectedForms.length - 1)) }}</span>
+        <mat-icon class="arrow" [class.open]="showFormPanel">expand_more</mat-icon>
+      </button>
+
+      <div class="form-panel" [class.open]="showFormPanel" *ngIf="showFormPanel">
+        <mat-form-field class="form-search" appearance="outline">
+          <mat-chip-set aria-label="Selected forms" class="chip-list">
+            <mat-chip *ngFor="let f of selectedForms" removable (removed)="removeForm(f)">
+              {{ f }}
+              <button matChipRemove aria-label="Remove">✕</button>
+            </mat-chip>
+          </mat-chip-set>
+
+          <input matInput [formControl]="formCtrl" [matAutocomplete]="fauto" placeholder="Űrlap keresés">
+
+          <mat-autocomplete #fauto="matAutocomplete" (optionSelected)="selectForm($event.option.value)">
+            <mat-option *ngFor="let option of filteredForms$ | async" [value]="option">{{ option }}</mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="status-wrapper">
+      <button mat-stroked-button class="status-btn" (click)="toggleStatusPanel()" [attr.aria-expanded]="showStatusPanel">
+        <mat-icon *ngIf="selectedStatuses.length > 0" class="tick">check</mat-icon>
+        <span class="label">Státusz:&nbsp;{{ selectedStatuses.length === 0 ? '' : (selectedStatuses.length === 1 ? selectedStatuses[0] : selectedStatuses[0] + ' +' + (selectedStatuses.length - 1)) }}</span>
+        <mat-icon class="arrow" [class.open]="showStatusPanel">expand_more</mat-icon>
+      </button>
+
+      <div class="status-panel" [class.open]="showStatusPanel" *ngIf="showStatusPanel">
+        <mat-form-field class="status-search" appearance="outline">
+          <mat-chip-set aria-label="Selected statuses" class="chip-list">
+            <mat-chip *ngFor="let s of selectedStatuses" removable (removed)="removeStatus(s)">
+              {{ s }}
+              <button matChipRemove aria-label="Remove">✕</button>
+            </mat-chip>
+          </mat-chip-set>
+
+          <input matInput [formControl]="statusCtrl" [matAutocomplete]="sauto" placeholder="Státusz keresés">
+
+          <mat-autocomplete #sauto="matAutocomplete" (optionSelected)="selectStatus($event.option.value)">
+            <mat-option *ngFor="let option of filteredStatuses$ | async" [value]="option">{{ option }}</mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="unread-wrapper">
+      <button mat-stroked-button class="unread-btn" (click)="toggleUnreadFilter()" [class.active]="showUnreadOnly">
+        <mat-icon *ngIf="showUnreadOnly" class="tick">check</mat-icon>
+        <span class="label">Olvasatlan</span>
+      </button>
     </div>
   </div>
 
@@ -52,22 +162,95 @@
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
 
       <ng-container matColumnDef="icon">
-        <td mat-cell *matCellDef="let element"><mat-icon aria-hidden="true">{{element.icon}}</mat-icon></td>
+        <td mat-cell *matCellDef="let element">
+          <mat-icon aria-hidden="true" [class]="'status-icon status-' + (element.status || '').toLowerCase().replace('ü', 'u').replace('á', 'a').replace('é', 'e').replace('ó', 'o')">{{getStatusIcon(element.status || '')}}</mat-icon>
+        </td>
       </ng-container>
 
-      <ng-container matColumnDef="ugyfel">
-        <td mat-cell *matCellDef="let element">{{ element.ugyfel }}</td>
+      <ng-container matColumnDef="name">
+        <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <td mat-cell *matCellDef="let element">{{ element.status }}</td>
       </ng-container>
 
       <ng-container matColumnDef="description">
-        <td mat-cell *matCellDef="let element">{{ element.description }}</td>
+        <td mat-cell *matCellDef="let element">{{ element.formName }}</td>
       </ng-container>
 
       <ng-container matColumnDef="datetime">
         <td mat-cell *matCellDef="let element" class="datetime-cell">{{ formatDate(element.datetime) }}</td>
       </ng-container>
 
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.unread]="row.unread" [class.read]="!row.unread"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.unread]="row.unread" [class.read]="!row.unread" (click)="selectTableRow(row)" style="cursor: pointer;"></tr>
     </table>
+  </div>
+</div>
+
+<!-- Detail view -->
+<div class="detail-view" *ngIf="selectedItem">
+  <div class="detail-header">
+    <button mat-icon-button (click)="closeDetailView()" aria-label="Back">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <button mat-stroked-button class="new-letter-btn" (click)="onReply()">
+      Új levél
+    </button>
+  </div>
+
+  <div class="detail-panel">
+    <div class="detail-top">
+      <div class="detail-name-status">
+        <span class="detail-ugyfel">{{ selectedItem.name }}</span>
+        <button mat-icon-button 
+          class="status-icon-button" 
+          [class]="'status-' + (selectedItem.status || '').toLowerCase().replace('ü', 'u').replace('á', 'a').replace('é', 'e').replace('ó', 'o')"
+          (click)="onManualClose()">
+          <mat-icon>{{ getStatusIcon(selectedItem.status || '') }}</mat-icon>
+        </button>
+      </div>
+      <div class="detail-meta">
+        <span>{{ generateUgyszam(selectedItem) }}</span>
+      </div>
+    </div>
+
+    <mat-accordion>
+      <mat-expansion-panel *ngFor="let item of selectedItem.items; let i = index" [expanded]="expandedItemIds.has('item-' + i)" (opened)="toggleAccordion('item-' + i)" (closed)="toggleAccordion('item-' + i)">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-icon class="accordion-icon" [class]="'status-' + (item.status || '').toLowerCase().replace('ü', 'u').replace('á', 'a').replace('é', 'e').replace('ó', 'o')">{{ getStatusIcon(item.status || '') }}</mat-icon>
+            <span class="accordion-title-text">
+              {{ item.iktatoszam }}
+              <ng-container *ngIf="hasKiegeszitesAttachment(item)">
+                · {{ getKiegeszitesName(item) }}
+              </ng-container>
+              <ng-container *ngIf="!hasKiegeszitesAttachment(item) && item.formName">
+                · {{ item.formName }}
+              </ng-container>
+            </span>
+          </mat-panel-title>
+          <mat-panel-description>{{ formatDate(item.datetime) }}</mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="accordion-content">
+          <div class="item-meta">
+            <span>Státusz: {{ item.status }}</span>
+            <span>Iktatószám: {{ item.iktatoszam }}</span>
+            <span>KR Érkeztetési szám: {{ item.krSzam }}</span>
+            <span *ngIf="hasFormTypeAttachment(item) && item.formName">Űrlap típus: {{ item.formName }}</span>
+          </div>
+          <div class="attachments-frame">
+            <div class="attachments-title">Csatolmányok</div>
+            <div class="attachment-row" *ngFor="let att of item.attachments">
+              <div class="attachment-name">{{ att.name }}</div>
+              <div class="attachment-actions">
+                <button mat-stroked-button color="primary" (click)="onViewAttachment()">View</button>
+                <button mat-stroked-button (click)="onDownloadAttachment()">Download</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
   </div>
 </div>
