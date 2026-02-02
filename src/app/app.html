@@ -15,9 +15,25 @@
 
     <nav class="sidebar" aria-label="Primary navigation">
       <mat-nav-list>
+        <a mat-list-item routerLink="/home" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }">
+          <mat-icon aria-hidden="false" aria-label="Kezdőoldal">home</mat-icon>
+          <span>Kezdőoldal</span>
+        </a>
         <a mat-list-item routerLink="/documents" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }">
           <mat-icon aria-hidden="false" aria-label="Dokumentumok">description</mat-icon>
           <span>Dokumentumok</span>
+        </a>
+        <a mat-list-item routerLink="/offices" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }">
+          <mat-icon aria-hidden="false" aria-label="Képviseletek">business</mat-icon>
+          <span>Képviseletek</span>
+        </a>
+        <a mat-list-item routerLink="/appointments" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }">
+          <mat-icon aria-hidden="false" aria-label="Időpontfoglalás">event</mat-icon>
+          <span>Időpontfoglalás</span>
+        </a>
+        <a mat-list-item routerLink="/information" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }">
+          <mat-icon aria-hidden="false" aria-label="Információk">info</mat-icon>
+          <span>Információk</span>
         </a>
       </mat-nav-list>
     </nav>

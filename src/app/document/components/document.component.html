@@ -1,7 +1,7 @@
 <div class="documents">
   <div class="search-wrapper">
     <mat-form-field class="search" appearance="outline">
-      <input matInput [formControl]="searchCtrl" placeholder="Search documents" (keydown.enter)="filterBySearch()">
+      <input matInput [formControl]="searchCtrl" placeholder="Search documents e.g.: ügyszám, iktatószám, ügyfél ..." (keydown.enter)="filterBySearch()">
     </mat-form-field>
 
     <div class="search-panel" [class.open]="showSearchPanel" *ngIf="showSearchPanel">
