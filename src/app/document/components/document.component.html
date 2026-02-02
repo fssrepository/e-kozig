@@ -39,7 +39,7 @@
             </mat-chip>
           </mat-chip-set>
 
-          <input matInput [formControl]="ugyfelCtrl" [matAutocomplete]="uauto" placeholder="Search ügyfél">
+          <input matInput [formControl]="ugyfelCtrl" [matAutocomplete]="uauto" placeholder="Ügyfél keresés">
 
           <mat-autocomplete #uauto="matAutocomplete" (optionSelected)="selectUgyfel($event.option.value)">
             <mat-option *ngFor="let option of filteredUgyfels$ | async" [value]="option">{{ option }}</mat-option>
@@ -101,7 +101,7 @@
             </mat-chip>
           </mat-chip-set>
 
-          <input matInput [formControl]="formCtrl" [matAutocomplete]="fauto" placeholder="Search form">
+          <input matInput [formControl]="formCtrl" [matAutocomplete]="fauto" placeholder="Űrlap keresés">
 
           <mat-autocomplete #fauto="matAutocomplete" (optionSelected)="selectForm($event.option.value)">
             <mat-option *ngFor="let option of filteredForms$ | async" [value]="option">{{ option }}</mat-option>
