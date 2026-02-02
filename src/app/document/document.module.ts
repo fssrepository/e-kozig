@@ -14,19 +14,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DocumentComponent } from './components/document.component';
 
 @NgModule({
-  declarations: [DocumentComponent],
   imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatAutocompleteModule,
-    MatChipsModule,
-    MatIconModule,
-    MatButtonModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatProgressSpinnerModule,
+    DocumentComponent,
     RouterModule.forChild([
       { path: '', component: DocumentComponent }
     ])
