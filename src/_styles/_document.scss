@@ -20,7 +20,10 @@
   display: flex; 
   justify-content: space-between; 
   font-size: 12px;
-  background: rgba(0,0,0,0.01);
+  background: rgba(255,255,255,0.98);
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
 }
 .footer-left { color: rgba(0,0,0,0.6); }
 .footer-right { color: rgba(0,0,0,0.4); font-style: italic; }
@@ -90,7 +93,149 @@ tr[mat-row], tr.mat-mdc-row, tr.mdc-data-table__row { cursor: pointer; }
 /* remove the old panel-chips area (now chips live in the input) */
 .panel-chips { display:none; }
 
+/* Date range dropdown */
+.date-wrapper { position: relative; }
+.date-btn { display:flex; align-items:center; gap:0.5rem; }
+.date-btn .arrow { transition: transform .18s ease; order: 1; }
+.date-btn .arrow.open { transform: rotate(180deg); }
+.date-btn .tick { color: var(--mat-sys-primary); }
+
+.date-panel { position: absolute; top: calc(100% + 6px); left: 0; width: 340px; max-height: 0; overflow: hidden; transition: max-height .22s ease; background: var(--mat-sys-surface); border-radius: 8px; padding: 8px; box-shadow: 0 6px 18px rgba(2,6,23,0.06); z-index: 100; }
+.date-panel.open { max-height: 320px; }
+.date-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.date-chips { margin-bottom: 0.25rem; }
+
 /* Table overlay for loading spinner */
 .table-container { position: relative; }
 .table-overlay { position: absolute; inset: 0; display:flex; align-items:center; justify-content:center; background: rgba(255,255,255,0.6); z-index: 10; }
+
+/* Detail view styles */
+.detail-view {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  gap: 0.5rem;
+}
+
+.detail-header button:first-child {
+  margin-right: auto;
+}
+
+.detail-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--mat-sys-surface);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  gap: 1rem;
+}
+
+.detail-top {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.detail-ugyfel {
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.detail-meta {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+mat-expansion-panel {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+  margin-bottom: 0.5rem !important;
+}
+
+mat-expansion-panel-header {
+  height: auto !important;
+  padding: 1rem !important;
+  background: rgba(0, 0, 0, 0.02) !important;
+}
+
+mat-panel-title {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 14px;
+}
+
+mat-panel-description {
+  justify-content: flex-end;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.accordion-content {
+  padding: 1rem;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.accordion-content p {
+  margin: 0;
+}
+
+.item-meta {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.65);
+  margin-bottom: 0.75rem;
+}
+
+.attachments-frame {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.01);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.attachments-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.attachment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.35rem 0;
+  border-top: 1px dashed rgba(0, 0, 0, 0.06);
+}
+
+.attachment-row:first-of-type {
+  border-top: none;
+}
+
+.attachment-name {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.75);
+  flex: 1;
+}
+
+.attachment-actions {
+  display: flex;
+  gap: 0.5rem;
+}
 

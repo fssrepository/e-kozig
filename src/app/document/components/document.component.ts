@@ -10,6 +10,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { Observable, startWith, map } from 'rxjs';
 import { DocumentItem } from '../models/document-item.interface';
 import { DocumentService } from '../services/document.service';
@@ -28,7 +31,10 @@ import { DocumentService } from '../services/document.service';
     MatButtonModule,
     MatTableModule,
     MatPaginatorModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatExpansionModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   styleUrls: ['../../../_styles/_document.scss'],
   templateUrl: './document.component.html',
@@ -48,6 +54,11 @@ export class DocumentComponent implements OnInit, AfterViewInit {
   filteredUgyfels$!: Observable<string[]>;
   showUgyfelPanel = false;
 
+  // Date range controls
+  dateFromCtrl = new FormControl<Date | null>(null);
+  dateToCtrl = new FormControl<Date | null>(null);
+  showDatePanel = false;
+
   // selected filter chips (üg yfels)
   chips: string[] = [];
   selectedFilters: string[] = [];
@@ -58,13 +69,21 @@ export class DocumentComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['icon', 'ugyfel', 'description', 'datetime'];
 
   loading = false;
+  selectedItem: DocumentItem | null = null;
+  expandedItemIds: Set<string> = new Set();
 
   @ViewChild('paginator') paginator!: MatPaginator;
 
   ngOnInit(): void {
     // Load documents from service
     this.documentService.getDocuments().subscribe(docs => {
-      this.documents = docs;
+      this.documents = docs.map((doc, index) => {
+        return {
+          ...doc,
+          id: `doc-${index}`,
+          searchKey: doc.searchKey.toLowerCase()
+        };
+      });
       this.sortDocuments();
       this.dataSource.data = this.documents;
     });
@@ -107,10 +126,53 @@ export class DocumentComponent implements OnInit, AfterViewInit {
   }
 
   selectSearchResult(doc: DocumentItem) {
-    // Close search panel and optionally navigate or highlight the selected document
+    // Close search panel and show detail view
     this.showSearchPanel = false;
     this.searchCtrl.setValue('', { emitEvent: false });
-    // You could emit an event or navigate here
+    this.selectedItem = doc;
+    this.expandedItemIds.clear();
+  }
+
+  selectTableRow(doc: DocumentItem) {
+    this.selectedItem = doc;
+    this.expandedItemIds.clear();
+  }
+
+  closeDetailView() {
+    this.selectedItem = null;
+    this.expandedItemIds.clear();
+    setTimeout(() => {
+      if (this.paginator) {
+        this.dataSource.paginator = this.paginator;
+        this.paginator.length = this.dataSource.data.length;
+        this.paginator.firstPage();
+      }
+    });
+  }
+
+  toggleAccordion(itemId: string) {
+    if (this.expandedItemIds.has(itemId)) {
+      this.expandedItemIds.delete(itemId);
+    } else {
+      this.expandedItemIds.add(itemId);
+    }
+  }
+
+  generateUgyszam(item: DocumentItem): string {
+    const baseNum = Math.abs(item.ugyfel.charCodeAt(0) * 1000 + (item.description.length * 10));
+    return `UGY-${String(baseNum % 999999).padStart(6, '0')}`;
+  }
+
+  onReply() {
+    window.alert('Új üzenet küldése az ügyhöz! (pl. e-papir)');
+  }
+
+  onViewAttachment() {
+    window.alert('Dokumentum megnyitasa Onya-ban (pl. javitasra)!');
+  }
+
+  onDownloadAttachment() {
+    window.alert('A dokumentum letoltese! (pl. pdf fájl)');
   }
 
   filterBySearch() {
@@ -172,11 +234,40 @@ export class DocumentComponent implements OnInit, AfterViewInit {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
     const target = event.target as HTMLElement;
-    const wrapper = document.querySelector('.ugyfel-wrapper');
-    if (!wrapper) return;
-    if (this.showUgyfelPanel && !wrapper.contains(target)) {
+    const ugyfelWrapper = document.querySelector('.ugyfel-wrapper');
+    if (this.showUgyfelPanel && ugyfelWrapper && !ugyfelWrapper.contains(target)) {
       this.showUgyfelPanel = false;
     }
+    const dateWrapper = document.querySelector('.date-wrapper');
+    if (this.showDatePanel && dateWrapper && !dateWrapper.contains(target)) {
+      this.showDatePanel = false;
+    }
+  }
+
+  toggleDatePanel() {
+    this.showDatePanel = !this.showDatePanel;
+  }
+
+  onDateChange() {
+    this.applyFilter();
+  }
+
+  removeDate(which: 'from' | 'to') {
+    if (which === 'from') {
+      this.dateFromCtrl.setValue(null);
+    } else {
+      this.dateToCtrl.setValue(null);
+    }
+    this.applyFilter();
+  }
+
+  get dateLabel(): string {
+    const from = this.dateFromCtrl.value;
+    const to = this.dateToCtrl.value;
+    if (!from && !to) return '';
+    const fromText = from ? this.formatShortDate(from) : '...';
+    const toText = to ? this.formatShortDate(to) : '...';
+    return `${fromText} - ${toText}`;
   }
 
   remove(chip: string) {
@@ -199,11 +290,26 @@ export class DocumentComponent implements OnInit, AfterViewInit {
         return db.getTime() - da.getTime();
       });
 
-      if (this.selectedFilters.length === 0) {
-        this.dataSource.data = sorted;
-      } else {
-        this.dataSource.data = sorted.filter(d => this.selectedFilters.includes(d.ugyfel));
+      let filtered = sorted;
+
+      if (this.selectedFilters.length > 0) {
+        filtered = filtered.filter(d => this.selectedFilters.includes(d.ugyfel));
       }
+
+      const from = this.dateFromCtrl.value;
+      const to = this.dateToCtrl.value;
+      if (from || to) {
+        const fromTime = from ? new Date(from.getFullYear(), from.getMonth(), from.getDate()).getTime() : null;
+        const toTime = to ? new Date(to.getFullYear(), to.getMonth(), to.getDate(), 23, 59, 59, 999).getTime() : null;
+        filtered = filtered.filter(d => {
+          const dt = this.parseDateTime(d.datetime).getTime();
+          if (fromTime !== null && dt < fromTime) return false;
+          if (toTime !== null && dt > toTime) return false;
+          return true;
+        });
+      }
+
+      this.dataSource.data = filtered;
       if (this.paginator) this.paginator.firstPage();
       this.loading = false;
     };
@@ -248,6 +354,10 @@ export class DocumentComponent implements OnInit, AfterViewInit {
     return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
   }
 
+  formatShortDate(d: Date): string {
+    return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+  }
+
   private parseDateTime(s: string): Date {
     // expected format: YYYY-MM-DD HH:mm or variants
     const parts = s.trim().split(' ');
@@ -263,5 +373,6 @@ export class DocumentComponent implements OnInit, AfterViewInit {
     const dt = new Date(s);
     return dt;
   }
+
 }
 
