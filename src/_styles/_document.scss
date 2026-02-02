@@ -1,0 +1,75 @@
+/* Document component styles moved from component inline styles */
+.documents { padding: 1rem; }
+.top-controls { display:flex; align-items:center; justify-content:space-between; gap: 0.75rem; }
+.left-controls { display:flex; align-items:center; }
+.right-controls { display:flex; align-items:center; }
+.search { margin-top: 0.75rem; min-width: 220px; max-width: 600px; width: 100%; }
+.chips { margin-top: 0.75rem; display:flex; gap:0.5rem; }
+.table-container { margin-top: 1rem; }
+table { width: 100%; }
+.paginator-row { display:flex; justify-content:flex-end; padding-top: 0.5rem; }
+.datetime-cell { text-align: right; }
+.datetime-header { text-align: right; }
+
+/* Row hover and read/unread styles (target runtime classes/attributes) */
+/* Use a pseudo-element on rows so the background and shadow are continuous (no breaks between cells) */
+tr[mat-row], tr.mat-mdc-row, tr.mdc-data-table__row, tr.mat-row { position: relative; }
+
+tr[mat-row]::before, tr.mat-mdc-row::before, tr.mdc-data-table__row::before, tr.mat-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 0;
+  background: transparent;
+  transition: box-shadow 0.18s ease, background-color 0.18s ease, transform 0.12s ease;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Hover: stronger but still subtle shadow */
+tr[mat-row]:hover::before, tr.mat-mdc-row:hover::before, tr.mdc-data-table__row:hover::before, tr.mat-row:hover::before {
+  box-shadow: 0 8px 24px rgba(2,6,23,0.08);
+  transform: translateY(-2px);
+}
+
+/* Read/unread states - read rows get a Gmail-like light grey-blue background, unread rows are bold */
+/* Gmail-like light grey-blue */
+$gmail-bg: #eef3fb;
+tr.read::before, tr[mat-row].read::before, tr.mat-mdc-row.read::before, tr.mdc-data-table__row.read::before {
+  background-color: $gmail-bg !important;
+}
+
+tr.unread td { font-weight: 700; }
+
+/* Remove cell dividers and ensure cells render above the pseudo-element */
+table { border-collapse: collapse; }
+tr[mat-row] td, tr.mat-mdc-row td, tr.mdc-data-table__row td { border-bottom: none !important; }
+
+td { background: transparent; position: relative; z-index: 1; transition: background 0.18s, color 0.12s; }
+
+tr[mat-row], tr.mat-mdc-row, tr.mdc-data-table__row { cursor: pointer; }
+
+/* Filters dropdown */
+.filters { margin-top: 0.5rem; display:flex; gap:0.75rem; align-items:flex-start; }
+.ugyfel-wrapper { position: relative; }
+.ugyfel-btn { display:flex; align-items:center; gap:0.5rem; }
+.ugyfel-btn .arrow { transition: transform .18s ease; order: 1;}
+.ugyfel-btn .arrow.open { transform: rotate(180deg);}
+.ugyfel-btn .tick { color: var(--mat-sys-primary);}
+
+
+.ugyfel-panel { position: absolute; top: calc(100% + 6px); left: 0; width: 320px; max-height: 0; overflow: hidden; transition: max-height .22s ease; background: var(--mat-sys-surface); border-radius: 8px; padding: 8px; box-shadow: 0 6px 18px rgba(2,6,23,0.06); z-index: 100; }
+.ugyfel-panel.open { max-height: 260px; }
+.ugyfeld-search { width: 100%; display:flex; align-items:center; gap:6px; }
+.ugyfeld-search .chip-list { display:flex; gap:6px; flex-wrap:wrap; padding:4px 0; max-width: 100%; }
+.chip-list mat-chip { margin: 2px 0; }
+/* remove the old panel-chips area (now chips live in the input) */
+.panel-chips { display:none; }
+
+/* Table overlay for loading spinner */
+.table-container { position: relative; }
+.table-overlay { position: absolute; inset: 0; display:flex; align-items:center; justify-content:center; background: rgba(255,255,255,0.6); z-index: 10; }
+

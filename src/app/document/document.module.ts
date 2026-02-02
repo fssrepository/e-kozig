@@ -15,6 +15,17 @@ import { DocumentComponent } from './components/document.component';
 
 @NgModule({
   imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatAutocompleteModule,
+    MatChipsModule,
+    MatIconModule,
+    MatButtonModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule,
     DocumentComponent,
     RouterModule.forChild([
       { path: '', component: DocumentComponent }
