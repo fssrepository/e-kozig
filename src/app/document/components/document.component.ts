@@ -14,7 +14,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { Observable, startWith, map } from 'rxjs';
-import { DocumentItem } from '../models/document-item.interface';
+import { DocumentItem, DocumentItemDetail } from '../models/document-item.interface';
 import { DocumentService } from '../services/document.service';
 
 @Component({
@@ -46,27 +46,37 @@ export class DocumentComponent implements OnInit, AfterViewInit {
   searchCtrl = new FormControl('');
   searchResults: DocumentItem[] = [];
   showSearchPanel = false;
-  options: string[] = ['Acme', 'Globex', 'Wayne Enterprises', 'Umbrella Corp', 'Initech', 'Stark Industries'];
-  filteredOptions$!: Observable<string[]>;
 
   // Ugyfél dropdown controls
   ugyfelCtrl = new FormControl('');
   filteredUgyfels$!: Observable<string[]>;
   showUgyfelPanel = false;
 
+  // Form dropdown controls
+  formCtrl = new FormControl('');
+  filteredForms$!: Observable<string[]>;
+  showFormPanel = false;
+  selectedForms: string[] = [];
+
   // Date range controls
   dateFromCtrl = new FormControl<Date | null>(null);
   dateToCtrl = new FormControl<Date | null>(null);
   showDatePanel = false;
 
+  // Unread filter
+  showUnreadOnly = false;
+
   // selected filter chips (üg yfels)
   chips: string[] = [];
   selectedFilters: string[] = [];
 
+  // Search chips for AND filtering
+  searchTerms: string[] = [];
+
   documents: DocumentItem[] = [];
 
   dataSource = new MatTableDataSource<DocumentItem>(this.documents);
-  displayedColumns: string[] = ['icon', 'ugyfel', 'description', 'datetime'];
+  displayedColumns: string[] = ['icon', 'name', 'status', 'description', 'datetime'];
 
   loading = false;
   selectedItem: DocumentItem | null = null;
@@ -77,15 +87,38 @@ export class DocumentComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     // Load documents from service
     this.documentService.getDocuments().subscribe(docs => {
+      const forms = this.documentService.getFormNames();
+      const names = this.documentService.getNames();
+      const statuses = this.documentService.getStatuses();
+      
       this.documents = docs.map((doc, index) => {
+        const items = (doc.items || []).map((item, i) => ({
+          ...item,
+          type: item.type || forms[(index + i) % forms.length],
+          formName: item.formName || item.type || forms[(index + i) % forms.length],
+          name: doc.ugyfel,
+          status: item.status || statuses[(index + i) % statuses.length]
+        })).sort((a, b) => {
+          const da = this.parseDateTime(a.datetime);
+          const db = this.parseDateTime(b.datetime);
+          return db.getTime() - da.getTime();
+        });
+        
+        // Latest item is first (items are sorted descending)
+        const latestItem = items[0];
+        
         return {
           ...doc,
           id: `doc-${index}`,
-          searchKey: doc.searchKey.toLowerCase()
+          name: doc.ugyfel,
+          status: latestItem?.status || statuses[index % statuses.length],
+          formName: latestItem?.formName || doc.formName,
+          datetime: latestItem?.datetime || doc.datetime,
+          items
         };
       });
       this.sortDocuments();
-      this.dataSource.data = this.documents;
+      this.applyFilter();
     });
 
     // Setup search bar to show results panel based on searchKey
@@ -107,35 +140,65 @@ export class DocumentComponent implements OnInit, AfterViewInit {
       startWith(''),
       map(value => this._filterUgyfel(value || ''))
     );
+
+    this.filteredForms$ = this.formCtrl.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filterForm(value || ''))
+    );
   }
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
   }
 
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
-    return this.options.filter(option => option.toLowerCase().includes(filterValue));
-  }
-
   private _filterUgyfel(value: string): string[] {
     const filterValue = value.toLowerCase();
-    return this.options
+    return this.documentService.getNames()
       .filter(option => option.toLowerCase().includes(filterValue))
       .filter(option => !this.selectedFilters.includes(option));
   }
 
+  private _filterForm(value: string): string[] {
+    const filterValue = value.toLowerCase();
+    return this.documentService.getFormNames()
+      .filter(option => option.toLowerCase().includes(filterValue))
+      .filter(option => !this.selectedForms.includes(option));
+  }
+
   selectSearchResult(doc: DocumentItem) {
-    // Close search panel and show detail view
+    // Close search panel and find the processed version from this.documents
     this.showSearchPanel = false;
     this.searchCtrl.setValue('', { emitEvent: false });
-    this.selectedItem = doc;
-    this.expandedItemIds.clear();
+    
+    // Find the matching document from the processed list using ugyfel as the unique key
+    const processedDoc = this.documents.find(d => d.ugyfel === doc.ugyfel);
+    
+    if (processedDoc) {
+      // Use selectTableRow to ensure consistent processing
+      this.selectTableRow(processedDoc);
+    } else {
+      this.expandedItemIds.clear();
+    }
   }
 
   selectTableRow(doc: DocumentItem) {
-    this.selectedItem = doc;
+    // Sort items by datetime descending
+    const sortedDoc = {
+      ...doc,
+      items: (doc.items || []).slice().sort((a, b) => {
+        const da = this.parseDateTime(a.datetime);
+        const db = this.parseDateTime(b.datetime);
+        return db.getTime() - da.getTime();
+      })
+    };
+    this.selectedItem = sortedDoc;
     this.expandedItemIds.clear();
+  }
+
+  getItemType(item: DocumentItemDetail, index: number): string {
+    if (item.type) return item.type;
+    const forms = this.documentService.getFormNames();
+    return forms[index % forms.length];
   }
 
   closeDetailView() {
@@ -159,12 +222,27 @@ export class DocumentComponent implements OnInit, AfterViewInit {
   }
 
   generateUgyszam(item: DocumentItem): string {
-    const baseNum = Math.abs(item.ugyfel.charCodeAt(0) * 1000 + (item.description.length * 10));
+    const baseNum = Math.abs(item.ugyfel.charCodeAt(0) * 1000 + ((item.formName || '').length * 10));
     return `UGY-${String(baseNum % 999999).padStart(6, '0')}`;
+  }
+
+  getStatusIcon(status: string): string {
+    const statusIconMap: { [key: string]: string } = {
+      'Beküldve': 'send',
+      'Iktatva': 'folder',
+      'Tájékoztató': 'info',
+      'Hiba': 'error',
+      'Lezárva': 'check_circle'
+    };
+    return statusIconMap[status] || 'description';
   }
 
   onReply() {
     window.alert('Új üzenet küldése az ügyhöz! (pl. e-papir)');
+  }
+
+  onManualClose() {
+    window.alert('Manuális Lezárás');
   }
 
   onViewAttachment() {
@@ -176,25 +254,28 @@ export class DocumentComponent implements OnInit, AfterViewInit {
   }
 
   filterBySearch() {
-    const query = (this.searchCtrl.value || '').trim().toLowerCase();
+    const query = (this.searchCtrl.value || '').trim();
     if (!query) return;
 
-    // Close search panel
+    // Add as search chip if not already present
+    if (!this.searchTerms.includes(query)) {
+      this.searchTerms.push(query);
+    }
+
+    // Clear input and close search panel
+    this.searchCtrl.setValue('', { emitEvent: false });
     this.showSearchPanel = false;
 
-    // Filter table by search query (matches searchKey)
-    this.loading = true;
-    setTimeout(() => {
-      const filtered = this.documents.filter(doc => doc.searchKey.includes(query));
-      const sorted = filtered.sort((a, b) => {
-        const da = this.parseDateTime(a.datetime);
-        const db = this.parseDateTime(b.datetime);
-        return db.getTime() - da.getTime();
-      });
-      this.dataSource.data = sorted;
-      if (this.paginator) this.paginator.firstPage();
-      this.loading = false;
-    }, 300);
+    // Apply filter with all search terms
+    this.applyFilter();
+  }
+
+  removeSearchTerm(term: string) {
+    const i = this.searchTerms.indexOf(term);
+    if (i >= 0) {
+      this.searchTerms.splice(i, 1);
+      this.applyFilter();
+    }
   }
 
   addChip(value: string) {
@@ -234,18 +315,41 @@ export class DocumentComponent implements OnInit, AfterViewInit {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
     const target = event.target as HTMLElement;
+    
+    // Check if click is inside a Material datepicker overlay
+    const isDatepickerClick = target.closest('.mat-datepicker-popup, .mat-datepicker-content, .mat-calendar');
+    
     const ugyfelWrapper = document.querySelector('.ugyfel-wrapper');
     if (this.showUgyfelPanel && ugyfelWrapper && !ugyfelWrapper.contains(target)) {
       this.showUgyfelPanel = false;
     }
     const dateWrapper = document.querySelector('.date-wrapper');
-    if (this.showDatePanel && dateWrapper && !dateWrapper.contains(target)) {
+    if (this.showDatePanel && dateWrapper && !dateWrapper.contains(target) && !isDatepickerClick) {
       this.showDatePanel = false;
+    }
+    const formWrapper = document.querySelector('.form-wrapper');
+    if (this.showFormPanel && formWrapper && !formWrapper.contains(target)) {
+      this.showFormPanel = false;
     }
   }
 
   toggleDatePanel() {
     this.showDatePanel = !this.showDatePanel;
+  }
+
+  toggleFormPanel() {
+    this.showFormPanel = !this.showFormPanel;
+    if (this.showFormPanel) {
+      setTimeout(() => {
+        const el = document.querySelector('.form-search input') as HTMLInputElement | null;
+        el?.focus();
+      }, 120);
+    }
+  }
+
+  toggleUnreadFilter() {
+    this.showUnreadOnly = !this.showUnreadOnly;
+    this.applyFilter();
   }
 
   onDateChange() {
@@ -270,6 +374,21 @@ export class DocumentComponent implements OnInit, AfterViewInit {
     return `${fromText} - ${toText}`;
   }
 
+  selectForm(value: string) {
+    if (!value) return;
+    if (!this.selectedForms.includes(value)) {
+      this.selectedForms.push(value);
+    }
+    this.formCtrl.setValue('');
+    this.applyFilter();
+  }
+
+  removeForm(value: string) {
+    const i = this.selectedForms.indexOf(value);
+    if (i >= 0) this.selectedForms.splice(i, 1);
+    this.applyFilter();
+  }
+
   remove(chip: string) {
     if (chip === 'Ügyfél') return;
     const i = this.chips.indexOf(chip);
@@ -292,8 +411,27 @@ export class DocumentComponent implements OnInit, AfterViewInit {
 
       let filtered = sorted;
 
+      // Apply search terms with AND logic
+      if (this.searchTerms.length > 0) {
+        filtered = filtered.filter(d => 
+          this.searchTerms.every(term => d.searchKey.includes(term.toLowerCase()))
+        );
+      }
+
       if (this.selectedFilters.length > 0) {
         filtered = filtered.filter(d => this.selectedFilters.includes(d.ugyfel));
+      }
+
+      if (this.selectedForms.length > 0) {
+        filtered = filtered.filter(d => 
+          d.items && d.items.some(item => 
+            item.formName && this.selectedForms.includes(item.formName)
+          )
+        );
+      }
+
+      if (this.showUnreadOnly) {
+        filtered = filtered.filter(d => d.unread === true);
       }
 
       const from = this.dateFromCtrl.value;

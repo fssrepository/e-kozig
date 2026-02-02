@@ -1,8 +1,10 @@
 export interface DocumentItem {
   id?: string;
   icon: string;
+  name?: string;
+  status?: string;
   ugyfel: string;
-  description: string;
+  formName?: string;
   datetime: string;
   unread?: boolean;
   searchKey: string;
@@ -10,7 +12,10 @@ export interface DocumentItem {
 }
 
 export interface DocumentItemDetail {
-  description: string;
+  type?: string;
+  name?: string;
+  status?: string;
+  formName?: string;
   datetime: string;
   iktatoszam: string;
   krSzam: string;
