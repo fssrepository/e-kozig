@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit, HostListener, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, HostListener, inject, ChangeDetectorRef, ElementRef, OnDestroy, ChangeDetectionStrategy, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -20,6 +20,7 @@ import { DocumentService } from '../services/document.service';
 @Component({
   selector: 'app-document',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -40,11 +41,30 @@ import { DocumentService } from '../services/document.service';
   templateUrl: './document.component.html',
 
 })
-export class DocumentComponent implements OnInit, AfterViewInit {
+export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
   private documentService = inject(DocumentService);
   private cdr = inject(ChangeDetectorRef);
+  private zone = inject(NgZone);
   private filtersScrollLeft = 0;
   private scrollLockInterval: any = null;
+  private intersectionObserver: IntersectionObserver | null = null;
+  private mobilePageSize = 10;
+  private mobileVisibleCount = 10;
+  private mobileFilteredDocuments: DocumentItem[] = [];
+  private lastFilteredDocuments: DocumentItem[] = [];
+  private resizeHandler?: () => void;
+  private pullStartY = 0;
+  private pullDistanceInternal = 0;
+  private pullTouchMoveHandler?: (event: TouchEvent) => void;
+  private pullTouchStartHandler?: (event: TouchEvent) => void;
+  private pullTouchEndHandler?: () => void;
+  private readonly pullThreshold = 64;
+  private readonly pullMax = 120;
+
+  isMobileView = window.innerWidth <= 768;
+  mobileLoadingMore = false;
+  pullActive = false;
+  pullRefreshing = false;
 
   searchCtrl = new FormControl('');
   searchResults: DocumentItem[] = [];
@@ -93,6 +113,8 @@ export class DocumentComponent implements OnInit, AfterViewInit {
   expandedItemIds: Set<string> = new Set();
 
   @ViewChild('paginator') paginator!: MatPaginator;
+  @ViewChild('tableScrollSentinel') tableScrollSentinel!: ElementRef<HTMLElement>;
+  @ViewChild('tableContainer') tableContainer!: ElementRef<HTMLElement>;
 
   ngOnInit(): void {
     // Load documents from service
@@ -163,7 +185,17 @@ export class DocumentComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
+    this.setupResizeListener();
+    this.updateViewMode(window.innerWidth);
+    this.updatePaginatorMode();
+    this.setupMobileIntersectionObserver();
+    this.setupPullToRefresh();
+  }
+
+  ngOnDestroy(): void {
+    this.teardownMobileIntersectionObserver();
+    this.teardownResizeListener();
+    this.teardownPullToRefresh();
   }
 
   private _filterUgyfel(value: string): string[] {
@@ -227,8 +259,8 @@ export class DocumentComponent implements OnInit, AfterViewInit {
     this.selectedItem = null;
     this.expandedItemIds.clear();
     setTimeout(() => {
-      if (this.paginator) {
-        this.dataSource.paginator = this.paginator;
+      this.updatePaginatorMode();
+      if (!this.isMobileView && this.paginator) {
         this.paginator.length = this.dataSource.data.length;
         this.paginator.firstPage();
       }
@@ -629,6 +661,7 @@ export class DocumentComponent implements OnInit, AfterViewInit {
   applyFilter() {
     // Simulate a short loading delay and refresh the table view
     this.loading = true;
+    this.mobileLoadingMore = false;
 
     const update = () => {
       const sorted = this.documents.slice().sort((a, b) => {
@@ -681,13 +714,43 @@ export class DocumentComponent implements OnInit, AfterViewInit {
         });
       }
 
-      this.dataSource.data = filtered;
-      if (this.paginator) this.paginator.firstPage();
+      this.lastFilteredDocuments = filtered;
+      this.updateTableData(filtered);
+      this.refreshMobileObserver();
       this.loading = false;
+      this.cdr.markForCheck();
     };
-
     // Debounce / simulate server delay
     setTimeout(update, 400);
+  }
+
+  private setupResizeListener() {
+    this.teardownResizeListener();
+    this.resizeHandler = () => this.updateViewMode(window.innerWidth);
+    window.addEventListener('resize', this.resizeHandler, { passive: true });
+  }
+
+  private teardownResizeListener() {
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+    }
+    this.resizeHandler = undefined;
+  }
+
+  private updateViewMode(width: number) {
+    const nextIsMobile = width <= 768;
+    if (nextIsMobile === this.isMobileView) return;
+
+    this.isMobileView = nextIsMobile;
+    this.updatePaginatorMode();
+    if (this.lastFilteredDocuments.length > 0) {
+      this.updateTableData(this.lastFilteredDocuments);
+    }
+    this.refreshMobileObserver();
+    if (!this.isMobileView) {
+      this.resetPullState();
+    }
+    this.cdr.markForCheck();
   }
 
   refresh() {
@@ -698,7 +761,185 @@ export class DocumentComponent implements OnInit, AfterViewInit {
       this.sortDocuments();
       this.applyFilter();
       this.loading = false;
+      this.pullRefreshing = false;
+      this.resetPullState();
+      this.cdr.markForCheck();
     }, 500);
+  }
+
+  get pullDistance(): number {
+    return this.pullRefreshing ? this.pullThreshold : this.pullDistanceInternal;
+  }
+
+  get pullProgress(): number {
+    if (this.pullRefreshing) return 100;
+    return Math.min(100, Math.round((this.pullDistanceInternal / this.pullThreshold) * 100));
+  }
+
+  private setupPullToRefresh() {
+    if (!this.tableContainer) return;
+    this.teardownPullToRefresh();
+
+    const container = this.tableContainer.nativeElement;
+    this.pullTouchStartHandler = (event: TouchEvent) => {
+      if (!this.isMobileView || this.loading || this.mobileLoadingMore || this.pullRefreshing) return;
+      if (container.scrollTop > 0) return;
+      this.pullActive = true;
+      this.pullStartY = event.touches[0]?.clientY ?? 0;
+      this.pullDistanceInternal = 0;
+      this.cdr.markForCheck();
+    };
+
+    this.pullTouchMoveHandler = (event: TouchEvent) => {
+      if (!this.pullActive) return;
+      const currentY = event.touches[0]?.clientY ?? 0;
+      const delta = Math.max(0, currentY - this.pullStartY);
+      this.pullDistanceInternal = Math.min(this.pullMax, delta);
+      if (this.pullDistanceInternal > 0) {
+        event.preventDefault();
+      }
+      this.cdr.markForCheck();
+    };
+
+    this.pullTouchEndHandler = () => {
+      if (!this.pullActive) return;
+      this.pullActive = false;
+      if (this.pullDistanceInternal >= this.pullThreshold) {
+        this.pullRefreshing = true;
+        this.cdr.markForCheck();
+        this.refresh();
+        return;
+      }
+      this.resetPullState();
+      this.cdr.markForCheck();
+    };
+
+    container.addEventListener('touchstart', this.pullTouchStartHandler, { passive: true });
+    container.addEventListener('touchmove', this.pullTouchMoveHandler, { passive: false });
+    container.addEventListener('touchend', this.pullTouchEndHandler, { passive: true });
+    container.addEventListener('touchcancel', this.pullTouchEndHandler, { passive: true });
+  }
+
+  private teardownPullToRefresh() {
+    if (!this.tableContainer) return;
+    const container = this.tableContainer.nativeElement;
+    if (this.pullTouchStartHandler) {
+      container.removeEventListener('touchstart', this.pullTouchStartHandler);
+    }
+    if (this.pullTouchMoveHandler) {
+      container.removeEventListener('touchmove', this.pullTouchMoveHandler);
+    }
+    if (this.pullTouchEndHandler) {
+      container.removeEventListener('touchend', this.pullTouchEndHandler);
+      container.removeEventListener('touchcancel', this.pullTouchEndHandler);
+    }
+    this.pullTouchStartHandler = undefined;
+    this.pullTouchMoveHandler = undefined;
+    this.pullTouchEndHandler = undefined;
+  }
+
+  private resetPullState() {
+    this.pullActive = false;
+    this.pullDistanceInternal = 0;
+  }
+
+  private updateTableData(filtered: DocumentItem[]) {
+    if (this.isMobileView) {
+      this.mobileFilteredDocuments = filtered;
+      this.mobileVisibleCount = Math.min(this.mobilePageSize, filtered.length);
+      this.dataSource.data = filtered.slice(0, this.mobileVisibleCount);
+    } else {
+      this.dataSource.data = filtered;
+      if (this.paginator) this.paginator.firstPage();
+    }
+  }
+
+  private refreshMobileObserver() {
+    if (!this.isMobileView || !this.tableScrollSentinel || !this.tableContainer) return;
+    if (!this.intersectionObserver) {
+      this.setupMobileIntersectionObserver();
+      return;
+    }
+
+    const sentinel = this.tableScrollSentinel.nativeElement;
+    this.intersectionObserver.unobserve(sentinel);
+    this.intersectionObserver.observe(sentinel);
+
+    const root = this.tableContainer.nativeElement;
+    const sentinelRect = sentinel.getBoundingClientRect();
+    const rootRect = root.getBoundingClientRect();
+    const isVisible = sentinelRect.top <= rootRect.bottom && sentinelRect.bottom >= rootRect.top;
+    if (isVisible) {
+      this.loadMoreMobileItems();
+    }
+  }
+
+  private updatePaginatorMode() {
+    if (this.isMobileView) {
+      this.dataSource.paginator = null;
+    } else if (this.paginator) {
+      this.dataSource.paginator = this.paginator;
+    }
+  }
+
+  private setupMobileIntersectionObserver() {
+    if (!this.isMobileView || !this.tableScrollSentinel || !this.tableContainer) return;
+    this.teardownMobileIntersectionObserver();
+
+    const root = this.tableContainer.nativeElement;
+    this.intersectionObserver = new IntersectionObserver(
+      entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          this.loadMoreMobileItems();
+        }
+      },
+      { root, rootMargin: '0px 0px 80px 0px', threshold: 0.1 }
+    );
+
+    this.intersectionObserver.observe(this.tableScrollSentinel.nativeElement);
+  }
+
+  private teardownMobileIntersectionObserver() {
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+      this.intersectionObserver = null;
+    }
+  }
+
+  private loadMoreMobileItems() {
+    console.log("load items 1");
+    if (!this.isMobileView || this.loading || this.mobileLoadingMore) return;
+    console.log("load items 2");
+    if (this.mobileVisibleCount >= this.mobileFilteredDocuments.length) return;
+    console.log("load items 3");
+
+    this.zone.run(() => {
+      console.log("load items 33");
+      console.debug('[documents] loadMoreMobileItems start', {
+        visible: this.mobileVisibleCount,
+        total: this.mobileFilteredDocuments.length
+      });
+      this.mobileLoadingMore = true;
+      this.cdr.markForCheck();
+    });
+
+    console.log("load items 4");
+
+    const nextCount = Math.min(this.mobileVisibleCount + this.mobilePageSize, this.mobileFilteredDocuments.length);
+
+    setTimeout(() => {
+      console.log("load items 5");
+      this.zone.run(() => {
+        console.debug('[documents] loadMoreMobileItems apply', {
+          nextVisible: nextCount,
+          total: this.mobileFilteredDocuments.length
+        });
+        this.mobileVisibleCount = nextCount;
+        this.dataSource.data = this.mobileFilteredDocuments.slice(0, this.mobileVisibleCount);
+        this.mobileLoadingMore = false;
+        this.cdr.markForCheck();
+      });
+    }, 1200);
   }
 
   private sortDocuments() {

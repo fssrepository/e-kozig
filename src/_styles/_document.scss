@@ -469,6 +469,26 @@ tr[mat-row], tr.mat-mdc-row, tr.mdc-data-table__row { cursor: pointer; }
 /* Table overlay for loading spinner */
 .table-container { position: relative; }
 .table-overlay { position: absolute; inset: 0; display:flex; align-items:center; justify-content:center; background: rgba(255,255,255,0.6); z-index: 10; }
+.pull-indicator {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  overflow: hidden;
+  transition: height 0.12s ease-out;
+}
+
+.pull-indicator.active {
+  margin-bottom: 4px;
+}
+.mobile-load-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 0 16px;
+  min-height: 32px;
+}
+.table-sentinel { height: 24px; width: 100%; }
 
 .mat-column-icon,
 td.mat-column-icon {
@@ -552,6 +572,8 @@ td.mat-column-icon .mat-icon {
     flex-wrap: nowrap;
     padding: 0 0.5rem;
     gap: 0.5rem;
+    height:0;
+    visibility: hidden;
   }
 
   .left-controls,
@@ -571,10 +593,6 @@ td.mat-column-icon .mat-icon {
     z-index: 2;
   }
 
-  .filters.panel-open {
-    // Keep overflow-x: auto to maintain scroll behavior
-    // Panels use position: fixed to escape clipping
-  }
 
   .ugyfel-wrapper,
   .date-wrapper,
@@ -593,6 +611,7 @@ td.mat-column-icon .mat-icon {
     position: relative;
     z-index: 0;
     padding: 0 0.5rem;
+    padding-bottom: 24px;
   }
 
   .ugyfel-panel,
