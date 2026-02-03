@@ -1,5 +1,6 @@
 <div class="documents" *ngIf="!selectedItem">
-  <div class="search-wrapper">
+  <div class="search-row">
+    <div class="search-wrapper">
     <mat-form-field class="search" appearance="outline">
       <mat-chip-set class="search-chips" *ngIf="searchTerms.length > 0">
         <mat-chip *ngFor="let term of searchTerms" removable (removed)="removeSearchTerm(term)">
@@ -20,11 +21,12 @@
         <span class="footer-right">Press ENTER</span>
       </div>
     </div>
+    </div>
   </div>
 
-  <div class="filters">
+  <div class="filters" [class.panel-open]="showUgyfelPanel || showDatePanel || showFormPanel || showStatusPanel">
     <div class="ugyfel-wrapper">
-      <button mat-stroked-button class="ugyfel-btn" (click)="toggleUgyfelPanel()" [attr.aria-expanded]="showUgyfelPanel">
+      <button mat-stroked-button class="ugyfel-btn" [class.active]="showUgyfelPanel" (click)="toggleUgyfelPanel()" [attr.aria-expanded]="showUgyfelPanel">
         <mat-icon *ngIf="selectedFilters.length > 0" class="tick">check</mat-icon>
         <span class="label">Ügyfél:&nbsp;{{ selectedFilters.length === 0 ? '' : (selectedFilters.length === 1 ? selectedFilters[0] : selectedFilters[0] + ' +' + (selectedFilters.length - 1)) }}</span>
         <mat-icon class="arrow" [class.open]="showUgyfelPanel">expand_more</mat-icon>
@@ -49,7 +51,7 @@
     </div>
 
     <div class="date-wrapper">
-      <button mat-stroked-button class="date-btn" (click)="toggleDatePanel()" [attr.aria-expanded]="showDatePanel">
+      <button mat-stroked-button class="date-btn" [class.active]="showDatePanel" (click)="toggleDatePanel()" [attr.aria-expanded]="showDatePanel">
         <mat-icon *ngIf="dateFromCtrl.value || dateToCtrl.value" class="tick">check</mat-icon>
         <span class="label">Dátum:&nbsp;{{ dateLabel }}</span>
         <mat-icon class="arrow" [class.open]="showDatePanel">expand_more</mat-icon>
@@ -71,22 +73,22 @@
 
         <div class="date-inputs">
           <mat-form-field appearance="outline">
-            <input matInput [matDatepicker]="fromPicker" placeholder="From" [formControl]="dateFromCtrl" (dateChange)="onDateChange()">
+            <input matInput [matDatepicker]="fromPicker" placeholder="Tól" [formControl]="dateFromCtrl" (dateChange)="onDateChange()">
             <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
-            <mat-datepicker #fromPicker></mat-datepicker>
+            <mat-datepicker #fromPicker xPosition="start" yPosition="below"></mat-datepicker>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <input matInput [matDatepicker]="toPicker" placeholder="To" [formControl]="dateToCtrl" (dateChange)="onDateChange()">
+            <input matInput [matDatepicker]="toPicker" placeholder="Ig" [formControl]="dateToCtrl" (dateChange)="onDateChange()">
             <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
-            <mat-datepicker #toPicker></mat-datepicker>
+            <mat-datepicker #toPicker xPosition="start" yPosition="below"></mat-datepicker>
           </mat-form-field>
         </div>
       </div>
     </div>
 
     <div class="form-wrapper">
-      <button mat-stroked-button class="form-btn" (click)="toggleFormPanel()" [attr.aria-expanded]="showFormPanel">
+      <button mat-stroked-button class="form-btn" [class.active]="showFormPanel" (click)="toggleFormPanel()" [attr.aria-expanded]="showFormPanel">
         <mat-icon *ngIf="selectedForms.length > 0" class="tick">check</mat-icon>
         <span class="label">Űrlap:&nbsp;{{ selectedForms.length === 0 ? '' : (selectedForms.length === 1 ? selectedForms[0] : selectedForms[0] + ' +' + (selectedForms.length - 1)) }}</span>
         <mat-icon class="arrow" [class.open]="showFormPanel">expand_more</mat-icon>
@@ -111,7 +113,7 @@
     </div>
 
     <div class="status-wrapper">
-      <button mat-stroked-button class="status-btn" (click)="toggleStatusPanel()" [attr.aria-expanded]="showStatusPanel">
+      <button mat-stroked-button class="status-btn" [class.active]="showStatusPanel" (click)="toggleStatusPanel()" [attr.aria-expanded]="showStatusPanel">
         <mat-icon *ngIf="selectedStatuses.length > 0" class="tick">check</mat-icon>
         <span class="label">Státusz:&nbsp;{{ selectedStatuses.length === 0 ? '' : (selectedStatuses.length === 1 ? selectedStatuses[0] : selectedStatuses[0] + ' +' + (selectedStatuses.length - 1)) }}</span>
         <mat-icon class="arrow" [class.open]="showStatusPanel">expand_more</mat-icon>
@@ -168,15 +170,22 @@
       </ng-container>
 
       <ng-container matColumnDef="name">
-        <td mat-cell *matCellDef="let element">{{ element.name }}</td>
-      </ng-container>
-
-      <ng-container matColumnDef="status">
-        <td mat-cell *matCellDef="let element">{{ element.status }}</td>
+        <td mat-cell *matCellDef="let element" class="col-name">
+          <div class="name-primary">{{ element.name }}</div>
+          <div class="mobile-meta">
+            <span class="mobile-status">{{ element.status }}</span>
+            <span class="mobile-sep">·</span>
+            <span class="mobile-form">{{ element.formName }}</span>
+          </div>
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="description">
-        <td mat-cell *matCellDef="let element">{{ element.formName }}</td>
+        <td mat-cell *matCellDef="let element" class="col-form">{{ element.formName }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <td mat-cell *matCellDef="let element" class="col-status">{{ element.status }}</td>
       </ng-container>
 
       <ng-container matColumnDef="datetime">

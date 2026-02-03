@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit, HostListener, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, HostListener, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -42,10 +42,14 @@ import { DocumentService } from '../services/document.service';
 })
 export class DocumentComponent implements OnInit, AfterViewInit {
   private documentService = inject(DocumentService);
+  private cdr = inject(ChangeDetectorRef);
+  private filtersScrollLeft = 0;
+  private scrollLockInterval: any = null;
 
   searchCtrl = new FormControl('');
   searchResults: DocumentItem[] = [];
   showSearchPanel = false;
+  userBadgeCount = 1;
 
   // Ugyfél dropdown controls
   ugyfelCtrl = new FormControl('');
@@ -82,7 +86,7 @@ export class DocumentComponent implements OnInit, AfterViewInit {
   documents: DocumentItem[] = [];
 
   dataSource = new MatTableDataSource<DocumentItem>(this.documents);
-  displayedColumns: string[] = ['icon', 'name', 'status', 'description', 'datetime'];
+  displayedColumns: string[] = ['icon', 'name', 'description', 'status', 'datetime'];
 
   loading = false;
   selectedItem: DocumentItem | null = null;
@@ -338,15 +342,140 @@ export class DocumentComponent implements OnInit, AfterViewInit {
     this.applyFilter();
   }
 
-  toggleUgyfelPanel() {
-    this.showUgyfelPanel = !this.showUgyfelPanel;
-    if (this.showUgyfelPanel) {
-      // focus the input after a tick
-      setTimeout(() => {
-        const el = document.querySelector('.ugyfeld-search input') as HTMLInputElement | null;
-        el?.focus();
-      }, 120);
+  private smoothScroll(container: HTMLElement, target: number, duration = 240) {
+    const start = container.scrollLeft;
+    const delta = target - start;
+    const startTime = performance.now();
+    const ease = (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
+
+    const step = (now: number) => {
+      const progress = Math.min(1, (now - startTime) / duration);
+      container.scrollLeft = start + delta * ease(progress);
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      }
+    };
+
+    requestAnimationFrame(step);
+  }
+
+  private lockFiltersScroll(container: HTMLElement, target: number) {
+    let frames = 0;
+    const lock = () => {
+      container.scrollLeft = target;
+      if (frames++ < 8) {
+        requestAnimationFrame(lock);
+      }
+    };
+    lock();
+    setTimeout(() => (container.scrollLeft = target), 100);
+    setTimeout(() => (container.scrollLeft = target), 200);
+    setTimeout(() => (container.scrollLeft = target), 350);
+  }
+
+  private startScrollLock() {
+    const container = document.querySelector('.filters') as HTMLElement | null;
+    if (!container) return;
+    const target = this.filtersScrollLeft;
+    
+    // Clear any existing lock
+    if (this.scrollLockInterval) {
+      clearInterval(this.scrollLockInterval);
     }
+    
+    // Continuously lock scroll position while panel is open
+    this.scrollLockInterval = setInterval(() => {
+      if (container.scrollLeft !== target) {
+        container.scrollLeft = target;
+      }
+    }, 16);
+  }
+
+  private stopScrollLock() {
+    if (this.scrollLockInterval) {
+      clearInterval(this.scrollLockInterval);
+      this.scrollLockInterval = null;
+    }
+  }
+
+  private restoreFiltersScroll() {
+    const container = document.querySelector('.filters') as HTMLElement | null;
+    if (!container) return;
+    const target = this.filtersScrollLeft;
+    container.scrollLeft = target;
+    requestAnimationFrame(() => (container.scrollLeft = target));
+    setTimeout(() => (container.scrollLeft = target), 50);
+    setTimeout(() => (container.scrollLeft = target), 150);
+  }
+
+  private positionPanel(btnSelector: string, panelSelector: string) {
+    // Only position panels on mobile (width <= 768px)
+    if (window.innerWidth > 768) return;
+    
+    const btn = document.querySelector(btnSelector) as HTMLElement | null;
+    const panel = document.querySelector(panelSelector) as HTMLElement | null;
+    if (!btn || !panel) return;
+
+    const btnRect = btn.getBoundingClientRect();
+    panel.style.top = `${btnRect.bottom + 6}px`;
+    panel.style.left = '16px';
+  }
+
+  private scrollFiltersToButton(selector: string, openPanel: () => void, focusSelector?: string) {
+    // Only scroll on mobile (width <= 768px)
+    if (window.innerWidth > 768) {
+      openPanel();
+      if (focusSelector) {
+        setTimeout(() => {
+          const el = document.querySelector(focusSelector) as HTMLInputElement | null;
+          el?.focus({ preventScroll: true });
+        }, 50);
+      }
+      return;
+    }
+
+    const btn = document.querySelector(selector) as HTMLElement | null;
+    const container = document.querySelector('.filters') as HTMLElement | null;
+    if (!btn || !container) {
+      openPanel();
+      return;
+    }
+
+    const btnRect = btn.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    const targetScroll = container.scrollLeft + (btnRect.left - containerRect.left) - 20;
+    this.filtersScrollLeft = targetScroll;
+
+    this.smoothScroll(container, targetScroll, 240);
+
+    setTimeout(() => {
+      openPanel();
+      this.cdr.detectChanges();
+      this.lockFiltersScroll(container, targetScroll);
+      this.startScrollLock();
+      if (focusSelector) {
+        setTimeout(() => {
+          const el = document.querySelector(focusSelector) as HTMLInputElement | null;
+          el?.focus({ preventScroll: true });
+        }, 50);
+      }
+      // Position panel based on button location
+      setTimeout(() => this.positionPanel(selector, focusSelector?.replace(' input', '') || ''), 10);
+    }, 260);
+  }
+
+  toggleUgyfelPanel() {
+    if (this.showUgyfelPanel) {
+      this.showUgyfelPanel = false;
+      this.stopScrollLock();
+      this.restoreFiltersScroll();
+      return;
+    }
+
+    this.scrollFiltersToButton('.ugyfel-btn', () => {
+      this.showUgyfelPanel = true;
+      setTimeout(() => this.positionPanel('.ugyfel-btn', '.ugyfel-panel'), 20);
+    }, '.ugyfeld-search input');
   }
 
   @HostListener('document:click', ['$event'])
@@ -359,33 +488,59 @@ export class DocumentComponent implements OnInit, AfterViewInit {
     const ugyfelWrapper = document.querySelector('.ugyfel-wrapper');
     if (this.showUgyfelPanel && ugyfelWrapper && !ugyfelWrapper.contains(target)) {
       this.showUgyfelPanel = false;
+      this.stopScrollLock();
+      this.restoreFiltersScroll();
     }
     const dateWrapper = document.querySelector('.date-wrapper');
     if (this.showDatePanel && dateWrapper && !dateWrapper.contains(target) && !isDatepickerClick) {
       this.showDatePanel = false;
+      this.stopScrollLock();
+      this.restoreFiltersScroll();
     }
     const formWrapper = document.querySelector('.form-wrapper');
     if (this.showFormPanel && formWrapper && !formWrapper.contains(target)) {
       this.showFormPanel = false;
+      this.stopScrollLock();
+      this.restoreFiltersScroll();
     }
     const statusWrapper = document.querySelector('.status-wrapper');
     if (this.showStatusPanel && statusWrapper && !statusWrapper.contains(target)) {
       this.showStatusPanel = false;
+      this.stopScrollLock();
+      this.restoreFiltersScroll();
     }
   }
 
   toggleDatePanel() {
-    this.showDatePanel = !this.showDatePanel;
+    if (this.showDatePanel) {
+      this.showDatePanel = false;
+      this.stopScrollLock();
+      this.restoreFiltersScroll();
+      return;
+    }
+
+    this.scrollFiltersToButton('.date-btn', () => {
+      this.showDatePanel = true;
+      setTimeout(() => this.positionPanel('.date-btn', '.date-panel'), 20);
+    });
   }
 
   toggleFormPanel() {
-    this.showFormPanel = !this.showFormPanel;
     if (this.showFormPanel) {
-      setTimeout(() => {
-        const el = document.querySelector('.form-search input') as HTMLInputElement | null;
-        el?.focus();
-      }, 120);
+      this.showFormPanel = false;
+      this.stopScrollLock();
+      this.restoreFiltersScroll();
+      return;
     }
+
+    this.scrollFiltersToButton('.form-btn', () => {
+      this.showFormPanel = true;
+      setTimeout(() => this.positionPanel('.form-btn', '.form-panel'), 20);
+    }, '.form-search input');
+  }
+
+  onUserSelect() {
+    window.alert('Felhasználó választása.');
   }
 
   toggleUnreadFilter() {
@@ -427,6 +582,7 @@ export class DocumentComponent implements OnInit, AfterViewInit {
   removeForm(value: string) {
     const i = this.selectedForms.indexOf(value);
     if (i >= 0) this.selectedForms.splice(i, 1);
+    this.formCtrl.updateValueAndValidity();
     this.applyFilter();
   }
 
@@ -442,17 +598,22 @@ export class DocumentComponent implements OnInit, AfterViewInit {
   removeStatus(value: string) {
     const i = this.selectedStatuses.indexOf(value);
     if (i >= 0) this.selectedStatuses.splice(i, 1);
+    this.statusCtrl.updateValueAndValidity();
     this.applyFilter();
   }
 
   toggleStatusPanel() {
-    this.showStatusPanel = !this.showStatusPanel;
     if (this.showStatusPanel) {
-      setTimeout(() => {
-        const el = document.querySelector('.status-search input') as HTMLInputElement | null;
-        el?.focus();
-      }, 120);
+      this.showStatusPanel = false;
+      this.stopScrollLock();
+      this.restoreFiltersScroll();
+      return;
     }
+
+    this.scrollFiltersToButton('.status-btn', () => {
+      this.showStatusPanel = true;
+      setTimeout(() => this.positionPanel('.status-btn', '.status-panel'), 20);
+    }, '.status-search input');
   }
 
   remove(chip: string) {
@@ -461,6 +622,7 @@ export class DocumentComponent implements OnInit, AfterViewInit {
     if (i >= 0) this.chips.splice(i, 1);
     const j = this.selectedFilters.indexOf(chip);
     if (j >= 0) this.selectedFilters.splice(j, 1);
+    this.ugyfelCtrl.updateValueAndValidity();
     this.applyFilter();
   }
 

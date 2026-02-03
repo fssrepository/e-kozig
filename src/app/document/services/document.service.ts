@@ -106,7 +106,7 @@ export class DocumentService {
       icon: 'description',
       status: 'Tájékoztató',
       ugyfel: 'Kovács János',
-      formName: '2601',
+      formName: '2608INT',
       datetime: '2026-02-02 10:00',
       unread: true,
       searchKey: 'kovács jános ikt-2026-000123 kr-450021 2601 ikt-2026-000124 kr-450022 2608 ikt-2026-000125 kr-450023 2608int',

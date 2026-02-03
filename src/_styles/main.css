@@ -57,7 +57,6 @@ main {
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
-  padding: 1rem;
   box-sizing: inherit;
   position: relative;
 }
@@ -215,7 +214,6 @@ main {
   flex-direction: column;
   align-items: stretch;
   position: sticky;
-  top: 1rem;
   align-self: flex-start;
   max-height: calc(100vh - 2rem);
   overflow: auto;
@@ -245,9 +243,60 @@ main {
   font-weight: 600;
 }
 
+.menu-badge {
+  margin-left: auto;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #e53935;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .content-area {
+  top:0;
   flex: 1;
   background: transparent;
   min-height: 420px;
-  padding: 1rem;
+
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1000;
+    max-height: 100vh;
+  }
+
+  .mobile-menu-open .sidebar {
+    display: flex;
+  }
+
+  .sidebar-top {
+    display: none;
+  }
+  
+  /* Separate styles for Dokumentumok page */
+  .content-area:has(.documents) {
+    padding-top: 0;
+  }
+  
+  /* Add top padding to all other pages */
+  .content-area:not(:has(.documents)) {
+    padding-top: 3.5rem;
+    box-sizing: border-box;
+  }
+  
+  .content {
+    overflow-x: hidden;
+  }
 }
