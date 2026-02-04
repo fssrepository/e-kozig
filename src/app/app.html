@@ -12,6 +12,52 @@
 <main class="main">
   <div class="content">
 
+    <!-- Mobile Menu Button -->
+    <button mat-icon-button class="mobile-menu-btn-global" (click)="toggleMobileMenu()" aria-label="Menü">
+      <mat-icon>menu</mat-icon>
+      <span class="badge-dot" *ngIf="menuBadgeTotal > 0">{{ menuBadgeTotal }}</span>
+    </button>
+
+    <!-- User Selector Button - Global -->
+    <button mat-icon-button class="user-selector-btn-global" (click)="onUserSelect()" aria-label="Felhasználó választása">
+      <span class="user-initial">F</span>
+      <span class="badge-dot" *ngIf="userBadgeCount > 0">{{ userBadgeCount }}</span>
+    </button>
+
+    <!-- Mobile Menu Panel -->
+    <div class="mobile-menu-backdrop" [class.open]="showMobileMenu" (click)="closeMobileMenu()" *ngIf="showMobileMenu"></div>
+    <div class="mobile-menu-panel-global" [class.open]="showMobileMenu">
+      <div class="menu-header">
+        <img src="assets/img/NAV_UPO_logo_RGB_fit.svg" alt="NAV ÜPO" />
+      </div>
+      <div class="menu-items">
+        <a class="menu-item" routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMobileMenu()">
+          <mat-icon>home</mat-icon>
+          <span>Kezdőoldal</span>
+          <span class="item-badge" *ngIf="menuBadges.home > 0">{{ menuBadges.home }}</span>
+        </a>
+        <a class="menu-item" routerLink="/documents" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMobileMenu()">
+          <mat-icon>description</mat-icon>
+          <span>Dokumentumok</span>
+          <span class="item-badge" *ngIf="menuBadges.documents > 0">{{ menuBadges.documents }}</span>
+        </a>
+        <a class="menu-item" routerLink="/offices" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMobileMenu()">
+          <mat-icon>business</mat-icon>
+          <span>Képviseletek</span>
+          <span class="item-badge" *ngIf="menuBadges.offices > 0">{{ menuBadges.offices }}</span>
+        </a>
+        <a class="menu-item" routerLink="/appointments" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMobileMenu()">
+          <mat-icon>event</mat-icon>
+          <span>Időpontfoglalás</span>
+          <span class="item-badge" *ngIf="menuBadges.appointments > 0">{{ menuBadges.appointments }}</span>
+        </a>
+        <a class="menu-item" routerLink="/information" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMobileMenu()">
+          <mat-icon>info</mat-icon>
+          <span>Információk</span>
+          <span class="item-badge" *ngIf="menuBadges.information > 0">{{ menuBadges.information }}</span>
+        </a>
+      </div>
+    </div>
 
     <nav class="sidebar" aria-label="Primary navigation">
       <div class="sidebar-top" aria-hidden="true">
@@ -21,22 +67,27 @@
         <a mat-list-item routerLink="/home" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }">
           <mat-icon aria-hidden="false" aria-label="Kezdőoldal">home</mat-icon>
           <span>Kezdőoldal</span>
+          <span class="menu-badge" *ngIf="menuBadges.home > 0">{{ menuBadges.home }}</span>
         </a>
         <a mat-list-item routerLink="/documents" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }">
           <mat-icon aria-hidden="false" aria-label="Dokumentumok">description</mat-icon>
           <span>Dokumentumok</span>
+          <span class="menu-badge" *ngIf="menuBadges.documents > 0">{{ menuBadges.documents }}</span>
         </a>
         <a mat-list-item routerLink="/offices" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }">
           <mat-icon aria-hidden="false" aria-label="Képviseletek">business</mat-icon>
           <span>Képviseletek</span>
+          <span class="menu-badge" *ngIf="menuBadges.offices > 0">{{ menuBadges.offices }}</span>
         </a>
         <a mat-list-item routerLink="/appointments" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }">
           <mat-icon aria-hidden="false" aria-label="Időpontfoglalás">event</mat-icon>
           <span>Időpontfoglalás</span>
+          <span class="menu-badge" *ngIf="menuBadges.appointments > 0">{{ menuBadges.appointments }}</span>
         </a>
         <a mat-list-item routerLink="/information" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }">
           <mat-icon aria-hidden="false" aria-label="Információk">info</mat-icon>
           <span>Információk</span>
+          <span class="menu-badge" *ngIf="menuBadges.information > 0">{{ menuBadges.information }}</span>
         </a>
       </mat-nav-list>
     </nav>

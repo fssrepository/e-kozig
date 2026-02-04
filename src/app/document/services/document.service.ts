@@ -13,7 +13,7 @@ export class DocumentService {
     'Rácz Noémi', 'Oláh Balázs', 'Fekete Eszter', 'Vincze Márton', 'Bíró Judit'
   ];
 
-  private statuses = ['Beküldve', 'Iktatva', 'Tájékoztató', 'Hiba', 'Lezárva'];
+  private statuses = ['Beküldve', 'Iktatva', 'Tájékoztató', 'Hiba', 'Lezárva', 'Elfogadásra vár'];
 
   private formNames = [
     "2601", "2608", "2608INT", "2611", "26110", "2620", "26251", "2629EUD", "2643TAO", "2649",
@@ -104,9 +104,9 @@ export class DocumentService {
   private documents: DocumentItem[] = [
     {
       icon: 'description',
-      status: 'Tájékoztató',
+      status: 'Elfogadásra vár',
       ugyfel: 'Kovács János',
-      formName: '2601',
+      formName: '2608INT',
       datetime: '2026-02-02 10:00',
       unread: true,
       searchKey: 'kovács jános ikt-2026-000123 kr-450021 2601 ikt-2026-000124 kr-450022 2608 ikt-2026-000125 kr-450023 2608int',
@@ -139,7 +139,7 @@ export class DocumentService {
         {
           type: '2608INT',
           formName: '2608INT',
-          status: 'Tájékoztató',
+          status: 'Elfogadásra vár',
           datetime: '2026-02-02 10:00',
           iktatoszam: 'IKT-2026-000125',
           krSzam: 'KR-450023',
@@ -286,7 +286,7 @@ export class DocumentService {
     },
     {
       icon: 'description',
-      status: 'Tájékoztató',
+      status: 'Elfogadásra vár',
       ugyfel: 'Varga László',
       formName: '2658',
       datetime: '2026-02-02 16:20',
@@ -318,7 +318,7 @@ export class DocumentService {
         {
           type: '2658',
           formName: '2658',
-          status: 'Tájékoztató',
+          status: 'Elfogadásra vár',
           datetime: '2026-02-02 16:20',
           iktatoszam: 'IKT-2026-000402',
           krSzam: 'KR-450303',
