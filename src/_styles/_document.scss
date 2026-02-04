@@ -550,12 +550,7 @@ td.mat-column-icon {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100dvh;
-  overflow: hidden;
-  position: fixed;
-  inset: 0;
-  background: var(--mat-sys-surface);
-  z-index: 900;
+  position: relative;
 }
 
 .detail-header {
@@ -680,6 +675,15 @@ td.mat-column-icon {
 }
 
 @media (max-width: 768px) {
+  .detail-view {
+    height: 100dvh;
+    overflow: hidden;
+    position: fixed;
+    inset: 0;
+    background: var(--mat-sys-surface);
+    z-index: 900;
+  }
+
   .documents {
     display: flex;
     flex-direction: column;
