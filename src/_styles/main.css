@@ -186,6 +186,8 @@ main {
   .content {
     flex-direction: column;
     width: max-content;
+    height: 100dvh;
+    overflow: hidden;
   }
 
   .divider {
@@ -211,7 +213,7 @@ main {
   border-radius: 8px;
   box-shadow: 0 0 0 1px rgba(0,0,0,0.02);
   padding: 0.5rem;
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: stretch;
   position: sticky;
@@ -264,6 +266,7 @@ main {
   flex: 1;
   background: transparent;
   min-height: 420px;
+  padding-top: 0.75rem;
 
 }
 
@@ -279,21 +282,16 @@ main {
   }
 
   .mobile-menu-open .sidebar {
-    display: flex;
+    display: none;
   }
 
   .sidebar-top {
     display: none;
   }
   
-  /* Separate styles for Dokumentumok page */
-  .content-area:has(.documents) {
-    padding-top: 0;
-  }
-  
   /* Add top padding to all other pages */
-  .content-area:not(:has(.documents)) {
-    padding-top: 3rem;
+  .content-area {
+    padding-top: 0.75rem;
     box-sizing: border-box;
   }
   

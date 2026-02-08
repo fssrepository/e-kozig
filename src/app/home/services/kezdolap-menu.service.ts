@@ -1,3 +1,17 @@
+import { Injectable } from '@angular/core';
+
+export interface MenuSubmenu {
+  title: string;
+  items: string[];
+}
+
+export interface MenuNode {
+  title: string;
+  submenus: MenuSubmenu[];
+  items: string[];
+}
+
+const RAW_MENU = `
 Részletes keresés (főmenü) (pls. put search icon right hand side)
 Ügyféliránytű (főmenü)
 Adókulcsok, járulékmértékek (sub fomenu)
@@ -292,3 +306,85 @@ Koncertkalendárium (sub főmenü)
 Kiadványok (sub főmenü)
 Elérhetőség (sub főmenü)
 Egyenruházat (főmenü)
+`;
+
+@Injectable({ providedIn: 'root' })
+export class KezdolapMenuService {
+  private readonly menu = this.parseMenu(RAW_MENU);
+
+  getMenu(): MenuNode[] {
+    return this.menu;
+  }
+
+  private parseMenu(raw: string): MenuNode[] {
+    const lines = raw
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
+
+    const menus: MenuNode[] = [];
+    let currentMenu: MenuNode | null = null;
+    let currentSubmenu: MenuSubmenu | null = null;
+
+    const isMainMenu = (line: string): boolean => line.includes('(főmenü)');
+    const isSubMenu = (line: string): boolean =>
+      line.includes('(sub fomenu)') || line.includes('(sub főmenü)');
+    const stripMain = (line: string): string => line.split('(főmenü)')[0].trim();
+    const stripSub = (line: string): string =>
+      line
+        .replace('(sub fomenu)', '')
+        .replace('(sub főmenü)', '')
+        .trim();
+
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i];
+
+      if (isMainMenu(line)) {
+        const title = stripMain(line);
+        currentMenu = {
+          title,
+          submenus: [],
+          items: []
+        };
+        menus.push(currentMenu);
+        currentSubmenu = null;
+        continue;
+      }
+
+      if (isSubMenu(line)) {
+        if (!currentMenu) {
+          continue;
+        }
+
+        const title = stripSub(line);
+        const nextLine = lines[i + 1];
+        if (!nextLine || isMainMenu(nextLine) || isSubMenu(nextLine)) {
+          currentMenu.items.push(`${title} menu item`);
+          currentSubmenu = null;
+          continue;
+        }
+
+        currentSubmenu = {
+          title,
+          items: []
+        };
+        currentMenu.submenus.push(currentSubmenu);
+        continue;
+      }
+
+      if (currentSubmenu) {
+        currentSubmenu.items.push(line);
+      } else if (currentMenu) {
+        currentMenu.items.push(line);
+      }
+    }
+
+    menus.forEach(menu => {
+      if (menu.submenus.length === 0 && menu.items.length === 0) {
+        menu.title = `${menu.title} menu item`;
+      }
+    });
+
+    return menus;
+  }
+}

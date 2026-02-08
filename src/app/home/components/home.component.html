@@ -1,6 +1,107 @@
 <div class="page-container">
-  <h1>Kezdőoldal</h1>
-  <p>Üdvözöljük a kezdőoldalon!</p>
-  <p>A gombsor eltüntetése, az adókalendár akár az egész weblap jobb felső sarokban is lehetne egy naptár ikon formájában. (fehasználó választó sorában az eredeti alkalmazásnál)</p>
-  <p>Elég helyünk van ahhoz is, hogy közvetlenül a NAV logo alá (bal felső sarok a képernyőn), mellé tegyük ezeket az ikonokat, de még a menüsor fölé.</p>
+  <div class="search-block">
+    <div class="search-row">
+      <div class="search-wrapper">
+        <mat-form-field class="search" appearance="outline">
+          <mat-chip-set class="search-chips" *ngIf="searchTerms.length > 0">
+            <mat-chip *ngFor="let term of searchTerms" removable (removed)="removeSearchTerm(term)">
+              {{ term }}
+              <button matChipRemove aria-label="Remove search term">✕</button>
+            </mat-chip>
+          </mat-chip-set>
+          <input
+            matInput
+            [formControl]="searchCtrl"
+            placeholder="Téma és Kifejezés keresés..."
+            (keydown.enter)="addSearchTerm()"
+          >
+          <button
+            mat-icon-button
+            matSuffix
+            class="detail-toggle"
+            [class.open]="showDetailedSearch"
+            (click)="toggleDetailedSearch()"
+            [attr.aria-pressed]="showDetailedSearch"
+            aria-label="Részletes keresés"
+          >
+            <mat-icon>{{ showDetailedSearch ? 'close' : 'tune' }}</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="detail-panel" *ngIf="showDetailedSearch">
+      <div class="detail-panel-inner">
+        <div class="panel-header" *ngIf="shouldShowBack()">
+          <button mat-icon-button class="back-btn" (click)="goBack()" aria-label="Vissza">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+          <span class="panel-title">{{ getHeaderTitle() }}</span>
+        </div>
+
+        <div class="panel-list" *ngIf="!currentMenu">
+          <button class="panel-item" type="button" *ngFor="let menu of menus" (click)="selectMenu(menu)">
+            <span>{{ formatMenuLabel(menu.title) }}</span>
+            <mat-icon *ngIf="menu.submenus.length > 0 || menu.items.length > 0">chevron_right</mat-icon>
+          </button>
+        </div>
+
+        <div class="panel-list" *ngIf="currentMenu && !currentSubmenu">
+          <button class="panel-item" type="button" *ngFor="let submenu of currentMenu.submenus" (click)="selectSubmenu(submenu)">
+            <span>{{ formatMenuLabel(submenu.title) }}</span>
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+          <button class="panel-item" type="button" *ngFor="let item of currentMenu.items" (click)="selectItem(item)">
+            <span>{{ formatMenuLabel(item) }}</span>
+          </button>
+        </div>
+
+        <div class="panel-list" *ngIf="currentMenu && currentSubmenu">
+          <button class="panel-item" type="button" *ngFor="let item of currentSubmenu.items" (click)="selectItem(item)">
+            <span>{{ formatMenuLabel(item) }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <section class="detail-popup" *ngIf="showPopup">
+      <div class="detail-popup-inner">
+        <div class="popup-header">
+          <h2>{{ popupTitle }}</h2>
+          <button mat-icon-button (click)="closePopup()" aria-label="Bezárás">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <p>A menüpontokhoz kapcsolódó tartalom.</p>
+      </div>
+    </section>
+  </div>
+
+  <section class="readme-content">
+    <h2>E-Közig prototípus (nav.gov.hu)</h2>
+    <p>
+      A legtöbb közigazgatási fejlesztés (például a NAV Ügyfélportál) zárt, integrált
+      környezetben készül, ezért az utólagos módosítás lassú és rendkívül drága.
+      Ha azonban a felületi prototípus már a fejlesztés korai fázisában elérhető a
+      felhasználók számára véleményezésre, a NAV meglepetések nélkül építheti ki a
+      háttérfolyamatokat, akár 80% költségmegtakarítást elérve.
+    </p>
+    <p>
+      A korai felületi prototípuson végzett korrekció órákban, míg a későbbi integrált
+      rendszerben végzett javítás hónapokban mérhető. A prototípus itt érhető el:
+      <a href="https://fssrepository.github.io/e-kozig/" target="_blank" rel="noopener">felületi prototípus</a>.
+    </p>
+    <p>
+      A GitHub integrált környezetet biztosít a közös munkához:
+      <a href="https://github.com/fssrepository/e-kozig/" target="_blank" rel="noopener">forráskód</a>
+      és
+      <a href="https://github.com/fssrepository/e-kozig/issues" target="_blank" rel="noopener">vitafórum</a>.
+      Így a külső szakmai szervezetek (például a könyvelői kamara) bevonása garantálja a
+      hatékony közös karbantartást és a magasabb minőséget.
+    </p>
+    <figure>
+      <img src="assets/img/process.png" alt="Folyamatábra">
+      <figcaption>Folyamatábra a prototípus és a háttérfolyamatok együttműködéséről.</figcaption>
+    </figure>
+  </section>
 </div>
