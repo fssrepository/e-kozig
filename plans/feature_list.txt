@@ -23,12 +23,14 @@ a kezdolapon legyen pl. a video, hogy mukodik stb., bemutatkozo szoveg stb. leir
 
 uj dokumentum / uj level - ez egy menu button (kinyilo) - angularban - a bal also sarokba rakni, es kijon - mind az accordionnal, mind a dokumentumok search-nel legyen jelen
 
-szja 1% felajanlas
+view button click in accordion and open the integrated onya popup ("differentiate view and edit mode" - put this text into the content of that popup)
+detailed search - show all the document type like a menu
+
+popup elobukkan, rairjuk online kitolto - dokumentum kereses, es letrehozas a szokasos modon (onya-ban ket felulet) - "az onya fel percenkent kuldje a hatterbe az adatokat - draft mentes"
+a szoveget rakjuk az onya popup-ra
 
 Szamlak menu
 ------------
-
-a stisztika fab button jelenljen meg szamlaknal, ha egy ugyfel ki van valasztva
 
 Adozoi es foglalkoztatasi adatok - a bal oldali menuben - a jobb oldali általánosabb, nem csak adóhatóság
 
@@ -45,43 +47,38 @@ status ikon, bizonylat sorszama/vevo neve/elado neve (3 sorban) + statusz + kial
 
 szamlak, nyugtak, vamhatarozatok,egyeb
 
-e-szja - dokumentum kezeles kepernyon - rakkattintva mas kepernyo, ahol el lehet fogadni a kiajanlott szja bevallast - kiajanlott statusz
-
 az e-AFA a Szamlak-ba lenne beintegralhato, es user valaszto filter az elso, bevallasi idoszak
 
 szamla soroknal, AFA bevallasi idoszakba tenni - statisztika overlay gomb az uj szamla gomb felett
 
-szamlak statusza szuro - settings menu szamlak
-
-szamla felhasznalo - user selector menu - felhasznalo popup + tab
+szamlak statusza szuro
 
 "Számlák" menupont - kilistazza a szamlakat - alul egy gomb, ahol uj szamlat lehet kiallitani - popup es ez lenne a NAV online Szamlazoja a billingo helyett
 
-popup elobukkan, rairjuk online kitolto - dokumentum kereses, es letrehozas a szokasos modon (onya-ban ket felulet) - "az onya fel percenkent kuldje a hatterbe az adatokat - draft mentes"
+upo menu
+--------
 
-szamlazo menu (NAV sajat szamlazo programjanak integracioja) - az online szamla beallitas a user selectornal van - rakkattint popup, es ott tab-os kialakitas - felhasznaloi adatok/ online szamla
+settings menu szamlak
 
-onya kitolto/online szamla beallitasai, settings menu-ben (user selector)
+szamla felhasznalo - upo menu - felhasznalo popup + tab
+
+szamlazo menu (NAV sajat szamlazo programjanak integracioja) - az online szamla beallitas a upo menuben van - rakkattint popup, es ott tab-os kialakitas - felhasznaloi adatok/ online szamla
+
+onya kitolto/online szamla beallitasai, settings menu-ben (upo menuben)
 
 M2M regisztráció
 
 Adónaptár (esedekes bevallasok/hianyzo bevallasok)
 
-upo menu
---------
+szja 1% felajanlas
 
 lehet az uzenetek menu nem kell
 
 lehet jobb lenne desktopon is a 3 vizszintes vonalu menu gomb, es maga a statikus menu eltavolitasa
 
-balance gombra rakkattintva megjelenik egy sub menu lista vissza gombbal - ugy mint a youtube-ban
+balance gombra rakkattintva megjelenik egy sub menu lista vissza gombbal - ugy mint a youtube-ban (adoellenorzes folyamatban)
 
 amikor info gombra kattintok, mutassa a teljes ablakos popup-ot infovan emailel, video chat ikonnal, kagylo ikonnal
-
-Uzenet frame set mellette egy info ikon (ami kinyitja az oldalt) - bal oldali menuben (tehat olyan, mintha submrnus lenne)
-Adóhatósági Ellenőrzés folyamatban, rakkattintva popup benne info oldal
-Rendszer Uzenetek - legutolso jelenik meg - rakkattintva info ablak
-lehet pontos leiras mit kellene csinalni, adóhatósági ellenőrzés is pl. a dokumentumok keeredoben - esetleg vhol megjeleniteni, hogy folyamatban - a NAV Upo menu tetejen
 
 felhasználó hozzaadasa + gomb - switch user felulet
 
