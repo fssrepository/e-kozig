@@ -1,50 +1,3 @@
-Kezdolap
---------
-
-balance gombra rakkattintva megjelenik egy sub menu lista vissza gombbal - ugy mint a youtube-ban
-
-Tema vagy kifejezes kereses a placeholder a szuroben - viszont ha csak belekattintunk megjelenik a menu, ha entert nyomunk akkor meg szur a tartalomra
-
-kezdolap-on szuro az accordion piros szam, almenu talalat, ketszeres accordion almenunek
-
---- ez ugy mukodnek, mint a NAV - vagy a youtube - nyil, es sub menu, es visszanyil a sub menubol - nem accordion
-
-feature_list.txt - a menupontok tartalma
-
-A kezdolap szuronek (menu/tartalom szuro) ugy kellene kinezni, hogy mind mobilon, mind desktopon van egy textbox a szendwich mellett, es amikor gepelunk a kezdolapot eltakarva jonnek elo az elemek, ha entert nyomunk - ahogy search for all result, akkor a kezdolapot eltakaro popup jelenik meg az eredményekkel, a popup header is the menu item, and below is the content
-
-Info icon a Kezdolap panel cimke felett - talan nehany menut oda kellene rakni, ha kinyilik, hogy jobban latszodjon, mit takar - de lehet, hogy a popup-ban utalas lesz ra, hogy ez az, ami a nav.gov.hu-n ez (pl. menu cimke neve)
-
-kezdőlap - searchbar next to rhe szendics menu - itt ha rakattint kijon a menu, es tovabb type-olva szur (vagy lehet maradjon ugy ahogy autocompleter
-popupban jelenik meg az aloldal, tehat a fooldal nem frissul alatta
-
-főmenü alatt levőek submenuk - ez egy harmonika legyen (latszodjon, hogy elvalasztva vannak az egyes blokkok egymastol)
-es ervenyesuljon ra a szuro textbox submenu szinten is, es mobilon teljes szelesseg legyen, gyakorlatilag egy grid, desktopon 5 oszlop
-
-ha nem fer ki, akkor scrollable hosszaban, de vizszintesen sohasem
-
-a főmenük, light szurke hatter (mint egy header), a sub főmenük, csak vastag betusek,
-az alatta levo sub elemek elemek egy tabbal beljebb vannak, es szimpla betusek, nem felkover
-
-amikor valamelyik menure rakattintunk, akar fomenu, akar sub fomenu, akar elem,
-akkor egy popup jelenik meg a kezdolap felett, es fejlec az elem, es content az elem content-je
-
-a menu dinamikus, tehat egy angular variable-bol jon es nem statikusan a html-be generalt
-
-a search text - place holde Menu/Tartalom keresés
-
-a kezdolap menu-re kattintva, gyakorlatilag egy info gomb jelenik meg, ami a nav.gov.hu felulete lenne (gyakorlatilag a szendvics ikon helyett)
-
-lehet jobb lenne desktopon is a 3 vizszintes vonalu menu gomb, es maga a statikus menu eltavolitasa (igy a nav.gov.hu feluletehez passzolna - es nagyban meg lehetne jeleniteni akarmit - anelkul, hogy a stilus valtozik)
-
-forraskod itt tekinthető meg gomb a kezdőlapon (github link mögötte)
-kezdolap - konyveloi kamara tudja karbantartani - egeszsegnyilvantarto rendszert orvoso kamara
-
-kezdolap kijelolve, ez egy kozossegi fejlesztes, mi celt szolgal stb. (gyakorlatilag a github readme struktúralt bemasolasa)
-
-egy szervekezeti abra - egy load balancerrol es egy http szerverrol (Felület - UI (angular)) - 
-es a backend modulokrol (szja/afa/szamla/dokumentumok modul stb.) - a loadbalancer tablaban egymas alatt - NAV / Kormanyablak / ...
-
 Dokumentumok:
 -------------
 uj level popup ket gomb - onya,e-papir gombok
@@ -70,12 +23,14 @@ a kezdolapon legyen pl. a video, hogy mukodik stb., bemutatkozo szoveg stb. leir
 
 uj dokumentum / uj level - ez egy menu button (kinyilo) - angularban - a bal also sarokba rakni, es kijon - mind az accordionnal, mind a dokumentumok search-nel legyen jelen
 
-szja 1% felajanlas
+view button click in accordion and open the integrated onya popup ("differentiate view and edit mode" - put this text into the content of that popup)
+detailed search - show all the document type like a menu
+
+popup elobukkan, rairjuk online kitolto - dokumentum kereses, es letrehozas a szokasos modon (onya-ban ket felulet) - "az onya fel percenkent kuldje a hatterbe az adatokat - draft mentes"
+a szoveget rakjuk az onya popup-ra
 
 Szamlak menu
 ------------
-
-a stisztika fab button jelenljen meg szamlaknal, ha egy ugyfel ki van valasztva
 
 Adozoi es foglalkoztatasi adatok - a bal oldali menuben - a jobb oldali általánosabb, nem csak adóhatóság
 
@@ -92,37 +47,38 @@ status ikon, bizonylat sorszama/vevo neve/elado neve (3 sorban) + statusz + kial
 
 szamlak, nyugtak, vamhatarozatok,egyeb
 
-e-szja - dokumentum kezeles kepernyon - rakkattintva mas kepernyo, ahol el lehet fogadni a kiajanlott szja bevallast - kiajanlott statusz
-
 az e-AFA a Szamlak-ba lenne beintegralhato, es user valaszto filter az elso, bevallasi idoszak
 
 szamla soroknal, AFA bevallasi idoszakba tenni - statisztika overlay gomb az uj szamla gomb felett
 
-szamlak statusza szuro - settings menu szamlak
-
-szamla felhasznalo - user selector menu - felhasznalo popup + tab
+szamlak statusza szuro
 
 "Számlák" menupont - kilistazza a szamlakat - alul egy gomb, ahol uj szamlat lehet kiallitani - popup es ez lenne a NAV online Szamlazoja a billingo helyett
 
-popup elobukkan, rairjuk online kitolto - dokumentum kereses, es letrehozas a szokasos modon (onya-ban ket felulet) - "az onya fel percenkent kuldje a hatterbe az adatokat - draft mentes"
+upo menu
+--------
 
-szamlazo menu (NAV sajat szamlazo programjanak integracioja) - az online szamla beallitas a user selectornal van - rakkattint popup, es ott tab-os kialakitas - felhasznaloi adatok/ online szamla
+settings menu szamlak
 
-onya kitolto/online szamla beallitasai, settings menu-ben (user selector)
+szamla felhasznalo - upo menu - felhasznalo popup + tab
+
+szamlazo menu (NAV sajat szamlazo programjanak integracioja) - az online szamla beallitas a upo menuben van - rakkattint popup, es ott tab-os kialakitas - felhasznaloi adatok/ online szamla
+
+onya kitolto/online szamla beallitasai, settings menu-ben (upo menuben)
 
 M2M regisztráció
 
 Adónaptár (esedekes bevallasok/hianyzo bevallasok)
 
-upo menu
---------
+szja 1% felajanlas
+
+lehet az uzenetek menu nem kell
+
+lehet jobb lenne desktopon is a 3 vizszintes vonalu menu gomb, es maga a statikus menu eltavolitasa
+
+balance gombra rakkattintva megjelenik egy sub menu lista vissza gombbal - ugy mint a youtube-ban (adoellenorzes folyamatban)
 
 amikor info gombra kattintok, mutassa a teljes ablakos popup-ot infovan emailel, video chat ikonnal, kagylo ikonnal
-
-Uzenet frame set mellette egy info ikon (ami kinyitja az oldalt) - bal oldali menuben (tehat olyan, mintha submrnus lenne)
-Adóhatósági Ellenőrzés folyamatban, rakkattintva popup benne info oldal
-Rendszer Uzenetek - legutolso jelenik meg - rakkattintva info ablak
-lehet pontos leiras mit kellene csinalni, adóhatósági ellenőrzés is pl. a dokumentumok keeredoben - esetleg vhol megjeleniteni, hogy folyamatban - a NAV Upo menu tetejen
 
 felhasználó hozzaadasa + gomb - switch user felulet
 

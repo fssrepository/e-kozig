@@ -1,4 +1,18 @@
-Keresés (keresés ikon)
+import { Injectable } from '@angular/core';
+
+export interface MenuSubmenu {
+  title: string;
+  items: string[];
+}
+
+export interface MenuNode {
+  title: string;
+  submenus: MenuSubmenu[];
+  items: string[];
+}
+
+const RAW_MENU = `
+Részletes keresés (főmenü) (pls. put search icon right hand side)
 Ügyféliránytű (főmenü)
 Adókulcsok, járulékmértékek (sub fomenu)
 Adótáblák
@@ -231,20 +245,146 @@ Igazgatosagok
 Ügyfélszolgálatok
 Együttműködő szervek
 Sajtószoba
-MIMCS
-Élethelyzetek adózása
-Kik vagyunk?
-Szabályzók
-Kiadványok
-Hirdetmények
-Anonimizált határozatok
-Európai Uniós projektek
-Pénzmosás
-OLAF
-Rendezvények
-Elveszett okmányok
-Oktatás
-Múzeum
-Múzeumbusz
-Zenekar
-Egyenruházat
+MIMCS (főmenü)
+Élethelyzetek adózása (főmenü)
+Kik vagyunk? (főmenü)
+Szabályzók (főmenü)
+Szabályzatok (sub főmenü)
+Utasítások (sub főmenü)
+Útmutatók (sub főmenü)
+Tájékoztatások (sub főmenü)
+Kiadványok (főmenü)
+Mi vagyunk a NAV (sub főmenü)
+Évkönyvek (sub főmenü)
+Jubileumi kiadványok (sub főmenü)
+Stratégia 2021-2024 (sub főmenü)
+Röviden, egyszerűen (sub főmenü)
+Utastájékoztató (sub főmenü)
+Utastájékoztató
+Travel Guides
+Információk az EU határain kívül és belül
+Konténeres vámkezelés (sub főmenü)
+A NAV nyomozó hatósága (sub főmenü)
+Adóvilág (sub főmenü)
+Adóvilág 2023
+Adóvilág 2022
+Adóvilág 2021
+Adóvilág 2020
+Adóvilág 2019
+Adóvilág 2018
+Adóvilág 2017
+Közérthetőségi kiadványok (sub főmenü)
+Hirdetmények (főmenü)
+Anonimizált határozatok (főmenü)
+Európai Uniós projektek (főmenü)
+Pénzmosás (főmenü)
+OLAF (főmenü)
+Bemutatkozás (sub főmenü)
+OLAF Koordinációs Iroda (sub főmenü)
+Szakértői tevékenység (sub főmenü)
+Hírek (sub főmenü)
+Szabályozási háttér (sub főmenü)
+Dokumentumtár (sub főmenü)
+Hasznos linkek (sub főmenü)
+Elérhetőségek (sub főmenü)
+Rendezvények (főmenü)
+Elveszett okmányok (főmenü)
+Oktatás (főmenü)
+Múzeum (főmenü)
+Múzeumtörténet (sub főmenü)
+Digitális gyűjtemény (sub főmenü)
+Múzeumpedagógia (sub főmenü)
+Elérhetőség (sub főmenü)
+Publikációk (sub főmenü)
+Eseménynaptár (sub főmenü)
+Múzeumbusz (főmenü)
+Zenekar (főmenü)
+Bemutatkozás (sub főmenü)
+Zenei vezetők (sub főmenü)
+Zenekari formációk (sub főmenü)
+Koncertkalendárium (sub főmenü)
+Kiadványok (sub főmenü)
+Elérhetőség (sub főmenü)
+Egyenruházat (főmenü)
+`;
+
+@Injectable({ providedIn: 'root' })
+export class KezdolapMenuService {
+  private readonly menu = this.parseMenu(RAW_MENU);
+
+  getMenu(): MenuNode[] {
+    return this.menu;
+  }
+
+  private parseMenu(raw: string): MenuNode[] {
+    const lines = raw
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
+
+    const menus: MenuNode[] = [];
+    let currentMenu: MenuNode | null = null;
+    let currentSubmenu: MenuSubmenu | null = null;
+
+    const isMainMenu = (line: string): boolean => line.includes('(főmenü)');
+    const isSubMenu = (line: string): boolean =>
+      line.includes('(sub fomenu)') || line.includes('(sub főmenü)');
+    const stripMain = (line: string): string => line.split('(főmenü)')[0].trim();
+    const stripSub = (line: string): string =>
+      line
+        .replace('(sub fomenu)', '')
+        .replace('(sub főmenü)', '')
+        .trim();
+
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i];
+
+      if (isMainMenu(line)) {
+        const title = stripMain(line);
+        currentMenu = {
+          title,
+          submenus: [],
+          items: []
+        };
+        menus.push(currentMenu);
+        currentSubmenu = null;
+        continue;
+      }
+
+      if (isSubMenu(line)) {
+        if (!currentMenu) {
+          continue;
+        }
+
+        const title = stripSub(line);
+        const nextLine = lines[i + 1];
+        if (!nextLine || isMainMenu(nextLine) || isSubMenu(nextLine)) {
+          currentMenu.items.push(`${title} menu item`);
+          currentSubmenu = null;
+          continue;
+        }
+
+        currentSubmenu = {
+          title,
+          items: []
+        };
+        currentMenu.submenus.push(currentSubmenu);
+        continue;
+      }
+
+      if (currentSubmenu) {
+        currentSubmenu.items.push(line);
+      } else if (currentMenu) {
+        currentMenu.items.push(line);
+      }
+    }
+
+    menus.forEach(menu => {
+      if (menu.submenus.length === 0 && menu.items.length === 0) {
+        menu.title = `${menu.title} menu item`;
+      }
+    });
+
+    return menus;
+  }
+}
