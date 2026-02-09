@@ -17,6 +17,37 @@ import { Observable, startWith, map } from 'rxjs';
 import { DocumentItem, DocumentItemDetail } from '../models/document-item.interface';
 import { DocumentService } from '../services/document.service';
 
+interface NyomtatvanyEntry {
+  code: string;
+  title: string;
+  version: string;
+  adoev: string;
+  adoevSort: number;
+}
+
+interface NyomtatvanyGroup {
+  key: string;
+  latest: NyomtatvanyEntry;
+  entries: NyomtatvanyEntry[];
+}
+
+interface DocMenuSubmenu {
+  title: string;
+  submenus: DocMenuSubSubmenu[];
+  items: NyomtatvanyEntry[];
+}
+
+interface DocMenuSubSubmenu {
+  title: string;
+  items: NyomtatvanyEntry[];
+}
+
+interface DocMenuNode {
+  title: string;
+  submenus: DocMenuSubmenu[];
+  items: NyomtatvanyEntry[];
+}
+
 @Component({
   selector: 'app-document',
   standalone: true,
@@ -115,6 +146,28 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedItem: DocumentItem | null = null;
   expandedItemIds: Set<string> = new Set();
   showCreateMenu = false;
+  activePopup: 'email' | 'form' | null = null;
+
+  emailSubjectCtrl = new FormControl('');
+  emailContentCtrl = new FormControl('');
+  emailSubjectChips: string[] = [];
+  emailSubjectResults: DocumentItem[] = [];
+  showEmailSubjectPanel = false;
+
+  docSearchCtrl = new FormControl('');
+  docSearchChips: string[] = [];
+  docSearchResults: NyomtatvanyEntry[] = [];
+  showDocSearchPanel = false;
+  showDocDetailSearch = false;
+  showDocContentPanel = false;
+  documentPanelTitle = 'Űrlap típus';
+
+  docMenus: DocMenuNode[] = [];
+  currentDocMenu: DocMenuNode | null = null;
+  currentDocSubmenu: DocMenuSubmenu | null = null;
+  currentDocSubSubmenu: DocMenuSubSubmenu | null = null;
+  allFormGroups: NyomtatvanyGroup[] = [];
+  activeEntryGroups: NyomtatvanyGroup[] = [];
 
   @ViewChild('paginator') paginator!: MatPaginator;
   @ViewChild('tableScrollSentinel') tableScrollSentinel!: ElementRef<HTMLElement>;
@@ -171,6 +224,25 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
 
+    this.emailSubjectCtrl.valueChanges.pipe(
+      startWith('')
+    ).subscribe(value => {
+      if (this.activePopup !== 'email') {
+        this.emailSubjectResults = [];
+        this.showEmailSubjectPanel = false;
+        return;
+      }
+      const query = (value || '').trim();
+      if (query.length > 0) {
+        this.emailSubjectResults = this.documentService.searchDocuments(query);
+        this.showEmailSubjectPanel = this.emailSubjectResults.length > 0;
+      } else {
+        this.emailSubjectResults = [];
+        this.showEmailSubjectPanel = false;
+      }
+      this.cdr.markForCheck();
+    });
+
     // setup ügyfél autocomplete filtered stream (exclude already selected)
     this.filteredUgyfels$ = this.ugyfelCtrl.valueChanges.pipe(
       startWith(''),
@@ -186,6 +258,27 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
       startWith(''),
       map(value => this._filterStatus(value || ''))
     );
+
+    this.loadNyomtatvanyok();
+
+    this.docSearchCtrl.valueChanges.pipe(
+      startWith('')
+    ).subscribe(value => {
+      if (this.activePopup !== 'form') {
+        this.docSearchResults = [];
+        this.showDocSearchPanel = false;
+        return;
+      }
+      const query = (value || '').toString().trim();
+      if (!query) {
+        this.docSearchResults = [];
+        this.showDocSearchPanel = false;
+        return;
+      }
+      this.docSearchResults = this.filterNyomtatvanyEntries(query);
+      this.showDocSearchPanel = this.docSearchResults.length > 0;
+      this.cdr.markForCheck();
+    });
   }
 
   ngAfterViewInit(): void {
@@ -338,14 +431,73 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showCreateMenu = !this.showCreateMenu;
   }
 
-  createLetter() {
+  openEmailPopup() {
     this.showCreateMenu = false;
-    window.alert('Új levél létrehozása (pl. e-papir)');
+    const subject = this.getCurrentSearchText();
+    this.emailSubjectChips = subject ? [subject] : [];
+    this.emailSubjectCtrl.setValue('');
+    this.emailContentCtrl.setValue('');
+    this.emailSubjectResults = [];
+    this.showEmailSubjectPanel = false;
+    this.activePopup = 'email';
   }
 
-  createDocument() {
+  openFormPopup() {
     this.showCreateMenu = false;
-    window.alert('Új Dokumentum Létrehozása (pl. onya)');
+    this.showDocContentPanel = false;
+    this.showDocDetailSearch = false;
+    this.documentPanelTitle = 'Űrlap típus';
+    this.docSearchCtrl.setValue('');
+    this.docSearchChips = [];
+    this.docSearchResults = [];
+    this.showDocSearchPanel = false;
+    this.currentDocMenu = null;
+    this.currentDocSubmenu = null;
+    this.currentDocSubSubmenu = null;
+    this.updateActiveEntryGroups();
+    this.activePopup = 'form';
+  }
+
+  openFormPopupFromItem(item: DocumentItemDetail) {
+    this.showCreateMenu = false;
+    const name = this.selectedItem?.name?.trim() || this.selectedItem?.ugyfel?.trim() || '';
+    const ugyszam = this.selectedItem ? this.generateUgyszam(this.selectedItem) : '';
+    const formType = item.formName || item.type || 'Űrlap típus';
+    const parts = [name, ugyszam, formType].filter(Boolean);
+    const label = parts.join(' - ');
+    this.documentPanelTitle = label;
+    this.docSearchChips = [label];
+    this.showDocContentPanel = true;
+    this.showDocDetailSearch = false;
+    this.updateActiveEntryGroups();
+    this.activePopup = 'form';
+  }
+
+  closePopup() {
+    this.activePopup = null;
+  }
+
+  addEmailSubjectChip(): void {
+    const value = (this.emailSubjectCtrl.value || '').toString().trim();
+    if (!value) return;
+    if (!this.emailSubjectChips.includes(value)) {
+      this.emailSubjectChips = [...this.emailSubjectChips, value];
+    }
+    this.emailSubjectCtrl.setValue('');
+    this.showEmailSubjectPanel = false;
+  }
+
+  removeEmailSubjectChip(term: string): void {
+    this.emailSubjectChips = this.emailSubjectChips.filter(t => t !== term);
+  }
+
+  selectEmailSubjectResult(doc: DocumentItem): void {
+    const label = `${doc.ugyfel} - ${this.generateUgyszam(doc)}`;
+    if (!this.emailSubjectChips.includes(label)) {
+      this.emailSubjectChips = [...this.emailSubjectChips, label];
+    }
+    this.emailSubjectCtrl.setValue('');
+    this.showEmailSubjectPanel = false;
   }
 
 
@@ -1027,6 +1179,44 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
   }
 
+  toggleDocDetailSearch(): void {
+    this.showDocDetailSearch = !this.showDocDetailSearch;
+    if (!this.showDocDetailSearch) {
+      this.currentDocMenu = null;
+      this.currentDocSubmenu = null;
+      this.currentDocSubSubmenu = null;
+      this.updateActiveEntryGroups();
+    }
+  }
+
+  removeDocSearchChip(_: string): void {
+    this.docSearchChips = [];
+    this.documentPanelTitle = 'Űrlap típus';
+    this.showDocContentPanel = false;
+  }
+
+  selectDocSearchResult(entry: NyomtatvanyEntry): void {
+    const label = `${entry.code} - ${entry.title}`;
+    this.docSearchChips = [label];
+    this.docSearchCtrl.setValue('');
+    this.documentPanelTitle = label;
+    this.showDocContentPanel = true;
+    this.showDocSearchPanel = false;
+  }
+
+  selectFirstDocSearchResult(): void {
+    if (!this.docSearchResults.length) return;
+    this.selectDocSearchResult(this.docSearchResults[0]);
+  }
+
+  selectFormEntry(entry: NyomtatvanyEntry): void {
+    const label = `${entry.code} - ${entry.title}`;
+    this.docSearchChips = [label];
+    this.documentPanelTitle = label;
+    this.showDocContentPanel = true;
+    this.showDocDetailSearch = false;
+  }
+
   private parseDateTime(s: string): Date {
     // expected format: YYYY-MM-DD HH:mm or variants
     const parts = s.trim().split(' ');
@@ -1041,6 +1231,289 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     const dt = new Date(s);
     return dt;
+  }
+
+  private getCurrentSearchText(): string {
+    const input = (this.searchCtrl.value || '').toString().trim();
+    if (input) return input;
+    if (this.searchTerms.length > 0) {
+      return this.searchTerms.join(' ');
+    }
+    return '';
+  }
+
+  private loadNyomtatvanyok(): void {
+    fetch('assets/data/nyomtatvanyok.txt')
+      .then(resp => resp.text())
+      .then(raw => {
+        this.allFormGroups = this.parseNyomtatvanyok(raw);
+        this.docMenus = this.parseNyomtatvanyMenus(raw);
+        this.updateActiveEntryGroups();
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.allFormGroups = [];
+        this.docMenus = [];
+        this.activeEntryGroups = [];
+        this.cdr.markForCheck();
+      });
+  }
+
+  private parseNyomtatvanyok(raw: string): NyomtatvanyGroup[] {
+    const lines = raw
+      .split(/\r?\n/)
+      .map(line => line.trim())
+      .filter(Boolean);
+
+    const entries: NyomtatvanyEntry[] = [];
+    for (let i = 0; i < lines.length; i += 1) {
+      const code = lines[i];
+      const title = lines[i + 1];
+      const verLabel = lines[i + 2];
+      const version = lines[i + 3];
+      const adoevLabel = lines[i + 4];
+      const adoev = lines[i + 5];
+
+      if (!code || !title) continue;
+      if (this.isMenuLine(code) || this.isMenuLine(title)) continue;
+      if (verLabel !== 'Verziószám' || adoevLabel !== 'Adóév') continue;
+
+      const adoevSort = this.parseAdoevValue(adoev, code);
+      entries.push({
+        code,
+        title,
+        version: version || '',
+        adoev: adoev || '-',
+        adoevSort
+      });
+
+      i += 5;
+    }
+
+    const grouped = new Map<string, NyomtatvanyGroup>();
+    entries.forEach(entry => {
+      const key = entry.title.toLowerCase();
+      const existing = grouped.get(key);
+      if (!existing) {
+        grouped.set(key, { key, latest: entry, entries: [entry] });
+      } else {
+        existing.entries.push(entry);
+      }
+    });
+
+    const groups = Array.from(grouped.values()).map(group => {
+      const sortedEntries = group.entries.sort((a, b) => b.adoevSort - a.adoevSort);
+      return {
+        key: group.key,
+        latest: sortedEntries[0],
+        entries: sortedEntries
+      };
+    });
+
+    return groups.sort((a, b) => a.latest.title.localeCompare(b.latest.title));
+  }
+
+  private isMenuLine(value: string): boolean {
+    return /\(fomenu\)|\(sub fomenu\)|\(sub sub fomenu\)|\(főmenü\)/i.test(value);
+  }
+
+  private parseAdoevValue(adoev: string, code: string): number {
+    const numeric = Number(adoev);
+    if (!Number.isNaN(numeric)) {
+      return numeric;
+    }
+    const match = code.match(/^(\d{2})/);
+    if (match) {
+      return 2000 + Number(match[1]);
+    }
+    return 0;
+  }
+
+  private filterNyomtatvanyEntries(value: string): NyomtatvanyEntry[] {
+    const filterValue = value.toLowerCase();
+    const entries = this.allFormGroups.flatMap(group => group.entries);
+    return entries.filter(entry =>
+      `${entry.code} ${entry.title}`.toLowerCase().includes(filterValue)
+    ).slice(0, 8);
+  }
+
+  private parseNyomtatvanyMenus(raw: string): DocMenuNode[] {
+    const lines = raw
+      .split(/\r?\n/)
+      .map(line => line.trim())
+      .filter(Boolean);
+
+    const menus: DocMenuNode[] = [];
+    let currentMenu: DocMenuNode | null = null;
+    let currentSubmenu: DocMenuSubmenu | null = null;
+    let currentSubSubmenu: DocMenuSubSubmenu | null = null;
+
+    for (let i = 0; i < lines.length; i += 1) {
+      const line = lines[i];
+      if (/\(fomenu\)|\(főmenü\)/i.test(line)) {
+        const title = this.stripMenuSuffix(line);
+        currentMenu = { title, submenus: [], items: [] };
+        menus.push(currentMenu);
+        currentSubmenu = null;
+        currentSubSubmenu = null;
+        continue;
+      }
+
+      if (/\(sub sub fomenu\)/i.test(line)) {
+        if (!currentMenu) continue;
+        const title = this.stripMenuSuffix(line);
+        if (currentSubmenu) {
+          currentSubSubmenu = { title, items: [] };
+          currentSubmenu.submenus.push(currentSubSubmenu);
+        } else {
+          currentSubmenu = { title, submenus: [], items: [] };
+          currentMenu.submenus.push(currentSubmenu);
+          currentSubSubmenu = null;
+        }
+        continue;
+      }
+
+      if (/\(sub fomenu\)/i.test(line)) {
+        if (!currentMenu) continue;
+        const title = this.stripMenuSuffix(line);
+        currentSubmenu = { title, submenus: [], items: [] };
+        currentMenu.submenus.push(currentSubmenu);
+        currentSubSubmenu = null;
+        continue;
+      }
+
+      const code = line;
+      const title = lines[i + 1];
+      const verLabel = lines[i + 2];
+      const version = lines[i + 3];
+      const adoevLabel = lines[i + 4];
+      const adoev = lines[i + 5];
+
+      if (code && title && verLabel === 'Verziószám' && adoevLabel === 'Adóév') {
+        const adoevSort = this.parseAdoevValue(adoev, code);
+        const entry: NyomtatvanyEntry = {
+          code,
+          title,
+          version: version || '',
+          adoev: adoev || '-',
+          adoevSort
+        };
+        if (currentSubSubmenu) {
+          currentSubSubmenu.items.push(entry);
+        } else if (currentSubmenu) {
+          currentSubmenu.items.push(entry);
+        } else if (currentMenu) {
+          currentMenu.items.push(entry);
+        }
+        i += 5;
+        continue;
+      }
+    }
+
+    return menus;
+  }
+
+  selectDocMenu(menu: DocMenuNode): void {
+    if (menu.submenus.length === 0 && menu.items.length === 0) {
+      this.selectDocMenuItem(menu.title);
+      return;
+    }
+    this.currentDocMenu = menu;
+    this.currentDocSubmenu = null;
+    this.currentDocSubSubmenu = null;
+    this.updateActiveEntryGroups();
+  }
+
+  selectDocSubmenu(submenu: DocMenuSubmenu): void {
+    this.currentDocSubmenu = submenu;
+    this.currentDocSubSubmenu = null;
+    this.updateActiveEntryGroups();
+  }
+
+  selectDocSubSubmenu(submenu: DocMenuSubSubmenu): void {
+    this.currentDocSubSubmenu = submenu;
+    this.updateActiveEntryGroups();
+  }
+
+  selectDocMenuItem(item: string): void {
+    this.docSearchChips = [this.stripMenuSuffix(item)];
+    this.documentPanelTitle = this.stripMenuSuffix(item);
+    this.showDocContentPanel = true;
+    this.showDocDetailSearch = false;
+  }
+
+  docGoBack(): void {
+    if (this.currentDocSubSubmenu) {
+      this.currentDocSubSubmenu = null;
+      this.updateActiveEntryGroups();
+      return;
+    }
+    if (this.currentDocSubmenu) {
+      this.currentDocSubmenu = null;
+      this.updateActiveEntryGroups();
+      return;
+    }
+    if (this.currentDocMenu) {
+      this.currentDocMenu = null;
+      this.updateActiveEntryGroups();
+    }
+  }
+
+  getDocHeaderTitle(): string {
+    if (this.currentDocMenu && this.currentDocSubmenu && this.currentDocSubSubmenu) {
+      return `${this.currentDocMenu.title} > ${this.currentDocSubmenu.title} > ${this.currentDocSubSubmenu.title}`;
+    }
+    if (this.currentDocMenu && this.currentDocSubmenu) {
+      return `${this.currentDocMenu.title} > ${this.currentDocSubmenu.title}`;
+    }
+    return this.currentDocMenu?.title || '';
+  }
+
+  shouldShowDocBack(): boolean {
+    return !!this.currentDocMenu;
+  }
+
+  formatDocMenuLabel(label: string): string {
+    return this.stripMenuSuffix(label);
+  }
+
+  private stripMenuSuffix(value: string): string {
+    return value.replace(/\s*\(.*?\)\s*/g, '').replace(/\s+menu item$/i, '').trim();
+  }
+
+  private updateActiveEntryGroups(): void {
+    this.activeEntryGroups = this.groupEntries(this.getActiveEntries());
+    this.cdr.markForCheck();
+  }
+
+  private getActiveEntries(): NyomtatvanyEntry[] {
+    if (this.currentDocSubSubmenu) {
+      return this.currentDocSubSubmenu.items;
+    }
+    if (this.currentDocSubmenu) {
+      return this.currentDocSubmenu.items;
+    }
+    if (this.currentDocMenu) {
+      return this.currentDocMenu.items;
+    }
+    return [];
+  }
+
+  private groupEntries(entries: NyomtatvanyEntry[]): NyomtatvanyGroup[] {
+    const grouped = new Map<string, NyomtatvanyGroup>();
+    entries.forEach(entry => {
+      const key = entry.title.toLowerCase();
+      const existing = grouped.get(key);
+      if (!existing) {
+        grouped.set(key, { key, latest: entry, entries: [entry] });
+      } else {
+        existing.entries.push(entry);
+      }
+    });
+    return Array.from(grouped.values()).map(group => {
+      const sortedEntries = group.entries.sort((a, b) => b.adoevSort - a.adoevSort);
+      return { key: group.key, latest: sortedEntries[0], entries: sortedEntries };
+    }).sort((a, b) => a.latest.title.localeCompare(b.latest.title));
   }
 
 }

@@ -179,7 +179,7 @@
 
       <ng-container matColumnDef="name">
         <td mat-cell *matCellDef="let element" class="col-name">
-          <div class="name-primary">{{ element.name }}</div>
+          <div class="name-primary">{{ element.name }} - {{ generateUgyszam(element) }}</div>
           <div class="mobile-meta">
             <span class="mobile-status">{{ element.status }}</span>
             <span class="mobile-form">{{ element.formName }}</span>
@@ -207,7 +207,312 @@
       <div #tableScrollSentinel class="table-sentinel" aria-hidden="true"></div>
     </div>
   </div>
+
+  <div class="documents-fab">
+    <div class="fab-actions" *ngIf="showCreateMenu">
+      <button mat-fab class="fab-action" aria-label="Új levél" (click)="openEmailPopup()">
+        <mat-icon>mail</mat-icon>
+      </button>
+      <button mat-fab class="fab-action" aria-label="Új dokumentum" (click)="openFormPopup()">
+        <mat-icon>description</mat-icon>
+      </button>
+    </div>
+    <button mat-fab color="primary" class="fab-trigger" [class.open]="showCreateMenu" aria-label="Új létrehozása" (click)="toggleCreateMenu()">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
 </div>
+
+<section class="doc-popup" *ngIf="activePopup">
+  <div class="doc-popup-backdrop" (click)="closePopup()"></div>
+
+  <div class="doc-popup-panel email-panel" *ngIf="activePopup === 'email'" (click)="$event.stopPropagation()">
+    <div class="popup-header">
+      <div class="popup-actions">
+        <div class="action-row">
+          <button mat-icon-button aria-label="Csatolmány">
+            <mat-icon>attach_file</mat-icon>
+          </button>
+          <button mat-icon-button aria-label="Küldés">
+            <mat-icon>send</mat-icon>
+          </button>
+        </div>
+      </div>
+      <button mat-icon-button class="popup-close" aria-label="Bezárás" (click)="closePopup()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="popup-body">
+      <div class="email-subject-wrapper">
+        <mat-form-field appearance="outline" class="popup-field">
+          <mat-chip-set class="search-chips" *ngIf="emailSubjectChips.length > 0">
+            <mat-chip *ngFor="let term of emailSubjectChips" removable (removed)="removeEmailSubjectChip(term)">
+              {{ term }}
+              <button matChipRemove aria-label="Remove subject">✕</button>
+            </mat-chip>
+          </mat-chip-set>
+          <input matInput [formControl]="emailSubjectCtrl" placeholder="Tárgy" (keydown.enter)="addEmailSubjectChip()">
+        </mat-form-field>
+
+        <div class="search-panel" [class.open]="showEmailSubjectPanel" *ngIf="showEmailSubjectPanel">
+          <div class="search-result" *ngFor="let result of emailSubjectResults" (click)="selectEmailSubjectResult(result)">
+            <div class="result-ugyfel">{{ result.ugyfel }} - {{ generateUgyszam(result) }}</div>
+            <div class="result-desc">{{ result.formName }}</div>
+          </div>
+          <div class="search-footer">
+            <span class="footer-left">all search result for "{{ emailSubjectCtrl.value }}"</span>
+            <span class="footer-right">Press ENTER</span>
+          </div>
+        </div>
+      </div>
+      <mat-form-field appearance="outline" class="popup-field">
+        <textarea matInput rows="10" [formControl]="emailContentCtrl" placeholder="Üzenet tartalma"></textarea>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="doc-popup-panel form-panel" *ngIf="activePopup === 'form'" (click)="$event.stopPropagation()">
+    <div class="popup-header popup-header-search">
+      <div class="popup-search-row">
+        <mat-form-field class="popup-search" appearance="outline">
+          <mat-chip-set class="search-chips" *ngIf="docSearchChips.length > 0">
+            <mat-chip *ngFor="let term of docSearchChips" removable (removed)="removeDocSearchChip(term)">
+              {{ term }}
+              <button matChipRemove aria-label="Remove search term">✕</button>
+            </mat-chip>
+          </mat-chip-set>
+          <input
+            matInput
+            [formControl]="docSearchCtrl"
+            placeholder="Űrlap keresés..."
+            (keydown.enter)="selectFirstDocSearchResult()"
+          >
+          <button
+            mat-icon-button
+            matSuffix
+            class="detail-toggle"
+            [class.open]="showDocDetailSearch"
+            (click)="toggleDocDetailSearch()"
+            [attr.aria-pressed]="showDocDetailSearch"
+            aria-label="Részletes keresés"
+          >
+            <mat-icon>{{ showDocDetailSearch ? 'close' : 'tune' }}</mat-icon>
+          </button>
+        </mat-form-field>
+        <button mat-icon-button class="popup-close" aria-label="Bezárás" (click)="closePopup()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="doc-search-panel search-panel" [class.open]="showDocSearchPanel" *ngIf="showDocSearchPanel">
+        <div class="search-result" *ngFor="let result of docSearchResults" (click)="selectDocSearchResult(result)">
+          <div class="result-ugyfel">{{ result.code }} - {{ result.title }}</div>
+          <div class="result-desc">Verziószám {{ result.version }} · Adóév {{ result.adoev }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="popup-body">
+      <div class="doc-detail-panel" *ngIf="showDocDetailSearch">
+        <div class="detail-panel-inner">
+          <div class="panel-header" *ngIf="shouldShowDocBack()">
+            <button mat-icon-button class="back-btn" (click)="docGoBack()" aria-label="Vissza">
+              <mat-icon>arrow_back</mat-icon>
+            </button>
+            <span class="panel-title">{{ getDocHeaderTitle() }}</span>
+          </div>
+
+          <div class="panel-list" *ngIf="!currentDocMenu">
+            <button class="panel-item" type="button" *ngFor="let menu of docMenus" (click)="selectDocMenu(menu)">
+              <div class="form-item-title">
+                <div class="form-item-name">{{ formatDocMenuLabel(menu.title) }}</div>
+                <div class="form-item-code">Főmenü</div>
+                <div class="form-item-meta">
+                  <span class="label">Tartalom</span>
+                  <span>{{ menu.submenus.length + menu.items.length }}</span>
+                </div>
+              </div>
+              <mat-icon *ngIf="menu.submenus.length > 0 || menu.items.length > 0">chevron_right</mat-icon>
+            </button>
+          </div>
+
+          <div class="panel-list" *ngIf="currentDocMenu && !currentDocSubmenu">
+            <button class="panel-item" type="button" *ngFor="let submenu of currentDocMenu.submenus" (click)="selectDocSubmenu(submenu)">
+              <div class="form-item-title">
+                <div class="form-item-name">{{ formatDocMenuLabel(submenu.title) }}</div>
+                <div class="form-item-code">Almenü</div>
+                <div class="form-item-meta">
+                  <span class="label">Tartalom</span>
+                  <span>{{ submenu.submenus.length + submenu.items.length }}</span>
+                </div>
+              </div>
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+            <mat-accordion *ngIf="activeEntryGroups.length > 0">
+              <ng-container *ngFor="let group of activeEntryGroups">
+                <mat-expansion-panel *ngIf="group.entries.length > 1; else singleFormItem">
+                  <mat-expansion-panel-header class="form-accordion-header">
+                    <mat-panel-title>
+                      <div class="form-item-title">
+                        <div class="form-item-name">{{ group.latest.title }}</div>
+                        <div class="form-item-code">{{ group.latest.code }}</div>
+                        <div class="form-item-meta">
+                          <span class="label">Verziószám</span>
+                          <span>{{ group.latest.version }}</span>
+                          <span class="label">Adóév</span>
+                          <span>{{ group.latest.adoev }}</span>
+                        </div>
+                      </div>
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <button class="panel-item" type="button" *ngFor="let entry of group.entries" (click)="selectFormEntry(entry)">
+                    <div class="form-item-title">
+                      <div class="form-item-name">{{ entry.title }}</div>
+                      <div class="form-item-code">{{ entry.code }}</div>
+                      <div class="form-item-meta">
+                        <span class="label">Verziószám</span>
+                        <span>{{ entry.version }}</span>
+                        <span class="label">Adóév</span>
+                        <span>{{ entry.adoev }}</span>
+                      </div>
+                    </div>
+                  </button>
+                </mat-expansion-panel>
+                <ng-template #singleFormItem>
+                  <button class="panel-item" type="button" (click)="selectFormEntry(group.latest)">
+                    <div class="form-item-title">
+                      <div class="form-item-name">{{ group.latest.title }}</div>
+                      <div class="form-item-code">{{ group.latest.code }}</div>
+                      <div class="form-item-meta">
+                        <span class="label">Verziószám</span>
+                        <span>{{ group.latest.version }}</span>
+                        <span class="label">Adóév</span>
+                        <span>{{ group.latest.adoev }}</span>
+                      </div>
+                    </div>
+                  </button>
+                </ng-template>
+              </ng-container>
+            </mat-accordion>
+          </div>
+
+          <div class="panel-list" *ngIf="currentDocMenu && currentDocSubmenu && !currentDocSubSubmenu">
+            <button class="panel-item" type="button" *ngFor="let submenu of currentDocSubmenu.submenus" (click)="selectDocSubSubmenu(submenu)">
+              <div class="form-item-title">
+                <div class="form-item-name">{{ formatDocMenuLabel(submenu.title) }}</div>
+                <div class="form-item-code">Részmenü</div>
+                <div class="form-item-meta">
+                  <span class="label">Tartalom</span>
+                  <span>{{ submenu.items.length }}</span>
+                </div>
+              </div>
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+            <mat-accordion *ngIf="activeEntryGroups.length > 0">
+              <ng-container *ngFor="let group of activeEntryGroups">
+                <mat-expansion-panel *ngIf="group.entries.length > 1; else singleFormItem2">
+                  <mat-expansion-panel-header class="form-accordion-header">
+                    <mat-panel-title>
+                      <div class="form-item-title">
+                        <div class="form-item-name">{{ group.latest.title }}</div>
+                        <div class="form-item-code">{{ group.latest.code }}</div>
+                        <div class="form-item-meta">
+                          <span class="label">Verziószám</span>
+                          <span>{{ group.latest.version }}</span>
+                          <span class="label">Adóév</span>
+                          <span>{{ group.latest.adoev }}</span>
+                        </div>
+                      </div>
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <button class="panel-item" type="button" *ngFor="let entry of group.entries" (click)="selectFormEntry(entry)">
+                    <div class="form-item-title">
+                      <div class="form-item-name">{{ entry.title }}</div>
+                      <div class="form-item-code">{{ entry.code }}</div>
+                      <div class="form-item-meta">
+                        <span class="label">Verziószám</span>
+                        <span>{{ entry.version }}</span>
+                        <span class="label">Adóév</span>
+                        <span>{{ entry.adoev }}</span>
+                      </div>
+                    </div>
+                  </button>
+                </mat-expansion-panel>
+                <ng-template #singleFormItem2>
+                  <button class="panel-item" type="button" (click)="selectFormEntry(group.latest)">
+                    <div class="form-item-title">
+                      <div class="form-item-name">{{ group.latest.title }}</div>
+                      <div class="form-item-code">{{ group.latest.code }}</div>
+                      <div class="form-item-meta">
+                        <span class="label">Verziószám</span>
+                        <span>{{ group.latest.version }}</span>
+                        <span class="label">Adóév</span>
+                        <span>{{ group.latest.adoev }}</span>
+                      </div>
+                    </div>
+                  </button>
+                </ng-template>
+              </ng-container>
+            </mat-accordion>
+          </div>
+
+          <div class="panel-list" *ngIf="currentDocMenu && currentDocSubmenu && currentDocSubSubmenu">
+            <mat-accordion *ngIf="activeEntryGroups.length > 0">
+              <ng-container *ngFor="let group of activeEntryGroups">
+                <mat-expansion-panel *ngIf="group.entries.length > 1; else singleFormItem3">
+                  <mat-expansion-panel-header class="form-accordion-header">
+                    <mat-panel-title>
+                      <div class="form-item-title">
+                        <div class="form-item-name">{{ group.latest.title }}</div>
+                        <div class="form-item-code">{{ group.latest.code }}</div>
+                        <div class="form-item-meta">
+                          <span class="label">Verziószám</span>
+                          <span>{{ group.latest.version }}</span>
+                          <span class="label">Adóév</span>
+                          <span>{{ group.latest.adoev }}</span>
+                        </div>
+                      </div>
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <button class="panel-item" type="button" *ngFor="let entry of group.entries" (click)="selectFormEntry(entry)">
+                    <div class="form-item-title">
+                      <div class="form-item-name">{{ entry.title }}</div>
+                      <div class="form-item-code">{{ entry.code }}</div>
+                      <div class="form-item-meta">
+                        <span class="label">Verziószám</span>
+                        <span>{{ entry.version }}</span>
+                        <span class="label">Adóév</span>
+                        <span>{{ entry.adoev }}</span>
+                      </div>
+                    </div>
+                  </button>
+                </mat-expansion-panel>
+                <ng-template #singleFormItem3>
+                  <button class="panel-item" type="button" (click)="selectFormEntry(group.latest)">
+                    <div class="form-item-title">
+                      <div class="form-item-name">{{ group.latest.title }}</div>
+                      <div class="form-item-code">{{ group.latest.code }}</div>
+                      <div class="form-item-meta">
+                        <span class="label">Verziószám</span>
+                        <span>{{ group.latest.version }}</span>
+                        <span class="label">Adóév</span>
+                        <span>{{ group.latest.adoev }}</span>
+                      </div>
+                    </div>
+                  </button>
+                </ng-template>
+              </ng-container>
+            </mat-accordion>
+          </div>
+        </div>
+      </div>
+
+      <div class="doc-content-panel" *ngIf="showDocContentPanel">
+        <p>Nyomtatvány szerkeszto panel (csak olvasas vagy szerkesztes mód) - fél percenként automatikus szerver oldali mentés (draft)</p>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- Detail view -->
 <div class="detail-view" *ngIf="selectedItem">
@@ -231,22 +536,6 @@
         <span>{{ generateUgyszam(selectedItem) }}</span>
       </div>
     </div>
-    <div class="detail-fab">
-      <div class="fab-actions" *ngIf="showCreateMenu">
-        <button mat-stroked-button class="fab-action" (click)="createLetter()">
-          <span>Új Levél</span>
-          <mat-icon>mail</mat-icon>
-        </button>
-        <button mat-stroked-button class="fab-action" (click)="createDocument()">
-          <span>Új Dokumentum</span>
-          <mat-icon>description</mat-icon>
-        </button>
-      </div>
-      <button mat-fab color="primary" class="fab-trigger" [class.open]="showCreateMenu" aria-label="Új létrehozása" (click)="toggleCreateMenu()">
-        <mat-icon>add</mat-icon>
-      </button>
-    </div>
-
     <div class="detail-accordion">
       <mat-accordion>
         <mat-expansion-panel *ngFor="let item of selectedItem.items; let i = index" [expanded]="expandedItemIds.has('item-' + i)" (opened)="toggleAccordion('item-' + i)" (closed)="toggleAccordion('item-' + i)">
@@ -271,8 +560,8 @@
             <div class="attachment-row" *ngFor="let att of item.attachments">
               <div class="attachment-name">{{ att.name }}</div>
               <div class="attachment-actions">
-                <button mat-icon-button color="primary" aria-label="View attachment" (click)="onViewAttachment()">
-                  <mat-icon>visibility</mat-icon>
+                <button mat-icon-button color="primary" aria-label="Review attachment" (click)="openFormPopupFromItem(item)">
+                  <mat-icon>grading</mat-icon>
                 </button>
                 <button mat-icon-button aria-label="Download attachment" (click)="onDownloadAttachment()">
                   <mat-icon>download</mat-icon>

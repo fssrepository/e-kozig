@@ -155,8 +155,8 @@
   padding: 1.25rem 1.5rem;
   box-shadow: 0 14px 34px rgba(15, 23, 42, 0.12);
   border: 1px solid rgba(15, 23, 42, 0.08);
-  max-height: calc(100vh - 140px);
-  height: calc(100vh - 140px);
+  max-height: calc(100vh - 200px);
+  height: calc(100vh - 200px);
   overflow: auto;
 }
 
@@ -249,12 +249,12 @@
   }
 
   .detail-panel-inner {
-    max-height: calc(100vh - 100px);
-    height: calc(100vh - 100px);
+    max-height: calc(100vh - 160px);
+    height: calc(100vh - 160px);
   }
 
   .detail-popup-inner {
-    height: calc(100vh - 120px);  
+    height: calc(100vh - 200px);  
   }
 
   .readme-content,
