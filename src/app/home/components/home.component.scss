@@ -143,8 +143,8 @@
   z-index: 50;
   padding: 0;
   background: var(--mat-sys-surface);
-  min-height: calc(100vh - 100px);
-  height: calc(100vh - 100px);
+  min-height: calc(100vh - 140px);
+  height: calc(100vh - 140px);
 }
 
 .detail-popup-inner {
@@ -155,8 +155,8 @@
   padding: 1.25rem 1.5rem;
   box-shadow: 0 14px 34px rgba(15, 23, 42, 0.12);
   border: 1px solid rgba(15, 23, 42, 0.08);
-  max-height: calc(100vh - 100px);
-  height: calc(100vh - 100px);
+  max-height: calc(100vh - 140px);
+  height: calc(100vh - 140px);
   overflow: auto;
 }
 
@@ -254,7 +254,7 @@
   }
 
   .detail-popup-inner {
-    height: calc(100vh - 100px);  
+    height: calc(100vh - 140px);  
   }
 
   .readme-content,
