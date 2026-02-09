@@ -1278,6 +1278,21 @@ mat-panel-description {
   color: rgba(0, 0, 0, 0.7);
 }
 
+.draft-confirm-details {
+  margin-bottom: 1rem;
+}
+
+.draft-confirm-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.draft-confirm-meta {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
 .draft-confirm-actions {
   display: flex;
   justify-content: flex-end;

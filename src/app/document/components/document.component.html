@@ -548,7 +548,10 @@
   <div class="draft-confirm-backdrop" (click)="cancelDraftDelete()"></div>
   <div class="draft-confirm-panel">
     <h3>Tényleg törölni szeretné a piszkozatot?</h3>
-    <p>{{ draftToDelete?.name }}</p>
+    <div class="draft-confirm-details" *ngIf="draftToDelete">
+      <div class="draft-confirm-name">{{ draftToDelete.name }}</div>
+      <div class="draft-confirm-meta">{{ draftToDelete.ugyszam }} - {{ draftToDelete.formType }}</div>
+    </div>
     <div class="draft-confirm-actions">
       <button mat-stroked-button type="button" (click)="cancelDraftDelete()">Nem</button>
       <button mat-raised-button color="warn" type="button" (click)="confirmDraftDelete()">Töröl</button>
