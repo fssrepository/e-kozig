@@ -340,10 +340,10 @@
             <button class="panel-item" type="button" *ngFor="let submenu of currentDocMenu.submenus" (click)="selectDocSubmenu(submenu)">
               <div class="form-item-title">
                 <div class="form-item-name">{{ formatDocMenuLabel(submenu.title) }}</div>
-                <div class="form-item-code">Almenü</div>
+                <div class="form-item-code">{{ isDraftMenuActive() ? 'Piszkozatok' : 'Almenü' }}</div>
                 <div class="form-item-meta">
                   <span class="label">Tartalom</span>
-                  <span>{{ submenu.submenus.length + submenu.items.length }}</span>
+                  <span>{{ isDraftMenuActive() ? getDraftCountForSubmenu(submenu.title) : (submenu.submenus.length + submenu.items.length) }}</span>
                 </div>
               </div>
               <mat-icon>chevron_right</mat-icon>
@@ -408,6 +408,22 @@
               </div>
               <mat-icon>chevron_right</mat-icon>
             </button>
+
+            <ng-container *ngIf="isDraftMenuActive()">
+              <button class="panel-item draft-item" type="button" *ngFor="let draft of getDraftsForCurrentSubmenu()" (click)="selectDraftItem(draft)">
+                <div class="draft-left">
+                  <div class="form-item-name">{{ draft.name }}</div>
+                  <div class="form-item-code">{{ draft.ugyszam }} - {{ draft.formType }}</div>
+                </div>
+                <div class="draft-right">
+                  <div class="draft-date">{{ formatDate(draft.datetime) }}</div>
+                  <button mat-icon-button class="draft-delete" aria-label="Törlés" (click)="onDraftDeleteClick(draft, $event)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </button>
+            </ng-container>
+
             <mat-accordion *ngIf="activeEntryGroups.length > 0">
               <ng-container *ngFor="let group of activeEntryGroups">
                 <mat-expansion-panel *ngIf="group.entries.length > 1; else singleFormItem2">
@@ -457,6 +473,20 @@
           </div>
 
           <div class="panel-list" *ngIf="currentDocMenu && currentDocSubmenu && currentDocSubSubmenu">
+            <ng-container *ngIf="isDraftMenuActive()">
+              <button class="panel-item draft-item" type="button" *ngFor="let draft of getDraftsForCurrentSubmenu()" (click)="selectDraftItem(draft)">
+                <div class="draft-left">
+                  <div class="form-item-name">{{ draft.name }}</div>
+                  <div class="form-item-code">{{ draft.ugyszam }} - {{ draft.formType }}</div>
+                </div>
+                <div class="draft-right">
+                  <div class="draft-date">{{ formatDate(draft.datetime) }}</div>
+                  <button mat-icon-button class="draft-delete" aria-label="Törlés" (click)="onDraftDeleteClick(draft, $event)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </button>
+            </ng-container>
             <mat-accordion *ngIf="activeEntryGroups.length > 0">
               <ng-container *ngFor="let group of activeEntryGroups">
                 <mat-expansion-panel *ngIf="group.entries.length > 1; else singleFormItem3">
@@ -510,6 +540,18 @@
       <div class="doc-content-panel" *ngIf="showDocContentPanel">
         <p>Nyomtatvány szerkeszto panel (csak olvasas vagy szerkesztes mód) - fél percenként automatikus szerver oldali mentés (draft)</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="draft-confirm" *ngIf="showDraftDeleteConfirm">
+  <div class="draft-confirm-backdrop" (click)="cancelDraftDelete()"></div>
+  <div class="draft-confirm-panel">
+    <h3>Tényleg törölni szeretné a piszkozatot?</h3>
+    <p>{{ draftToDelete?.name }}</p>
+    <div class="draft-confirm-actions">
+      <button mat-stroked-button type="button" (click)="cancelDraftDelete()">Nem</button>
+      <button mat-raised-button color="warn" type="button" (click)="confirmDraftDelete()">Töröl</button>
     </div>
   </div>
 </section>

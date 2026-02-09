@@ -1142,6 +1142,32 @@ mat-panel-description {
   color: rgba(0, 0, 0, 0.6);
 }
 
+.draft-item {
+  align-items: flex-start;
+}
+
+.draft-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.draft-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.draft-date {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.draft-delete {
+  margin-right: -4px;
+}
+
 .form-item-meta {
   display: flex;
   flex-wrap: wrap;
@@ -1213,6 +1239,49 @@ mat-panel-description {
   .doc-search-panel {
     right: 0;
   }
+}
+
+.draft-confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.draft-confirm-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.draft-confirm-panel {
+  position: relative;
+  z-index: 1;
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  width: min(420px, 90vw);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+}
+
+.draft-confirm-panel h3 {
+  margin: 0 0 0.5rem;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.draft-confirm-panel p {
+  margin: 0 0 1rem;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.draft-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
 }
 
 .item-meta {

@@ -48,6 +48,15 @@ interface DocMenuNode {
   items: NyomtatvanyEntry[];
 }
 
+interface DraftItem {
+  id: string;
+  name: string;
+  ugyszam: string;
+  formType: string;
+  datetime: string;
+  submenu: string;
+}
+
 @Component({
   selector: 'app-document',
   standalone: true,
@@ -163,11 +172,40 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
   documentPanelTitle = 'Űrlap típus';
 
   docMenus: DocMenuNode[] = [];
+  baseDocMenus: DocMenuNode[] = [];
   currentDocMenu: DocMenuNode | null = null;
   currentDocSubmenu: DocMenuSubmenu | null = null;
   currentDocSubSubmenu: DocMenuSubSubmenu | null = null;
   allFormGroups: NyomtatvanyGroup[] = [];
   activeEntryGroups: NyomtatvanyGroup[] = [];
+  drafts: DraftItem[] = [
+    {
+      id: 'draft-1',
+      name: 'Kovács János',
+      ugyszam: 'UGY-004512',
+      formType: '2608INT',
+      datetime: '2026-02-08 09:10',
+      submenu: 'Bevallások'
+    },
+    {
+      id: 'draft-2',
+      name: 'Nagy Péter',
+      ugyszam: 'UGY-000892',
+      formType: '25KTBEV',
+      datetime: '2026-02-07 14:45',
+      submenu: 'Bevallások'
+    },
+    {
+      id: 'draft-3',
+      name: 'Szabó Anna',
+      ugyszam: 'UGY-001177',
+      formType: 'NAV_F04',
+      datetime: '2025-12-12 10:30',
+      submenu: 'Bejelentések'
+    }
+  ];
+  showDraftDeleteConfirm = false;
+  draftToDelete: DraftItem | null = null;
 
   @ViewChild('paginator') paginator!: MatPaginator;
   @ViewChild('tableScrollSentinel') tableScrollSentinel!: ElementRef<HTMLElement>;
@@ -1247,12 +1285,14 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
       .then(resp => resp.text())
       .then(raw => {
         this.allFormGroups = this.parseNyomtatvanyok(raw);
-        this.docMenus = this.parseNyomtatvanyMenus(raw);
+        this.baseDocMenus = this.parseNyomtatvanyMenus(raw);
+        this.refreshDocMenus();
         this.updateActiveEntryGroups();
         this.cdr.markForCheck();
       })
       .catch(() => {
         this.allFormGroups = [];
+        this.baseDocMenus = [];
         this.docMenus = [];
         this.activeEntryGroups = [];
         this.cdr.markForCheck();
@@ -1442,6 +1482,46 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showDocDetailSearch = false;
   }
 
+  selectDraftItem(item: DraftItem): void {
+    const label = `${item.name} - ${item.ugyszam} - ${item.formType}`;
+    this.docSearchChips = [label];
+    this.documentPanelTitle = label;
+    this.showDocContentPanel = true;
+    this.showDocDetailSearch = false;
+  }
+
+  onDraftDeleteClick(item: DraftItem, event: Event): void {
+    event.stopPropagation();
+    this.draftToDelete = item;
+    this.showDraftDeleteConfirm = true;
+  }
+
+  confirmDraftDelete(): void {
+    if (!this.draftToDelete) return;
+    const id = this.draftToDelete.id;
+    this.drafts = this.drafts.filter(d => d.id !== id);
+    this.draftToDelete = null;
+    this.showDraftDeleteConfirm = false;
+    this.refreshDocMenus();
+    this.updateActiveEntryGroups();
+    if (this.currentDocMenu?.title === 'Piszkozatok') {
+      this.currentDocMenu = this.docMenus.find(menu => menu.title === 'Piszkozatok') || null;
+      if (this.drafts.length === 0) {
+        this.currentDocMenu = null;
+        this.currentDocSubmenu = null;
+        this.currentDocSubSubmenu = null;
+      } else if (this.currentDocSubmenu && this.getDraftCountForSubmenu(this.currentDocSubmenu.title) === 0) {
+        this.currentDocSubmenu = null;
+        this.currentDocSubSubmenu = null;
+      }
+    }
+  }
+
+  cancelDraftDelete(): void {
+    this.draftToDelete = null;
+    this.showDraftDeleteConfirm = false;
+  }
+
   docGoBack(): void {
     if (this.currentDocSubSubmenu) {
       this.currentDocSubSubmenu = null;
@@ -1514,6 +1594,51 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
       const sortedEntries = group.entries.sort((a, b) => b.adoevSort - a.adoevSort);
       return { key: group.key, latest: sortedEntries[0], entries: sortedEntries };
     }).sort((a, b) => a.latest.title.localeCompare(b.latest.title));
+  }
+
+  isDraftMenuActive(): boolean {
+    return this.currentDocMenu?.title === 'Piszkozatok';
+  }
+
+  getDraftSubmenus(): string[] {
+    const counts = new Map<string, number>();
+    this.drafts.forEach(d => {
+      counts.set(d.submenu, (counts.get(d.submenu) || 0) + 1);
+    });
+    return Array.from(counts.entries())
+      .filter(([, count]) => count > 0)
+      .map(([title]) => title);
+  }
+
+  getDraftCountForSubmenu(title: string): number {
+    return this.drafts.filter(d => d.submenu === title).length;
+  }
+
+  getDraftsForCurrentSubmenu(): DraftItem[] {
+    if (!this.currentDocSubmenu) return [];
+    return this.drafts.filter(d => d.submenu === this.currentDocSubmenu?.title);
+  }
+
+  private buildDraftMenu(): DocMenuNode | null {
+    if (this.drafts.length === 0) {
+      return null;
+    }
+    const submenus = this.getDraftSubmenus()
+      .map(title => ({
+        title,
+        submenus: [],
+        items: []
+      }));
+    return {
+      title: 'Piszkozatok',
+      submenus,
+      items: []
+    };
+  }
+
+  private refreshDocMenus(): void {
+    const draftMenu = this.buildDraftMenu();
+    this.docMenus = draftMenu ? [draftMenu, ...this.baseDocMenus] : [...this.baseDocMenus];
   }
 
 }
