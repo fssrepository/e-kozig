@@ -143,8 +143,8 @@
   z-index: 50;
   padding: 0;
   background: var(--mat-sys-surface);
-  min-height: calc(100vh - 120px);
-  height: calc(100vh - 120px);
+  min-height: calc(100vh - 140px);
+  height: calc(100vh - 140px);
 }
 
 .detail-popup-inner {
@@ -254,7 +254,7 @@
   }
 
   .detail-popup-inner {
-    height: calc(100vh - 120px);  
+    height: calc(100vh - 140px);  
   }
 
   .readme-content,
