@@ -41,6 +41,11 @@ export class HomeComponent {
   popupTitle = '';
 
   selectedIssue = this.issueSelection.selectedIssue;
+  selectedIssueLabel = this.issueSelection.selectedIssueLabel;
+
+  isNavIssue(): boolean {
+    return (this.selectedIssue() ?? '').toLowerCase() === 'nav';
+  }
 
   addSearchTerm(): void {
     const value = (this.searchCtrl.value || '').trim();

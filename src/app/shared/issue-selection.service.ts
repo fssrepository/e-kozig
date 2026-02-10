@@ -3,8 +3,10 @@ import { Injectable, signal } from '@angular/core';
 @Injectable({ providedIn: 'root' })
 export class IssueSelectionService {
   readonly selectedIssue = signal<string | null>(null);
+  readonly selectedIssueLabel = signal<string | null>(null);
 
-  setIssue(issue: string | null): void {
-    this.selectedIssue.set(issue);
+  setIssue(label: string | null, detail: string | null): void {
+    this.selectedIssueLabel.set(label);
+    this.selectedIssue.set(detail);
   }
 }

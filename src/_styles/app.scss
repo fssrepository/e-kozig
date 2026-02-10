@@ -323,8 +323,7 @@
   border: 1px solid rgba(15, 23, 42, 0.12);
   border-radius: 16px;
   background: #fff;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: visible;
   width: 100%;
   box-sizing: border-box;
 }
@@ -370,7 +369,6 @@
 }
 
 .card-header-action {
-  width: 100%;
   cursor: pointer;
   justify-content: space-between;
 }
@@ -414,7 +412,7 @@
 }
 
 .accordion-body.open {
-  max-height: 2000px;
+  max-height: none;
   overflow: visible;
   opacity: 1;
   padding-top: 0.75rem;
@@ -433,9 +431,9 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  margin-left: 0.25rem;
-  margin-right: 0.85rem;
-  transform: translateX(-8px);
+  margin-left: auto;
+  margin-right: 0.25rem;
+  transform: none;
 }
 
 .user-row {
@@ -450,6 +448,46 @@
   gap: 0.5rem;
   width: 100%;
   box-sizing: border-box;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+.user-row:hover {
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(15, 23, 42, 0.18);
+}
+
+.user-row:active {
+  transform: scale(0.98);
+  background: rgba(25, 118, 210, 0.1);
+  border-color: rgba(25, 118, 210, 0.4);
+  box-shadow: 0 0 0 6px rgba(25, 118, 210, 0.2);
+}
+
+.user-row:focus-visible {
+  outline: 2px solid rgba(25, 118, 210, 0.6);
+  outline-offset: 2px;
+}
+
+.user-row-clicked {
+  animation: userRowBlink 0.45s ease-out;
+}
+
+@keyframes userRowBlink {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(25, 118, 210, 0.0);
+    background: #fff;
+  }
+  35% {
+    transform: scale(1.01);
+    box-shadow: 0 0 0 6px rgba(25, 118, 210, 0.18);
+    background: rgba(25, 118, 210, 0.08);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(25, 118, 210, 0.0);
+    background: #fff;
+  }
 }
 
 .user-row-badge {
@@ -550,6 +588,60 @@
   color: rgba(15, 23, 42, 0.72);
   width: 100%;
   box-sizing: border-box;
+  border: 0;
+  background: transparent;
+  padding: 0.35rem 0.5rem;
+  text-align: left;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.issue-row:hover {
+  background: rgba(15, 23, 42, 0.06);
+}
+
+.issue-row:focus-visible {
+  outline: 2px solid rgba(25, 118, 210, 0.6);
+  outline-offset: 2px;
+}
+
+.issue-row-active {
+  background: rgba(25, 118, 210, 0.12);
+  color: rgba(15, 23, 42, 0.9);
+  font-weight: 700;
+}
+
+.issue-row--nav.issue-row-active {
+  background: rgba(25, 118, 210, 0.18);
+}
+
+.issue-row--kormanyablak.issue-row-active {
+  background: rgba(29, 78, 216, 0.18);
+}
+
+.issue-row--onkormanyzat.issue-row-active {
+  background: rgba(15, 118, 110, 0.18);
+}
+
+.issue-row--bunugy.issue-row-active {
+  background: rgba(185, 28, 28, 0.18);
+}
+
+.issue-row--egeszsegugy.issue-row-active {
+  background: rgba(21, 128, 61, 0.18);
+}
+
+.issue-row--munkauegy.issue-row-active {
+  background: rgba(124, 58, 237, 0.18);
+}
+
+.issue-row--jog.issue-row-active {
+  background: rgba(15, 23, 42, 0.18);
+}
+
+.issue-row--szolgaltatasok.issue-row-active {
+  background: rgba(180, 83, 9, 0.18);
 }
 
 .issue-name {
@@ -776,6 +868,55 @@
   justify-content: flex-end;
 }
 
+.user-delete-confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 3200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-delete-confirm-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.user-delete-confirm-panel {
+  position: relative;
+  z-index: 1;
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  width: min(420px, 90vw);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.user-delete-confirm-panel h3 {
+  margin: 0 0 0.75rem;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.user-delete-confirm-name {
+  margin-bottom: 0.75rem;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(15, 23, 42, 0.85);
+}
+
+.user-delete-confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.user-delete-confirm-actions .delete-btn {
+  color: #d32f2f;
+}
+
 .popup-header {
   display: flex;
   align-items: center;
@@ -948,10 +1089,49 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  align-items: flex-start;
 }
 
 .appointment-actions .link-btn {
   background: #1976d2;
   color: #fff;
   border-color: #1976d2;
+  width: auto;
+  align-self: flex-start;
+}
+
+.suspension-popup {
+  text-align: center;
+}
+
+.suspension-actions {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.suspension-user {
+  margin-top: 0.5rem;
+  font-weight: 700;
+  font-size: 14px;
+  color: rgba(15, 23, 42, 0.85);
+}
+
+.suspension-actions .link-btn {
+  color: #fff;
+  border-color: transparent;
+}
+
+.suspension-actions .link-btn:nth-child(1) {
+  background: #e53935;
+}
+
+.suspension-actions .link-btn:nth-child(2) {
+  background: #2e7d32;
+}
+
+.suspension-actions .link-btn:nth-child(3) {
+  background: #1976d2;
 }

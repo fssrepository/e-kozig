@@ -21,6 +21,11 @@
   max-width: 1100px;
 }
 
+.search-block-hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .search-row {
   display: flex;
   align-items: center;

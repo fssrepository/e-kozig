@@ -6,7 +6,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { FormsModule } from '@angular/forms';
-import { MENU_BADGES, MENU_BADGES_TOTAL } from './shared/menu-badges';
 import { AlertService } from './shared/alert.service';
 import { IssueSelectionService } from './shared/issue-selection.service';
 
@@ -32,6 +31,23 @@ type IssueLabel =
 
 type IssueCountMap = Record<IssueLabel, number>;
 
+interface UserCounts {
+  appointments: number;
+  issues: number;
+  suspension: number;
+  centralHelp: number;
+  userSettings: number;
+  users: number;
+}
+
+interface UserEntry {
+  id: string;
+  name: string;
+  initials: string;
+  issueCounts: IssueCountMap;
+  counts: UserCounts;
+}
+
 @Component({
   selector: 'app-root',
   imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, MatListModule, MatIconModule, MatButtonModule, MatExpansionModule, FormsModule],
@@ -55,8 +71,8 @@ export class App {
 
   protected activePopup: 'settings' | 'contact' | 'balance' | 'appointment' | 'centralHelp' | 'suspension' | 'userSettings' | 'addUser' | 'deleteUser' | null = null;
   protected readonly title = signal('e-kozig');
-  protected readonly menuBadges = MENU_BADGES;
-  protected readonly menuBadgeTotal = MENU_BADGES_TOTAL;
+  protected menuBadges = { home: 0, documents: 0, invoices: 0 };
+  protected menuBadgeTotal = 0;
   protected showMobileMenu = false;
   protected showUserMenu = false;
   protected userBadgeCount = 1;
@@ -128,7 +144,7 @@ export class App {
     }
   ];
 
-  protected readonly users = [
+  protected readonly users: UserEntry[] = [
     {
       id: 'user-1',
       name: 'Farkas Anna',
@@ -145,7 +161,7 @@ export class App {
       } as IssueCountMap,
       counts: {
         appointments: 3,
-        issues: 0,
+        issues: 15,
         suspension: 1,
         centralHelp: 2,
         userSettings: 1,
@@ -167,8 +183,8 @@ export class App {
         'Szolgáltatások': 0
       } as IssueCountMap,
       counts: {
-        appointments: 1,
-        issues: 0,
+        appointments: 2,
+        issues: 5,
         suspension: 0,
         centralHelp: 1,
         userSettings: 1,
@@ -190,8 +206,8 @@ export class App {
         'Szolgáltatások': 3
       } as IssueCountMap,
       counts: {
-        appointments: 5,
-        issues: 0,
+        appointments: 4,
+        issues: 13,
         suspension: 2,
         centralHelp: 1,
         userSettings: 1,
@@ -291,6 +307,9 @@ export class App {
     'Szolgáltatások'
   ];
   protected selectedAppointmentCategory = this.appointmentCategories[0];
+  protected clickedUserId: string | null = null;
+  private clickedUserTimer: ReturnType<typeof setTimeout> | null = null;
+  protected pendingDeleteUser: UserEntry | null = null;
 
   protected readonly issueGroups: Array<{ label: IssueLabel; detail: string }> = [
     { label: 'Adóügy', detail: 'NAV' },
@@ -306,9 +325,21 @@ export class App {
   protected usersOpen = true;
   protected appointmentsOpen = false;
   protected issuesOpen = false;
+  protected selectedIssueLabel: IssueLabel = 'Adóügy';
+  protected readonly issueLogoMap: Record<IssueLabel, string> = {
+    'Adóügy': 'adougy-logo.svg',
+    'Kormányablak': 'kormanyablak-logo.svg',
+    'Önkormányzat': 'onkormanyzat-logo.svg',
+    'Bűnügy': 'bunugy-logo.svg',
+    'Egészségügy': 'egeszsegugy-logo.svg',
+    'Munkaügy': 'munkauegy-logo.svg',
+    'Jog': 'jog-logo.svg',
+    'Szolgáltatások': 'szolgaltatasok-logo.svg'
+  };
 
   constructor() {
     this.userBadgeCount = this.getUserMenuTotal();
+    this.selectIssue('Adóügy');
     // Listen for menu toggle events from child components
     window.addEventListener('toggleMobileMenu', () => {
       this.toggleMobileMenu();
@@ -324,13 +355,17 @@ export class App {
     this.showMobileMenu = false;
   }
 
-  openUserPopup(type: 'appointment' | 'centralHelp' | 'suspension' | 'userSettings' | 'addUser' | 'deleteUser') {
+  openUserPopup(type: 'appointment' | 'centralHelp' | 'suspension' | 'userSettings' | 'addUser' | 'deleteUser', user?: UserEntry) {
+    if (type === 'deleteUser' || type === 'suspension') {
+      this.pendingDeleteUser = user ?? null;
+    }
     this.activePopup = type;
     this.showUserMenu = false;
   }
 
   closePopup() {
     this.activePopup = null;
+    this.pendingDeleteUser = null;
   }
 
   getPopupTitle() {
@@ -410,7 +445,16 @@ export class App {
 
   selectUser(userId: string) {
     this.activeUserId = userId;
+    this.clickedUserId = userId;
+    if (this.clickedUserTimer) {
+      clearTimeout(this.clickedUserTimer);
+    }
+    this.clickedUserTimer = setTimeout(() => {
+      this.clickedUserId = null;
+      this.clickedUserTimer = null;
+    }, 450);
     this.userBadgeCount = this.getUserMenuTotal();
+    this.selectIssue('Adóügy');
     const firstAppointment = this.userAppointments[0];
     if (firstAppointment) {
       this.selectedAppointmentId = firstAppointment.id;
@@ -418,13 +462,13 @@ export class App {
   }
 
   getUserMenuTotal() {
-    const counts = this.activeUser.counts;
-    return Object.entries(counts).reduce((sum, [key, value]) => {
-      if (key === 'issues') {
-        return sum + this.getIssueTotal();
-      }
-      return sum + value;
-    }, 0);
+    return this.getUserMenuTotalFor(this.activeUser);
+  }
+
+  getUserMenuTotalFor(user: { id: string; counts: UserCounts; issueCounts?: IssueCountMap }) {
+    const issueTotal = Object.values(user.issueCounts ?? {}).reduce((sum, value) => sum + value, 0);
+    const appointmentTotal = this.appointmentsByUser[user.id]?.length ?? user.counts.appointments;
+    return appointmentTotal + issueTotal;
   }
 
   getUserMenuCount(key: keyof typeof this.activeUser.counts) {
@@ -470,8 +514,67 @@ export class App {
     this.issueQuery = value;
     const match = this.issueGroups.find(item => item.label.toLowerCase() === value.toLowerCase());
     if (match) {
-      this.issueSelection.setIssue(match.detail);
+      this.selectIssue(match.label);
     }
+  }
+
+  selectIssue(issue: IssueLabel) {
+    this.selectedIssueLabel = issue;
+    const detail = this.getIssueDetail(issue);
+    this.issueSelection.setIssue(issue, detail);
+    this.updateMenuBadgesForIssue(issue);
+  }
+
+  getIssueDetail(issue: IssueLabel) {
+    return this.issueGroups.find(item => item.label === issue)?.detail ?? '';
+  }
+
+  getIssueRowClass(issue: IssueLabel) {
+    switch (issue) {
+      case 'Adóügy':
+        return 'issue-row--nav';
+      case 'Kormányablak':
+        return 'issue-row--kormanyablak';
+      case 'Önkormányzat':
+        return 'issue-row--onkormanyzat';
+      case 'Bűnügy':
+        return 'issue-row--bunugy';
+      case 'Egészségügy':
+        return 'issue-row--egeszsegugy';
+      case 'Munkaügy':
+        return 'issue-row--munkauegy';
+      case 'Jog':
+        return 'issue-row--jog';
+      case 'Szolgáltatások':
+        return 'issue-row--szolgaltatasok';
+      default:
+        return '';
+    }
+  }
+
+  getIssueLogo() {
+    const file = this.issueLogoMap[this.selectedIssueLabel] ?? 'adougy-logo.svg';
+    return `assets/img/${file}`;
+  }
+
+  private updateMenuBadgesForIssue(issue: IssueLabel) {
+    const count = this.getIssueCount(issue);
+    if (issue === 'Adóügy') {
+      const base = Math.floor(count / 3);
+      const remainder = count % 3;
+      this.menuBadges = {
+        home: base + (remainder > 0 ? 1 : 0),
+        documents: base + (remainder > 1 ? 1 : 0),
+        invoices: base
+      };
+    } else {
+      this.menuBadges = {
+        home: count,
+        documents: 0,
+        invoices: 0
+      };
+    }
+    this.menuBadgeTotal = count;
   }
 
   openMapLink(url: string, openNewTab: boolean) {

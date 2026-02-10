@@ -28,8 +28,14 @@
     <div class="mobile-menu-backdrop" [class.open]="showMobileMenu" (click)="closeMobileMenu()" *ngIf="showMobileMenu"></div>
     <div class="mobile-menu-panel-global" [class.open]="showMobileMenu">
       <div class="menu-header menu-header-row">
-        <img src="assets/img/nav-logo.svg" alt="NAV" />
-        <button class="balance-card" type="button" (click)="openPopup('balance')" aria-label="Egyenleg megnyitása">
+        <img [src]="getIssueLogo()" [alt]="selectedIssueLabel" />
+        <button
+          *ngIf="selectedIssueLabel === 'Adóügy'"
+          class="balance-card"
+          type="button"
+          (click)="openPopup('balance')"
+          aria-label="Egyenleg megnyitása"
+        >
           <span class="balance-title">Egyenleg</span>
           <span class="balance-value">-200e Ft</span>
         </button>
@@ -40,21 +46,21 @@
           <span>Kezdőoldal</span>
           <span class="item-badge" *ngIf="menuBadges.home > 0">{{ menuBadges.home }}</span>
         </a>
-        <a class="menu-item" routerLink="/documents" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMobileMenu()">
+        <a *ngIf="selectedIssueLabel === 'Adóügy'" class="menu-item" routerLink="/documents" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMobileMenu()">
           <mat-icon>description</mat-icon>
           <span>Dokumentumok</span>
           <span class="item-badge" *ngIf="menuBadges.documents > 0">{{ menuBadges.documents }}</span>
         </a>
-        <a class="menu-item" routerLink="/documents/szamlak" routerLinkActive="active" (click)="closeMobileMenu()">
+        <a *ngIf="selectedIssueLabel === 'Adóügy'" class="menu-item" routerLink="/documents/szamlak" routerLinkActive="active" (click)="closeMobileMenu()">
           <mat-icon>receipt_long</mat-icon>
           <span>Bizonylatok</span>
           <span class="item-badge" *ngIf="menuBadges.invoices > 0">{{ menuBadges.invoices }}</span>
         </a>
-        <button class="menu-item menu-item-action" type="button" (click)="openPopup('contact')">
+        <button *ngIf="selectedIssueLabel === 'Adóügy'" class="menu-item menu-item-action" type="button" (click)="openPopup('contact')">
           <mat-icon>support_agent</mat-icon>
           <span>Kapcsolat</span>
         </button>
-        <button class="menu-item menu-item-action" type="button" (click)="openPopup('settings')">
+        <button *ngIf="selectedIssueLabel === 'Adóügy'" class="menu-item menu-item-action" type="button" (click)="openPopup('settings')">
           <mat-icon>settings</mat-icon>
           <span>Beállítások</span>
         </button>
@@ -91,13 +97,19 @@
           </div>
           <div class="card-body user-list-body accordion-body" [class.open]="usersOpen">
             <div class="accordion-inner">
-              <button class="user-row" type="button" *ngFor="let user of otherUsers" (click)="selectUser(user.id)">
+              <button
+                class="user-row"
+                type="button"
+                *ngFor="let user of otherUsers"
+                (click)="selectUser(user.id)"
+                [class.user-row-clicked]="clickedUserId === user.id"
+              >
                 <span class="user-row-name">{{ user.name }}</span>
                 <span class="user-row-actions">
                   <button
                     type="button"
                     class="row-icon-btn"
-                    (click)="$event.stopPropagation(); openUserPopup('suspension')"
+                    (click)="$event.stopPropagation(); openUserPopup('suspension', user)"
                     aria-label="Akadályoztatás"
                   >
                     <mat-icon>priority_high</mat-icon>
@@ -105,12 +117,12 @@
                   <button
                     type="button"
                     class="row-icon-btn"
-                    (click)="$event.stopPropagation(); openUserPopup('deleteUser')"
+                    (click)="$event.stopPropagation(); openUserPopup('deleteUser', user)"
                     aria-label="Törlés"
                   >
                     <mat-icon>delete</mat-icon>
                   </button>
-                  <span class="user-row-badge">{{ user.counts.appointments + user.counts.issues + user.counts.suspension + user.counts.centralHelp + user.counts.userSettings + user.counts.users }}</span>
+                  <span class="user-row-badge">{{ getUserMenuTotalFor(user) }}</span>
                 </span>
               </button>
             </div>
@@ -152,10 +164,17 @@
           <div class="card-body accordion-body" [class.open]="issuesOpen">
             <div class="accordion-inner">
               <div class="issue-list">
-                <div class="issue-row" *ngFor="let issue of issueGroups">
+                <button
+                  class="issue-row"
+                  type="button"
+                  *ngFor="let issue of issueGroups"
+                  (click)="selectIssue(issue.label)"
+                  [class.issue-row-active]="selectedIssueLabel === issue.label"
+                  [class]="getIssueRowClass(issue.label)"
+                >
                   <span class="issue-name">{{ issue.label }}</span>
                   <span class="issue-count" *ngIf="getIssueCount(issue.label) > 0">{{ getIssueCount(issue.label) }}</span>
-                </div>
+                </button>
               </div>
             </div>
           </div>
@@ -175,8 +194,14 @@
 
     <nav class="sidebar" aria-label="Primary navigation">
       <div class="sidebar-top">
-        <img src="assets/img/nav-logo.svg" alt="NAV" />
-        <button class="balance-card" type="button" (click)="openPopup('balance')" aria-label="Egyenleg megnyitása">
+        <img [src]="getIssueLogo()" [alt]="selectedIssueLabel" />
+        <button
+          *ngIf="selectedIssueLabel === 'Adóügy'"
+          class="balance-card"
+          type="button"
+          (click)="openPopup('balance')"
+          aria-label="Egyenleg megnyitása"
+        >
           <span class="balance-title">Egyenleg</span>
           <span class="balance-value">-200e Ft</span>
         </button>
@@ -187,21 +212,21 @@
           <span>Kezdőoldal</span>
           <span class="menu-badge" *ngIf="menuBadges.home > 0">{{ menuBadges.home }}</span>
         </a>
-        <a mat-list-item routerLink="/documents" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }">
+        <a *ngIf="selectedIssueLabel === 'Adóügy'" mat-list-item routerLink="/documents" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }">
           <mat-icon aria-hidden="false" aria-label="Dokumentumok">description</mat-icon>
           <span>Dokumentumok</span>
           <span class="menu-badge" *ngIf="menuBadges.documents > 0">{{ menuBadges.documents }}</span>
         </a>
-        <a mat-list-item routerLink="/documents/szamlak" routerLinkActive="selected">
+        <a *ngIf="selectedIssueLabel === 'Adóügy'" mat-list-item routerLink="/documents/szamlak" routerLinkActive="selected">
           <mat-icon aria-hidden="false" aria-label="Bizonylatok">receipt_long</mat-icon>
           <span>Bizonylatok</span>
           <span class="menu-badge" *ngIf="menuBadges.invoices > 0">{{ menuBadges.invoices }}</span>
         </a>
-        <button mat-list-item type="button" class="menu-item-action" (click)="openPopup('contact')">
+        <button *ngIf="selectedIssueLabel === 'Adóügy'" mat-list-item type="button" class="menu-item-action" (click)="openPopup('contact')">
           <mat-icon aria-hidden="false" aria-label="Kapcsolat">support_agent</mat-icon>
           <span>Kapcsolat</span>
         </button>
-        <button mat-list-item type="button" class="menu-item-action" (click)="openPopup('settings')">
+        <button *ngIf="selectedIssueLabel === 'Adóügy'" mat-list-item type="button" class="menu-item-action" (click)="openPopup('settings')">
           <mat-icon aria-hidden="false" aria-label="Beállítások">settings</mat-icon>
           <span>Beállítások</span>
         </button>
@@ -213,7 +238,7 @@
   </div>
 </main>
 
-<section class="app-popup" *ngIf="activePopup">
+<section class="app-popup" *ngIf="activePopup && activePopup !== 'deleteUser'">
   <div class="app-popup-backdrop" (click)="closePopup()"></div>
   <div class="app-popup-panel" (click)="$event.stopPropagation()">
     <div class="popup-header">
@@ -292,6 +317,9 @@
       <div *ngIf="activePopup === 'suspension'" class="suspension-popup">
         <p>Egészségügyi Krízishelyzet Moratórium - betegség, baleset, gondnok stb.</p>
         <p>A felhasználó nem tudja ellátni a feladatait.</p>
+        <div class="suspension-user" *ngIf="pendingDeleteUser">
+          {{ pendingDeleteUser.name }}
+        </div>
         <div class="suspension-actions">
           <button type="button" class="link-btn">Felfüggeszt</button>
           <button type="button" class="link-btn">Felfüggesztés törlése</button>
@@ -304,13 +332,20 @@
       <div *ngIf="activePopup === 'addUser'" class="contact-content">
         KAÜ (Ügyfélkapu+ bejelentkezés)
       </div>
-      <div *ngIf="activePopup === 'deleteUser'" class="delete-confirm">
-        <p>Valóban törölni akarja?</p>
-        <div class="delete-actions">
-          <button mat-stroked-button type="button" (click)="closePopup()">Mégsem</button>
-          <button mat-raised-button color="warn" type="button" (click)="closePopup()">Törlés</button>
-        </div>
-      </div>
+    </div>
+  </div>
+</section>
+
+<section class="user-delete-confirm" *ngIf="activePopup === 'deleteUser'">
+  <div class="user-delete-confirm-backdrop" (click)="closePopup()"></div>
+  <div class="user-delete-confirm-panel" (click)="$event.stopPropagation()">
+    <h3>Valóban törölni akarja?</h3>
+    <div class="user-delete-confirm-name" *ngIf="pendingDeleteUser">
+      {{ pendingDeleteUser.name }}
+    </div>
+    <div class="user-delete-confirm-actions">
+      <button mat-stroked-button type="button" (click)="closePopup()">Mégsem</button>
+      <button mat-raised-button color="warn" class="delete-btn" type="button" (click)="closePopup()">Törlés</button>
     </div>
   </div>
 </section>
