@@ -70,7 +70,7 @@ export class App {
     return item.level ?? 0;
   }
 
-  protected activePopup: 'settings' | 'contact' | 'balance' | 'appointment' | 'centralHelp' | 'suspension' | 'userSettings' | 'addUser' | 'deleteUser' | 'logoutConfirm' | null = null;
+  protected activePopup: 'settings' | 'contact' | 'balance' | 'appointment' | 'addAppointment' | 'centralHelp' | 'suspension' | 'userSettings' | 'addUser' | 'deleteUser' | 'logoutConfirm' | null = null;
   protected readonly title = signal('e-kozig');
   protected menuBadges = { home: 0, documents: 0, invoices: 0 };
   protected menuBadgeTotal = 0;
@@ -363,7 +363,7 @@ export class App {
     this.showMobileMenu = false;
   }
 
-  openUserPopup(type: 'appointment' | 'centralHelp' | 'suspension' | 'userSettings' | 'addUser' | 'deleteUser' | 'logoutConfirm', user?: UserEntry) {
+  openUserPopup(type: 'appointment' | 'addAppointment' | 'centralHelp' | 'suspension' | 'userSettings' | 'addUser' | 'deleteUser' | 'logoutConfirm', user?: UserEntry) {
     if (type === 'deleteUser' || type === 'suspension') {
       this.pendingDeleteUser = user ?? null;
     }
@@ -386,6 +386,8 @@ export class App {
         return 'Egyenleg';
       case 'appointment':
         return 'Időpontfoglalás';
+      case 'addAppointment':
+        return 'Új időpontfoglalás';
       case 'centralHelp':
         return 'Központi segítség';
       case 'suspension':

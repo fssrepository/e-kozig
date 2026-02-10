@@ -100,6 +100,9 @@
                 <span class="card-badge">{{ userAppointments.length }}</span>
                 <span class="card-title">Időpontfoglalás</span>
               </span>
+              <button class="header-icon-btn" type="button" (click)="$event.stopPropagation(); openUserPopup('addAppointment')">
+                <mat-icon>add</mat-icon>
+              </button>
             </div>
             <div class="card-body appointment-list accordion-body" [class.open]="appointmentsOpen">
               <div class="accordion-inner">
@@ -351,6 +354,13 @@
       </div>
       <div *ngIf="activePopup === 'addUser'" class="contact-content">
         KAÜ (Ügyfélkapu+ bejelentkezés)
+      </div>
+      <div *ngIf="activePopup === 'addAppointment'" class="contact-content">
+        <p>Helyszín:</p>
+        <p>Cím:</p>
+        <p>Időpont:</p>
+        <p>Kategória:</p>
+        <p>Térkép link:</p>
       </div>
     </div>
   </div>
