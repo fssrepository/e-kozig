@@ -1,31 +1,7 @@
-Szamlak menu
-------------
-
-Adozoi es foglalkoztatasi adatok - a bal oldali menuben - a jobb oldali általánosabb, nem csak adóhatóság
-
-fab kicsit magasabb, es kevesbe ilyen szeles legyen es background szinben usson el egymastol, legyen shadow is
-
-| Ikon | Név / Hivatkozás       | Feladó / Kedvezményezett | Dátum        | Státusz    |
-|------|----------------------|-------------------------|-------------|------------|
-| 📄   | Számla 2026/02/01     | ABC Kft.               | 2026-02-01  | Beadva     |
-| 🧾   | Nyugta 10234           | DEF Bt.                | 2026-01-29  | Kiajánlott |
-| ⚖️   | Vámhatározat 5678      | NAV Vámhivatal         | 2026-01-20  | Elfogadva  |
-| 📄   | Egyéb dokumentum 12    | XYZ Zrt.               | 2026-02-03  | Feldolgozás alatt |
-
-status ikon, bizonylat sorszama/vevo neve/elado neve (3 sorban) + statusz + kiallitas datuma - tejesites datuma - (az adokod felulbiralasa)
-
-szamlak, nyugtak, vamhatarozatok,egyeb
-
-az e-AFA a Szamlak-ba lenne beintegralhato, es user valaszto filter az elso, bevallasi idoszak
-
-szamla soroknal, AFA bevallasi idoszakba tenni - statisztika overlay gomb az uj szamla gomb felett
-
-szamlak statusza szuro
-
-"Számlák" menupont - kilistazza a szamlakat - alul egy gomb, ahol uj szamlat lehet kiallitani - popup es ez lenne a NAV online Szamlazoja a billingo helyett
-
 upo menu
 --------
+
+Adozoi es foglalkoztatasi adatok - a bal oldali menuben - a jobb oldali általánosabb, nem csak adóhatóság
 
 settings menu szamlak
 

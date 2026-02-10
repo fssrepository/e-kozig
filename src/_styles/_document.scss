@@ -252,12 +252,33 @@ mat-paginator ::ng-deep .mat-mdc-paginator-page-size-label {
   } /* Amber - pending acceptance */
   &.status-hiba { color: #e53935; } /* Red - error */
   &.status-lezarva { color: #43a047; } /* Green - closed/completed */
+  &.status-felulbiralasra-var { color: #ef6c00; }
+  &.status-felulvizsgalva { color: #2e7d32; }
+  &.status-ellenorzesre-var { color: #0277bd; }
 }
 
 .status-icon.status-elfogadasra-var,
 .accordion-icon.status-elfogadasra-var,
 .status-icon-button.status-elfogadasra-var mat-icon {
   color: darkorange !important;
+}
+
+.status-icon.status-felulbiralasra-var,
+.accordion-icon.status-felulbiralasra-var,
+.status-icon-button.status-felulbiralasra-var mat-icon {
+  color: #ef6c00 !important;
+}
+
+.status-icon.status-felulvizsgalva,
+.accordion-icon.status-felulvizsgalva,
+.status-icon-button.status-felulvizsgalva mat-icon {
+  color: #2e7d32 !important;
+}
+
+.status-icon.status-ellenorzesre-var,
+.accordion-icon.status-ellenorzesre-var,
+.status-icon-button.status-ellenorzesre-var mat-icon {
+  color: #0277bd !important;
 }
 
 .datetime-cell { text-align: right; }
@@ -301,12 +322,36 @@ tr.read .col-name .name-primary { font-weight: 500; }
 table { border-collapse: collapse; }
 tr[mat-row] td, tr.mat-mdc-row td, tr.mdc-data-table__row td { border-bottom: none !important; }
 
-td { background: transparent; position: relative; z-index: 1; transition: background 0.18s, color 0.12s; }
+td { background: transparent; position: relative; z-index: 1; transition: background 0.18s, color 0.12s; vertical-align: middle; }
 
 tr[mat-row], tr.mat-mdc-row, tr.mdc-data-table__row { cursor: pointer; }
 
 /* Mobile table layout */
 .name-primary { font-weight: 600; }
+.name-primary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bizonylat-inline {
+  font-weight: 500;
+}
+
+.mobile-bizonylat {
+  font-weight: 500;
+}
+
+.mobile-status,
+.mobile-form,
+.mobile-bizonylat {
+  white-space: nowrap;
+}
+
+.mobile-status {
+  display: block;
+  width: 100%;
+}
 .mobile-meta {
   display: none;
   font-size: 12px;
@@ -334,8 +379,17 @@ tr[mat-row], tr.mat-mdc-row, tr.mdc-data-table__row { cursor: pointer; }
     white-space: normal;
   }
 
+  .bizonylat-inline {
+    display: none;
+  }
+
   .mobile-meta {
-    display: block;
+    display: inline-flex;
+    flex-wrap: wrap;
+  }
+
+  .mobile-bizonylat {
+    display: inline-flex;
   }
 }
 
@@ -476,9 +530,69 @@ tr[mat-row], tr.mat-mdc-row, tr.mdc-data-table__row { cursor: pointer; }
 }
 .status-search { width: 100%; display:flex; align-items:center; gap:6px; }
 
+.direction-wrapper { position: relative; z-index: 10; }
+.direction-btn { display:flex; align-items:center; gap:0.5rem; }
+.direction-btn .arrow { transition: transform .18s ease; order: 1; }
+.direction-btn .arrow.open { transform: rotate(180deg); }
+.direction-btn .tick { color: var(--mat-sys-primary); }
+.direction-btn.active { background-color: rgba(25, 118, 210, 0.2); }
+
+.direction-panel { 
+  position: absolute; 
+  top: calc(100% + 6px); 
+  left: 0; 
+  right: auto; 
+  width: 320px; 
+  max-width: calc(100vw - 32px); 
+  max-height: 0; 
+  overflow: hidden; 
+  transition: max-height .22s ease; 
+  background: var(--mat-sys-surface); 
+  border-radius: 8px; 
+  padding: 8px; 
+  box-shadow: 0 6px 18px rgba(2,6,23,0.06); 
+  z-index: 200; 
+}
+.direction-panel.open { 
+  max-height: 260px; 
+  overflow-y: auto; 
+}
+.direction-search { width: 100%; display:flex; align-items:center; gap:6px; }
+
+.type-wrapper { position: relative; z-index: 10; }
+.type-btn { display:flex; align-items:center; gap:0.5rem; }
+.type-btn .arrow { transition: transform .18s ease; order: 1; }
+.type-btn .arrow.open { transform: rotate(180deg); }
+.type-btn .tick { color: var(--mat-sys-primary); }
+.type-btn.active { background-color: rgba(25, 118, 210, 0.2); }
+
+.type-panel { 
+  position: absolute; 
+  top: calc(100% + 6px); 
+  left: 0; 
+  right: auto; 
+  width: 320px; 
+  max-width: calc(100vw - 32px); 
+  max-height: 0; 
+  overflow: hidden; 
+  transition: max-height .22s ease; 
+  background: var(--mat-sys-surface); 
+  border-radius: 8px; 
+  padding: 8px; 
+  box-shadow: 0 6px 18px rgba(2,6,23,0.06); 
+  z-index: 200; 
+}
+.type-panel.open { 
+  max-height: 260px; 
+  overflow-y: auto; 
+}
+.type-search { width: 100%; display:flex; align-items:center; gap:6px; }
+
 .ugyfeld-search .mat-mdc-form-field-infix,
 .form-search .mat-mdc-form-field-infix,
-.status-search .mat-mdc-form-field-infix {
+.status-search .mat-mdc-form-field-infix,
+.direction-search .mat-mdc-form-field-infix,
+.type-search .mat-mdc-form-field-infix {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -669,6 +783,482 @@ td.mat-column-icon {
   font-size: 26px;
   width: 26px;
   height: 26px;
+}
+
+.invoice-create-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.invoice-card {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 0.75rem;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.invoice-card.wide {
+  grid-column: span 2;
+  align-items: center;
+}
+
+.invoice-card-title {
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.6);
+  text-align: left;
+}
+
+.invoice-items {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.invoice-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.invoice-item .item-name {
+  font-weight: 600;
+}
+
+.invoice-item .item-meta {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.invoice-summary {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 500;
+  gap: 1.5rem;
+  padding: 0.35rem 0;
+}
+
+.summary-row span:first-child {
+  flex: 1 1 auto;
+}
+
+.summary-row.total {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.upload-zone {
+  border: 1px dashed rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  display: grid;
+  gap: 0.5rem;
+  background: #fff;
+}
+
+.upload-zone mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.upload-text {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 13px;
+}
+
+.afa-option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.afa-option-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.afa-option-desc {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.period-status-cell {
+  width: 32px;
+  text-align: left;
+  padding-left: 8px;
+  vertical-align: middle;
+}
+
+.period-status-open {
+  color: #2e7d32;
+}
+
+.period-status-locked {
+  color: #6d4c41;
+}
+
+.period-name-text {
+  font-weight: 600;
+}
+
+.period-meta {
+  display: none;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+  margin-top: 2px;
+  gap: 6px;
+}
+
+.period-detail-view .detail-header {
+  padding-top: 0.75rem;
+}
+
+.period-detail-view .detail-panel {
+  box-shadow: none;
+  padding: 0.75rem;
+}
+
+.period-table {
+  overflow-x: hidden;
+}
+
+.period-table table {
+  width: 100%;
+  table-layout: auto;
+}
+
+.period-panel .popup-body {
+  overflow-x: hidden;
+}
+
+.period-panel .popup-header {
+  padding-bottom: 0.25rem;
+}
+
+.period-panel .popup-body {
+  padding-top: 0.25rem;
+  gap: 0.5rem;
+}
+
+.period-panel .filters {
+  margin-top: 0;
+}
+
+.period-panel .top-controls {
+  margin-top: 0.25rem;
+}
+
+.period-panel .table-container {
+  margin-top: 1rem;
+}
+
+.period-panel .top-controls,
+.period-panel mat-paginator {
+  background: #fff;
+}
+
+.period-open-row::before,
+.period-closed-row::before {
+  background-color: transparent;
+}
+
+.period-open-row td {
+  background-color: #fff;
+}
+
+.period-closed-row td {
+  background-color: rgba(229, 57, 53, 0.06);
+}
+
+.create-action {
+  display: flex;
+  justify-content: center;
+}
+
+.create-invoice-btn {
+  width: 100%;
+  max-width: 320px;
+}
+
+.popup-action-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.invoices .mobile-form::before {
+  content: '';
+  margin: 0;
+}
+
+.invoice-create-layout {
+  gap: 1rem;
+  max-width: 100%;
+}
+
+.invoice-create-layout .inline-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.items-table {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.items-row {
+  display: grid;
+  grid-template-columns: 2.5fr 1fr 1fr 0.8fr 1fr 1.2fr 48px;
+  gap: 0.75rem;
+  align-items: center;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.items-header {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.55);
+  align-items: end;
+}
+
+.items-header span {
+  padding-left: 0;
+}
+
+.item-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.item-label {
+  display: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.items-field {
+  width: 100%;
+  min-width: 0;
+}
+
+.items-row > * {
+  min-width: 0;
+}
+
+.add-item-btn {
+  align-self: flex-start;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .invoice-create-layout .inline-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .items-row {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "name name"
+      "unitprice vat"
+      "unit qty"
+      "net net";
+    width: 100%;
+  }
+
+  .cell-name { grid-area: name; }
+  .cell-unitprice { grid-area: unitprice; }
+  .cell-vat { grid-area: vat; }
+  .cell-unit { grid-area: unit; }
+  .cell-qty { grid-area: qty; }
+  .cell-net { grid-area: net; }
+
+  .items-header {
+    display: none;
+  }
+
+  .item-label {
+    display: none;
+  }
+}
+
+.vat-autocomplete-panel {
+  min-width: 760px;
+  max-width: min(860px, 95vw);
+}
+
+.vat-autocomplete-panel .afa-option {
+  min-width: 100%;
+  width: 100%;
+}
+
+.afa-option-title {
+  
+}
+
+.items-accordion {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.items-accordion .mat-expansion-panel {
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.08);
+}
+
+.items-accordion .items-row {
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "name name"
+    "unitprice vat"
+    "unit qty"
+    "net net"
+    "actions actions";
+}
+
+.items-accordion .cell-name { grid-area: name; }
+.items-accordion .cell-unitprice { grid-area: unitprice; }
+.items-accordion .cell-vat { grid-area: vat; }
+.items-accordion .cell-unit { grid-area: unit; }
+.items-accordion .cell-qty { grid-area: qty; }
+.items-accordion .cell-net { grid-area: net; }
+.items-accordion .cell-actions { grid-area: actions; }
+
+.items-accordion .item-label {
+  display: block;
+}
+
+.cell-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100%;
+}
+
+.item-remove mat-icon {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.accordion-actions {
+  margin-left: auto;
+}
+
+@media (max-width: 768px) {
+  .vat-autocomplete-panel {
+    min-width: 0;
+    max-width: 90vw;
+  }
+
+  .doc-popup-panel {
+    overflow-x: hidden;
+  }
+
+  .popup-body {
+    overflow-x: hidden;
+  }
+}
+
+.period-table td {
+  vertical-align: middle;
+  text-align: left;
+}
+
+.period-name {
+  text-align: left;
+}
+
+.period-range {
+  text-align: right;
+}
+
+.period-table .mat-column-statusIcon {
+  width: 40px;
+}
+
+.period-table .mat-column-ugyfel {
+  text-align: left;
+  padding-left: 8px;
+}
+
+.period-table .mat-column-idoszak {
+  text-align: right;
+}
+
+.col-ugyszam,
+.col-bizonylat {
+  white-space: nowrap;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+@media (max-width: 768px) {
+  .col-ugyszam,
+  .col-bizonylat {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .period-range {
+    text-align: left;
+  }
+
+  .period-table .mat-column-statusIcon {
+    width: 32px;
+  }
+
+  .period-table .mat-column-idoszak {
+    text-align: left;
+  }
+}
+
+@media (max-width: 900px) {
+  .invoice-create-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-card.wide {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .period-range {
+    display: none;
+  }
+
+  .period-name-text {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .period-meta {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+  }
 }
 
 @media (max-width: 768px) {
@@ -956,6 +1546,21 @@ mat-panel-description {
   overflow: visible;
   z-index: 2;
   margin-top: 0;
+}
+
+@media (min-width: 900px) {
+  .doc-popup {
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .doc-popup-panel {
+    width: min(1100px, 100%);
+    height: calc(100vh - 2rem);
+    max-height: calc(100vh - 2rem);
+    border-radius: 12px;
+    margin: 0 auto;
+  }
 }
 
 .popup-header {

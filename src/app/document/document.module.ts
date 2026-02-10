@@ -12,6 +12,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DocumentComponent } from './components/document.component';
+import { InvoicesComponent } from './components/invoices.component';
 
 @NgModule({
   imports: [
@@ -27,8 +28,10 @@ import { DocumentComponent } from './components/document.component';
     MatPaginatorModule,
     MatProgressSpinnerModule,
     DocumentComponent,
+    InvoicesComponent,
     RouterModule.forChild([
-      { path: '', component: DocumentComponent }
+      { path: '', component: DocumentComponent },
+      { path: 'szamlak', component: InvoicesComponent }
     ])
   ]
 })
