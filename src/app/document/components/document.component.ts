@@ -149,7 +149,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
   documents: DocumentItem[] = [];
 
   dataSource = new MatTableDataSource<DocumentItem>(this.documents);
-  displayedColumns: string[] = ['icon', 'name', 'description', 'status', 'datetime'];
+  displayedColumns: string[] = ['icon', 'name', 'ugyszam', 'description', 'status', 'datetime'];
 
   loading = false;
   selectedItem: DocumentItem | null = null;
