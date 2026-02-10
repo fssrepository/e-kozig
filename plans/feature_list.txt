@@ -1,50 +1,44 @@
-user selector - balra nyilo menu:
+user selector
 --------------------------------
 
-Egészségügyi Krízishelyzet Moratórium - suspend on user selector
+minden menu mellett egy piros szam, ugy mint az upo menuben
 
-ha kivalasztjuk a szervezetet, a bal oldali menu frissuljon (ikon) es a szuro feltetelek is es a sugo gomb alatti tartalom is --- ezt csak a kivalaszt gombra elojovo popup-ra leirni
-(egyelore a NAV Upo logot, ne tuntessuk el) - jelezzuk, hogy akar NAV logo is lehetne ott - onya integracioval
+1) when clicking user button (top right corner) similar like NAV side menu bar appears just sliding to the right side of the screen
+the icon of the user button (without shadow) + kilepes (exit symbol) button next to it
 
-felhasználó hozzaadasa + gomb - switch user felulet
+Felhasználók menü
+felhasználók kiveve a kivalasztottat - rakkattintva - az selectalodik ki - es megy a menu tetejere, az eddigi felhasznalo meg jon ide
+felhasznaló hozzáadása gomb -> popup content with KAÜ
 
-busz, vonatjegyek, posta
-Szolgáltatások - kozuzemi szamlak, bkv berletek, autópálya matrica, parkolas
-szervezet - ado, egeszegugy, jog, közbiztonság
+Központi segítség menü - popup
+Egészségügyi Krízishelyzet Moratórium (betegseg, baleset - ne zavard az illetot) - suspend menu on user selector
 
-szervezet kivalaszto - mutassa meg hogy frissul a menu es a kezdolap
+Időpontfoglalás menü ">" a menu savban, mivel alatta mar foglalt idopontok jelennek meg a menuben, amire ra lehet kattintani, popup with content of szervezet, dátum, terkep link
+popup panel with content of Szervezet kiválasztása + dátum választó + video chat vagy hely (pl.: google map)
+Adóügy-re, Kormányablak-ra, Önkormányzat-ra, Bűnügy-re, Egészségügy-re, Munkaügy-re, Jog-ra, Szolgáltatások-ra (tehát mindenre, ami állami)
 
-Segitseg 8181 - menu
+lazy load modules, mindegyiknek van "Kezdőlap" menuje, és egy speciális ikonja
+Ügyek menü (szamok mellette - ami a felhasznalo ikonon van - masik felhasznalo van kivalasztva, frissulnek a szamok)
+Adóügy
+- NAV (már megvan)
+Kormányablak
+- Okmány stb.
+Önkormányzat
+- Helyi ügyek
+Bűnügy
+- Rendőrség
+Egészségügy
+- EESZT
+Munkaügy - Munkaügyi Központ
+Jog
+- Birosag, Ugyeszseg, Fogyasztó védelem, Igazságügy, Köztársasági Elnök
+Szolgáltatások
+- kozuzemi szamlak, bkv berletek, autópálya matrica, parkolas
 
-Szervezet kivalaszto alatta
+kiválaszt gomb - ha kivalasztjuk az ügyet, a bal oldali menu, ikon frissuljon
 
-Beállítások menu - pl. nyelv, kau regisztráció stb.
-
-Kilepes gomb a user selector menu tetejen jobb oldalt
-
-nyelv beallito/kilepes gomb
-
-angol / magyar valaszto - a user selector settings gombnal
-
-a youtube-on latszik ilyen sub menu jellegu dolog - a jobb oldali menu - user selector is hasonlo
-
-chat link a szervezet oldalan - a dokumentum kezeles oldal savjaban egy uj level (compose icon)
-
-user selector menu - felfuggeszt icon - betegseg, baleset stb - emberseges közigazgatás
-
-idopont - video chat is lehet (popup message-be belerakni - mutatja a szervezet elérhetősegeit is, amikor ki van választva - központi telefon, email, video chat ikon - rákattintva pedig info oldal a szervezetrol - ahol szervezeti egységek is vannak email stb. - info button a kivalaszt mellet jelenik meg jobb oldalt menüben
-
-az idopontfoglalo eltuntetetese - egyseges idopont foglalo rendszer - a user selector menube belerakni a funkciot
-
-Idopont foglalasok - mellette egy ikon, hozzaad, a tabla soraira kattintva lehet lemondani - gordulo max. 5 elem egyszerre megjelenitve
-
-a foglalt idopont es hol jelenjen meg az ikon alatt - ket sorban - rákattintva terkepet nyisson meg
-
-olyan auto completer, ahol a menu-t a felhasznalo accountjait lehet szurni, de hasonloan piros szamok vannak
-
-a szervezet auto completer alatta, ami a felhasználó kivalaszto alapjan szurodik, benne van az osszes szervezet, de ketszeres sorba rendezes vastag vonallalelvalasztva - bemutatva ki uzent abc sorrendben a tetejere kerul
-
-Szervezet message a user selectoron - pl. NAV, Ombudsman hozzaadni
+Beállítások menu
+- nyelv választás stb.
 
 hibak
 -----
