@@ -1,5 +1,6 @@
 user selector menubar
 --------------------------------
+(laptop és mobil) - nav kezdolap bold letters
 
 minden menu mellett egy piros szam, ugy mint az upo menuben
 
