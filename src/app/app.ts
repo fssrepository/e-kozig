@@ -70,10 +70,10 @@ export class App {
     {
       title: 'Értesítő szabályok',
       items: [
-        { text: 'A GDPR alapján a vállalkozónak is kell értesítőt küldeni a képviseleti műveletekről. (adatai változtak)', level: 0 },
+        { text: 'A GDPR alapján a vállalkozónak is kell értesítőt küldeni a képviseleti műveletekről! (adatai változtak)', level: 0 },
         { text: 'A vállalkozó beállíthatja:', level: 0 },
-        { text: 'Mely képviseleti műveletekről szeretne értesítést a vállalkozó', level: 1 },
-        { text: 'Mely képviseleti műveleteket szeretné el is fogadni, mielőtt aktiválódik (30 nap múlva automatikusan elfogadasra kerül)', level: 1 },
+        { text: 'Mely képviseleti műveletekről szeretne értesítést a vállalkozó a tárhelyén (e-mail)', level: 1 },
+        { text: 'Mely képviseleti műveleteket szeretné el is fogadni a tárhelyén (e-mail), mielőtt aktiválódik (30 nap múlva automatikusan elfogadasra kerül)', level: 1 },
         { text: 'A tárhelyre érkező üzenet formája, amikor A könyvelő benyújtja az adóbevallást és a NAV feldolgozza azt:', level: 0 },
         { text: 'A könyvelőnek visszaküld egy technikai vagy hibaüzenetet a szokásos módon', level: 1 },
         { text: 'A vállalkozónak rövid, közérthető tájékoztatást küld', level: 1 },

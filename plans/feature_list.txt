@@ -1,12 +1,3 @@
-upo menu
---------
-1) pls. remove "Képviseletek", "Időpontfoglalás", "Információk" menu
-2) pls. add "Kapcsolat" menu below the "Beállítások", similar popup, title is Kapcsolat with content "Chat, video, telefon link"
-3) pls. add "Beállítások" menu below "Kapcsolatok" menu on the same level, but bottom of the menu bar - clicking on that a popup should show (similar style to uj email popup for desktop and mobile)
-2) pls. add Egyenleg button next to the NAV icon on the menu right hand side (the style is like a frame Egyenleg title at the top and below -200e Ft with red in the same frame)
-clicking on that popup similar to the uj email should be shown with the content of egyenleg.txt (angular accordion structure inside)
-
-
 user selector - balra nyilo menu:
 --------------------------------
 
