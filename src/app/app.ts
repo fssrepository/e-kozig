@@ -65,7 +65,7 @@ export class App {
     },
     {
       title: 'Szamlak',
-      items: ['Számla kliens regisztráció (m2m/billingo) - mikor kuldjon emailt']
+      items: ['Számla kliens regisztráció (m2m/billingo)']
     },
     {
       title: 'Értesítő szabályok',
