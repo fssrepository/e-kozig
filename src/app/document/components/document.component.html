@@ -554,7 +554,7 @@
     </div>
     <div class="draft-confirm-actions">
       <button mat-stroked-button type="button" (click)="cancelDraftDelete()">Nem</button>
-      <button mat-raised-button color="warn" type="button" (click)="confirmDraftDelete()">Töröl</button>
+      <button mat-raised-button color="warn" class="delete-btn" type="button" (click)="confirmDraftDelete()">Töröl</button>
     </div>
   </div>
 </section>
@@ -565,22 +565,20 @@
     <button mat-icon-button (click)="closeDetailView()" aria-label="Back">
       <mat-icon>arrow_back</mat-icon>
     </button>
+    <div class="detail-header-info">
+      <div class="detail-header-text">
+        <div class="detail-ugyfel">{{ selectedItem.name }}</div>
+        <div class="detail-meta">{{ generateUgyszam(selectedItem) }}</div>
+      </div>
+    </div>
+    <span
+      class="status-icon-button detail-header-status"
+      [class]="'status-' + getStatusClass(selectedItem.status)">
+      <mat-icon>{{ getStatusIcon(selectedItem.status || '') }}</mat-icon>
+    </span>
   </div>
 
   <div class="detail-panel">
-    <div class="detail-top">
-      <div class="detail-name-status">
-        <span class="detail-ugyfel">{{ selectedItem.name }}</span>
-        <span
-          class="status-icon-button"
-          [class]="'status-' + getStatusClass(selectedItem.status)">
-          <mat-icon>{{ getStatusIcon(selectedItem.status || '') }}</mat-icon>
-        </span>
-      </div>
-      <div class="detail-meta">
-        <span>{{ generateUgyszam(selectedItem) }}</span>
-      </div>
-    </div>
     <div class="detail-accordion">
       <mat-accordion>
         <mat-expansion-panel *ngFor="let item of selectedItem.items; let i = index" [expanded]="expandedItemIds.has('item-' + i)" (opened)="toggleAccordion('item-' + i)" (closed)="toggleAccordion('item-' + i)">
