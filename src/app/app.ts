@@ -1,4 +1,4 @@
-import { Component, signal, HostListener } from '@angular/core';
+import { Component, HostListener, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatListModule } from '@angular/material/list';
@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MENU_BADGES, MENU_BADGES_TOTAL } from './shared/menu-badges';
+import { AlertService } from './shared/alert.service';
 
 interface MenuItemEntry {
   text: string;
@@ -24,6 +25,7 @@ interface MenuPanelItem {
   styleUrl: '../_styles/app.scss'
 })
 export class App {
+  public readonly alertService = inject(AlertService);
 
   protected getItemText(item: string | { text: string }) {
     return typeof item === 'string' ? item : item.text;
@@ -148,7 +150,7 @@ export class App {
   }
 
   onUserSelect() {
-    window.alert('Felhasználó választása (pl. vállalkozó, képviselő, szimpla személy) és vagy Szervezet választása esetén a szűrőfeltételek és a menüpontok módosulhatnak!');
+    this.alertService.open('Felhasználó választása (pl. vállalkozó, képviselő, szimpla személy) és vagy Szervezet választása esetén a szűrőfeltételek és a menüpontok módosulhatnak!');
   }
 
   @HostListener('document:click', ['$event'])

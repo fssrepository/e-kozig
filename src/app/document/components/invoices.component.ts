@@ -17,6 +17,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { Observable, map, startWith } from 'rxjs';
 import { InvoiceItem, InvoicePeriodItem } from '../models/invoice-item.interface';
 import { InvoiceService } from '../services/invoice.service';
+import { AlertService } from '../../shared/alert.service';
 
 interface AfaCodeOption {
   code: string;
@@ -51,6 +52,7 @@ interface AfaCodeOption {
 })
 export class InvoicesComponent implements OnInit, AfterViewInit, OnDestroy {
   private invoiceService = inject(InvoiceService);
+  private alertService = inject(AlertService);
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
   private invoiceFiltersScrollLeft = 0;
@@ -1025,7 +1027,7 @@ export class InvoicesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onDownloadAttachment() {
-    window.alert('Számla letöltése! (pl. pdf fájl)');
+    this.alertService.open('Számla letöltése! (pl. pdf fájl)');
   }
 
   private filterUgyfel(value: string): string[] {

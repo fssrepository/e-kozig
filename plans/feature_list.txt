@@ -1,7 +1,5 @@
 user selector menubar
 --------------------------------
-(laptop és mobil) - nav kezdolap bold letters
-
 minden menu mellett egy piros szam, ugy mint az upo menuben
 
 belépés nélkül csak a kezdőlap jelenik meg - vhova leirni
@@ -43,7 +41,3 @@ kiválaszt gomb - ha kivalasztjuk az ügyet, a bal oldali menu, ikon frissuljon
 
 Beállítások menu
 - nyelv választás stb.
-
-hibak
------
-1) popup angular popup legyen - ne system

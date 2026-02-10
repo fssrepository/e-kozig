@@ -159,6 +159,26 @@
   </div>
 </section>
 
+<section class="alert-popup" *ngIf="alertService.message() as message">
+  <div class="alert-popup-backdrop" (click)="alertService.close()"></div>
+  <div class="alert-popup-panel" (click)="$event.stopPropagation()">
+    <div class="popup-header">
+      <div class="popup-title">
+        <h2>Értesítés</h2>
+      </div>
+      <button mat-icon-button class="popup-close" (click)="alertService.close()" aria-label="Bezárás">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="popup-body">
+      <p>{{ message }}</p>
+    </div>
+    <div class="alert-actions">
+      <button mat-stroked-button type="button" (click)="alertService.close()">Rendben</button>
+    </div>
+  </div>
+</section>
+
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 <!-- * * * * * * * * * * * The content above * * * * * * * * * * * * -->
 <!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * * -->
