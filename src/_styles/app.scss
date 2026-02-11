@@ -1282,6 +1282,39 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.14);
+  transition: transform 0.12s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.link-btn:hover {
+  background: #f3f6fa;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.2);
+  transform: translateY(-1px);
+}
+
+.link-btn:focus-visible {
+  outline: 2px solid rgba(25, 118, 210, 0.55);
+  outline-offset: 2px;
+}
+
+.link-btn:active {
+  background: #e9eef5;
+  transform: scale(0.97);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.14);
+}
+
+.link-btn.map-btn {
+  background: #9be7a6;
+  border-color: #7fd68c;
+  color: #0f3d1f;
+}
+
+.link-btn.map-btn:hover {
+  background: #8fdd9b;
+}
+
+.link-btn.map-btn:active {
+  background: #84d391;
 }
 
 .appointment-categories {
@@ -1316,6 +1349,16 @@
   align-self: flex-start;
 }
 
+.appointment-actions .link-btn:hover {
+  background: #1e6fc2;
+  border-color: #1e6fc2;
+}
+
+.appointment-actions .link-btn:active {
+  background: #185ea5;
+  border-color: #185ea5;
+}
+
 .suspension-popup {
   text-align: center;
 }
@@ -1344,10 +1387,34 @@
   background: #e53935;
 }
 
+.suspension-actions .link-btn:nth-child(1):hover {
+  background: #d32f2f;
+}
+
+.suspension-actions .link-btn:nth-child(1):active {
+  background: #c62828;
+}
+
 .suspension-actions .link-btn:nth-child(2) {
   background: #2e7d32;
 }
 
+.suspension-actions .link-btn:nth-child(2):hover {
+  background: #276d2b;
+}
+
+.suspension-actions .link-btn:nth-child(2):active {
+  background: #225f26;
+}
+
 .suspension-actions .link-btn:nth-child(3) {
   background: #1976d2;
+}
+
+.suspension-actions .link-btn:nth-child(3):hover {
+  background: #1e6fc2;
+}
+
+.suspension-actions .link-btn:nth-child(3):active {
+  background: #185ea5;
 }
