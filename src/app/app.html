@@ -322,13 +322,24 @@
               <mat-panel-title>{{ panel.title }}</mat-panel-title>
             </mat-expansion-panel-header>
             <div class="accordion-content" *ngIf="panel.items && panel.items.length">
-              <p *ngFor="let item of panel.items">{{ getItemText(item) }}</p>
+              <ul class="popup-list">
+                <li *ngFor="let item of panel.items" class="popup-list-item" [class]="'popup-list-item level-' + getItemLevel(item)">
+                  {{ getItemText(item) }}
+                </li>
+              </ul>
             </div>
             <mat-accordion class="sub-accordion" *ngIf="panel.subpanels?.length" multi>
               <mat-expansion-panel *ngFor="let subpanel of panel.subpanels">
                 <mat-expansion-panel-header>
                   <mat-panel-title>{{ subpanel.title }}</mat-panel-title>
                 </mat-expansion-panel-header>
+                <div class="accordion-content" *ngIf="subpanel.items && subpanel.items.length">
+                  <ul class="popup-list">
+                    <li *ngFor="let item of subpanel.items" class="popup-list-item" [class]="'popup-list-item level-' + getItemLevel(item)">
+                      {{ getItemText(item) }}
+                    </li>
+                  </ul>
+                </div>
               </mat-expansion-panel>
             </mat-accordion>
           </mat-expansion-panel>

@@ -19,6 +19,17 @@ interface MenuPanelItem {
   items: Array<string | MenuItemEntry>;
 }
 
+interface BalanceSubpanelItem {
+  title: string;
+  items: Array<string | MenuItemEntry>;
+}
+
+interface BalancePanelItem {
+  title: string;
+  items?: Array<string | MenuItemEntry>;
+  subpanels?: BalanceSubpanelItem[];
+}
+
 type IssueLabel =
   | 'Adóügy'
   | 'Kormányablak'
@@ -119,29 +130,71 @@ export class App {
       ]
     }
   ];
-  protected readonly balancePanels = [
+  protected readonly balancePanels: BalancePanelItem[] = [
     {
-      title: 'Befizetés'
+      title: 'Befizetés',
+      items: [
+        { text: 'A különböző jogcímekhez tartozó számlák főszámla alá rendezése.', level: 0 },
+        { text: '"Természetes Személy" (Egyéni vállalkozó, Munkanélküli stb.)', level: 1 },
+        { text: 'Ha egy utalás a főszámlára érkezik, azt a rendszer automatikusan felbonthatná az alszámlák között. (pl. egészségügyi járulék, nyugdíjjárulék, kamarai hozzájárulás, HIPA stb.).', level: 2 },
+        { text: '"Vállalkozás" (Kft, Bt...)', level: 1 },
+        { text: 'Adózási formák', level: 0 },
+        { text: 'Számlaalapú adózás (fix %, a bérköltség munkavállalót terhelő részéhez igazított mérték - külföldi távmunka is)', level: 1 },
+        { text: 'Fix költségelszámolás alapú adózás (átalányadó)', level: 1 },
+        { text: 'Egyedi költségelszámolás alapú adózás (VSZJA)', level: 1 },
+        { text: '', level: 1 },
+        { text: 'Közös elemek:', level: 1 },
+        { text: 'Alanyi adómentes határ', level: 2 },
+        { text: 'Minimum a minimálbér utáni járulékfizetés (garantált bérminimum eltörlése)', level: 2 },
+        { text: 'Adókulcsot csökkentő tételek (pl. családi kedvezmény)', level: 2 },
+        { text: 'Adó-visszaigénylési lehetőség (pl. ha az éves jövedelem nem éri el a minimálbér összegét)', level: 2 },
+        { text: 'Mindig MNB közép a számla kiállítás pillanatában (se banki eladási, se forgalmi alapú)', level: 2 },
+        { text: 'A KATA kivezetésnél 3M-es határ eltörlése adóév végéig, majd számla alapú adózássá formálása okozta volna a legkevesebb káoszt.', level: 1 }
+      ]
     },
     {
       title: 'Adónaptár',
-      items: ['Esedekes bevallasok, hianyzo bevallasok']
+      items: [
+        'Esedékes bevallások',
+        'Hiányzó bevallások'
+      ]
     },
     {
       title: 'Köztartozások',
       subpanels: [
-        { title: 'Fizetési tájékoztatók' },
-        { title: 'Pótléklevezetés' },
-        { title: 'Adóteljesítmény' },
-        { title: 'Köztartozásmentes adózói adatbázis (KOMA)' },
-        { title: 'Egyéb végrehajtható köztartozások' }
+        {
+          title: 'Fizetési tájékoztatók',
+          items: ['Aktuális fizetési kötelezettségek összesítése']
+        },
+        {
+          title: 'Pótléklevezetés',
+          items: ['Késedelmi pótlékok részletezése időszakonként']
+        },
+        {
+          title: 'Adóteljesítmény',
+          items: ['Befizetések és teljesítések kimutatása']
+        },
+        {
+          title: 'Köztartozásmentes adózói adatbázis (KOMA)',
+          items: ['KOMA státusz és előzmények']
+        },
+        {
+          title: 'Egyéb végrehajtható köztartozások',
+          items: ['Más hatóságoktól átvett végrehajtható tartozások']
+        }
       ]
     },
     {
       title: 'Adóraktár',
       subpanels: [
-        { title: 'Adóraktári készlet + mozgás' },
-        { title: 'Jövedéki biztosíték szabad keret' }
+        {
+          title: 'Adóraktári készlet + mozgás',
+          items: ['Készletállomány és készletmozgások listája']
+        },
+        {
+          title: 'Jövedéki biztosíték szabad keret',
+          items: ['Aktuális biztosítékkeret és felhasználás']
+        }
       ]
     }
   ];
