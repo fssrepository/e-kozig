@@ -16,6 +16,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { Observable, startWith, map } from 'rxjs';
 import { DocumentItem, DocumentItemDetail } from '../models/document-item.interface';
 import { DocumentService } from '../services/document.service';
+import { AlertService } from '../../shared/alert.service';
 
 interface NyomtatvanyEntry {
   code: string;
@@ -83,6 +84,7 @@ interface DraftItem {
 })
 export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
   private documentService = inject(DocumentService);
+  private alertService = inject(AlertService);
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
   private filtersScrollLeft = 0;
@@ -472,7 +474,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onReply() {
-    window.alert('Új üzenet küldése az ügyhöz! (pl. e-papir)');
+    this.alertService.open('Új üzenet küldése az ügyhöz! (pl. e-papir)');
   }
 
   toggleCreateMenu() {
@@ -550,11 +552,11 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   onViewAttachment() {
-    window.alert('Dokumentum megnyitasa Onya-ban (pl. javitasra, jovahagyasra)!');
+    this.alertService.open('Dokumentum megnyitasa Onya-ban (pl. javitasra, jovahagyasra)!');
   }
 
   onDownloadAttachment() {
-    window.alert('A dokumentum letoltese! (pl. pdf fájl)');
+    this.alertService.open('A dokumentum letoltese! (pl. pdf fájl)');
   }
 
   filterBySearch() {
@@ -803,7 +805,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onUserSelect() {
-    window.alert('Felhasználó választása.');
+    this.alertService.open('Felhasználó választása.');
   }
 
   toggleUnreadFilter() {

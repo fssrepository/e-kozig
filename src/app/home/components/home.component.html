@@ -1,5 +1,5 @@
 <div class="page-container">
-  <div class="search-block">
+  <div class="search-block" [class.search-block-hidden]="!isNavIssue()">
     <div class="search-row">
       <div class="search-wrapper">
         <mat-form-field class="search" appearance="outline">
@@ -77,7 +77,7 @@
     </section>
   </div>
 
-  <section class="readme-content">
+  <section class="readme-content" *ngIf="isNavIssue(); else nonNavHome">
     <h2>E-Közig prototípus (Itt a nav.gov.hu főoldal van!)</h2>
     <p>
       A legtöbb közigazgatási fejlesztés (például a NAV Ügyfélportál) zárt, integrált
@@ -88,7 +88,7 @@
       már a fejlesztés korai fázisában elérhető véleményezésre a
       felhasználók számára, a NAV meglepetések nélkül alakíthatja ki a
       háttérfolyamatokat, akár 80% költségmegtakarítást elérve.
-      A korai felületi prototípuson (laptop és mobil) végzett korrekció órákban, míg a későbbi integrált
+      A korai felületi prototípuson <b>(laptop és mobil)</b> végzett korrekció órákban, míg a későbbi integrált
       rendszerben végzett javítás hónapokban mérhető.
     </p>
     <p>
@@ -104,4 +104,11 @@
       <figcaption class="caption">Folyamatábra a prototípus és a háttérfolyamatok együttműködéséről.</figcaption>
     </figure>
   </section>
+
+  <ng-template #nonNavHome>
+    <section class="readme-content">
+      <h2>{{ selectedIssueLabel() || 'Kezdőlap' }}</h2>
+      <p>{{ selectedIssue() }}</p>
+    </section>
+  </ng-template>
 </div>
