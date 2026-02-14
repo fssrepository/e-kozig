@@ -141,7 +141,7 @@ export class App {
         { text: 'Adózási formák', level: 0 },
         { text: 'Számlaalapú adózás (fix %, a bérköltség munkavállalót terhelő részéhez igazított mérték - külföldi távmunka is)', level: 1 },
         { text: 'Fix költségelszámolás alapú adózás (átalányadó)', level: 1 },
-        { text: 'Egyedi költségelszámolás alapú adózás (VSZJA)', level: 1 },
+        { text: 'Tételes költségelszámolás alapú adózás (VSZJA)', level: 1 },
         { text: '', level: 1 },
         { text: 'Közös elemek:', level: 1 },
         { text: 'Alanyi adómentes határ', level: 2 },
