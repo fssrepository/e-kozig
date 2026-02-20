@@ -743,6 +743,14 @@ td.mat-column-icon {
   z-index: 1000;
 }
 
+@media (min-width: 769px) {
+  .documents-fab {
+    position: fixed;
+    right: max(24px, calc((100vw - 1100px) / 2 + 24px));
+    bottom: 56px;
+  }
+}
+
 .fab-actions {
   display: flex;
   flex-direction: column;
