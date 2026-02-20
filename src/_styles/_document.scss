@@ -4,7 +4,7 @@
 .right-controls { display:flex; align-items:center; }
 
 /* Search wrapper and Gmail-style search results panel */
-.search-row { display: flex; align-items: center; gap: 0.5rem; min-height: 44px; padding: 0 52px;}
+.search-row { display: flex; align-items: center; gap: 0.75rem; min-height: 44px; padding: 0 52px;}
 .search-wrapper {
   position: relative;
   min-width: 0;
@@ -1351,6 +1351,12 @@ td.mat-column-icon {
   overflow-y: hidden;
   padding: 0 0.5rem 0.5rem;
   position: relative;
+}
+
+@media (min-width: 769px) {
+  .documents {
+    padding: 0 1.25rem 1.25rem;
+  }
 }
 
 @media (max-width: 768px) {
