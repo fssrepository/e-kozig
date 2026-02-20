@@ -312,24 +312,35 @@
   }
 
   .search-row {
-    padding: 0 52px;
+    padding: 0 64px;
   }
 
   .detail-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
     padding: 0;
+    background: var(--mat-sys-surface);
   }
 
   .detail-popup {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
     padding: 0;
+    background: var(--mat-sys-surface);
   }
 
   .detail-panel-inner {
-    max-height: calc(100vh - 100px);
-    height: calc(100vh - 100px);
+    max-height: 100dvh;
+    height: 100dvh;
+    border-radius: 0;
   }
 
   .detail-popup-inner {
-    height: calc(100vh - 140px);  
+    max-height: 100dvh;
+    height: 100dvh;
+    border-radius: 0;
   }
 
   .readme-content,

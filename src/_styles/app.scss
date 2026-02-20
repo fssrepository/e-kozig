@@ -8,7 +8,7 @@
 .mobile-menu-btn-global {
   position: fixed;
   top: 1.0rem;
-  left: 0.5rem;
+  left: 1rem;
   z-index: 999;
   width: 44px;
   height: 44px;
@@ -26,7 +26,7 @@
 
 @media (min-width: 769px) {
   .mobile-menu-btn-global {
-    left: max(0.5rem, calc((100vw - 1100px) / 2 + 0.5rem));
+    left: max(1rem, calc((100vw - 1100px) / 2 + 1rem));
   }
 
   .mobile-menu-btn-global .mat-icon {
@@ -1124,6 +1124,22 @@
     max-height: 100dvh;
     border-radius: 12px;
     margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-popup {
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 0;
+  }
+
+  .app-popup-panel {
+    width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    margin: 0;
   }
 }
 
