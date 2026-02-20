@@ -1,7 +1,7 @@
 <div class="page-container">
-  <div class="search-block" [class.search-block-hidden]="!isNavIssue()">
-    <div class="search-row">
-      <div class="search-wrapper">
+  <div class="search-block" [class.search-block-hidden]="!isNavIssue()" [style.--search-overlay-top.px]="searchOverlayTop" [style.--search-overlay-height.px]="searchOverlayHeight">
+    <div class="search-row" #searchRow>
+      <div class="search-wrapper" #searchWrapper>
         <mat-form-field class="search" appearance="outline">
           <mat-chip-set class="search-chips" *ngIf="searchTerms.length > 0">
             <mat-chip *ngFor="let term of searchTerms" removable (removed)="removeSearchTerm(term)">

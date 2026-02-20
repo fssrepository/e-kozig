@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -25,9 +25,19 @@ import { IssueSelectionService } from '../../shared/issue-selection.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent {
+export class HomeComponent implements AfterViewInit, OnDestroy {
+  private readonly overlayGap = 0;
   private menuService = inject(KezdolapMenuService);
   private issueSelection = inject(IssueSelectionService);
+  private cdr = inject(ChangeDetectorRef);
+  private searchRowResizeObserver?: ResizeObserver;
+  private searchWrapperResizeObserver?: ResizeObserver;
+
+  @ViewChild('searchRow') private searchRowRef?: ElementRef<HTMLElement>;
+  @ViewChild('searchWrapper') private searchWrapperRef?: ElementRef<HTMLElement>;
+
+  searchOverlayTop = 52;
+  searchOverlayHeight = 480;
 
   searchCtrl = new FormControl('');
   searchTerms: string[] = [];
@@ -47,6 +57,30 @@ export class HomeComponent {
     return (this.selectedIssue() ?? '').toLowerCase() === 'nav';
   }
 
+  ngAfterViewInit(): void {
+    this.updateSearchOverlayTop();
+
+    if (typeof ResizeObserver !== 'undefined' && this.searchRowRef?.nativeElement) {
+      this.searchRowResizeObserver = new ResizeObserver(() => this.updateSearchOverlayTop());
+      this.searchRowResizeObserver.observe(this.searchRowRef.nativeElement);
+    }
+
+    if (typeof ResizeObserver !== 'undefined' && this.searchWrapperRef?.nativeElement) {
+      this.searchWrapperResizeObserver = new ResizeObserver(() => this.updateSearchOverlayTop());
+      this.searchWrapperResizeObserver.observe(this.searchWrapperRef.nativeElement);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.searchRowResizeObserver?.disconnect();
+    this.searchWrapperResizeObserver?.disconnect();
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.scheduleSearchMetricsUpdate();
+  }
+
   addSearchTerm(): void {
     const value = (this.searchCtrl.value || '').trim();
     if (!value) {
@@ -58,15 +92,19 @@ export class HomeComponent {
     }
 
     this.searchCtrl.setValue('');
+    this.scheduleSearchMetricsUpdate();
     this.openDetailedPopup('További szűrők és tartalom');
+    this.scheduleSearchMetricsUpdate();
   }
 
   removeSearchTerm(term: string): void {
     this.searchTerms = this.searchTerms.filter(t => t !== term);
+    this.scheduleSearchMetricsUpdate();
   }
 
   toggleDetailedSearch(): void {
     this.showDetailedSearch = !this.showDetailedSearch;
+    this.scheduleSearchMetricsUpdate();
     if (!this.showDetailedSearch) {
       this.resetMenuNavigation();
     }
@@ -138,6 +176,7 @@ export class HomeComponent {
     this.showPopup = true;
     this.showDetailedSearch = false;
     this.resetMenuNavigation();
+    this.scheduleSearchMetricsUpdate();
   }
 
   private getPopupTitle(path: string): string {
@@ -155,5 +194,34 @@ export class HomeComponent {
 
   private stripMenuItemSuffix(value: string): string {
     return value.replace(/\s+menu item$/i, '');
+  }
+
+  private scheduleSearchMetricsUpdate(): void {
+    requestAnimationFrame(() => {
+      this.updateSearchOverlayTop();
+      requestAnimationFrame(() => this.updateSearchOverlayTop());
+    });
+  }
+
+  private updateSearchOverlayTop(): void {
+    const rowElement = this.searchRowRef?.nativeElement;
+    const blockElement = rowElement?.parentElement;
+    if (!rowElement || !blockElement) {
+      return;
+    }
+
+    const contentAreaElement = this.searchRowRef?.nativeElement.closest('.content-area') as HTMLElement | null;
+    const blockRect = blockElement.getBoundingClientRect();
+    const measuredTop = Math.max(44, rowElement.offsetTop + rowElement.offsetHeight + this.overlayGap);
+    const clippingRect = (contentAreaElement ?? blockElement).getBoundingClientRect();
+    const measuredHeight = Math.max(220, Math.floor(clippingRect.bottom - (blockRect.top + measuredTop)));
+
+    if (measuredTop === this.searchOverlayTop && measuredHeight === this.searchOverlayHeight) {
+      return;
+    }
+
+    this.searchOverlayTop = measuredTop;
+    this.searchOverlayHeight = measuredHeight;
+    this.cdr.markForCheck();
   }
 }

@@ -76,6 +76,13 @@ main {
   height: 100dvh;
 }
 
+@media (min-width: 769px) {
+  .content {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
 .sidebar-top {
   align-items: center;
   justify-content: center;

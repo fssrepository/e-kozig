@@ -20,6 +20,54 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
+.mobile-menu-btn-global .desktop-menu-icon {
+  display: none;
+}
+
+@media (min-width: 769px) {
+  .mobile-menu-btn-global {
+    left: max(1rem, calc((100vw - 1100px) / 2 + 1rem));
+  }
+
+  .mobile-menu-btn-global .mat-icon {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .mobile-menu-btn-global .desktop-menu-icon {
+    position: absolute;
+    width: 20px;
+    height: 14px;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+
+  .mobile-menu-btn-global .desktop-menu-icon .line {
+    display: block;
+    width: 100%;
+    height: 2px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.9);
+    transition: transform 0.22s ease, opacity 0.18s ease;
+    transform-origin: center;
+  }
+
+  .mobile-menu-btn-global.open .desktop-menu-icon .line-1 {
+    transform: translateY(6px) rotate(45deg);
+  }
+
+  .mobile-menu-btn-global.open .desktop-menu-icon .line-2 {
+    opacity: 0;
+  }
+
+  .mobile-menu-btn-global.open .desktop-menu-icon .line-3 {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+}
+
 .mobile-menu-btn-global .mat-icon {
   font-size: 28px;
   width: 28px;
@@ -206,6 +254,42 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+@media (min-width: 769px) {
+  .mobile-menu-backdrop,
+  .mobile-menu-backdrop.open {
+    background: transparent;
+  }
+
+  .mobile-menu-panel-global {
+    top: calc(1rem + 44px + 0.5rem);
+    left: max(1rem, calc((100vw - 1100px) / 2 + 1rem));
+    bottom: auto;
+    width: 280px;
+    max-height: min(70vh, 560px);
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.22);
+    transform: translateY(-8px);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .mobile-menu-panel-global.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mobile-menu-panel-global .menu-header {
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+  }
+
+  .mobile-menu-panel-global .menu-header.menu-header-row {
+    justify-content: flex-start;
+    gap: 0.5rem;
+  }
 }
 
 /* User menu panel */
@@ -1017,9 +1101,46 @@
 .app-popup-panel {
   width: min(1100px, 100%);
   height: calc(100vh - 2rem);
+  height: calc(100dvh - 2rem);
   max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
   border-radius: 12px;
   margin: 0 auto;
+  box-sizing: border-box;
+}
+
+@media (min-width: 769px) {
+  .app-popup {
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0 1rem;
+  }
+
+  .app-popup-panel {
+    width: min(1100px, 100%);
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    border-radius: 12px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-popup {
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 0;
+  }
+
+  .app-popup-panel {
+    width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    margin: 0;
+  }
 }
 
 .alert-popup {
@@ -1058,12 +1179,13 @@
   flex-direction: column;
   overflow: hidden;
   max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
   box-sizing: border-box;
   margin: 0 auto;
 }
 
 .alert-popup-panel .popup-body {
-  max-height: 60vh;
+  max-height: none;
 }
 
 .alert-popup-panel .popup-close {
@@ -1106,8 +1228,19 @@
   border-radius: 12px;
   padding: 1rem 1.25rem;
   width: min(420px, 90vw);
+  max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
   text-align: center;
+  overflow: auto;
+  box-sizing: border-box;
+}
+
+.logout-confirm-panel {
+  max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  box-sizing: border-box;
 }
 
 .user-delete-confirm-panel h3 {
@@ -1178,6 +1311,8 @@
   padding: 0.75rem;
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
   gap: 0.75rem;
   overflow: auto;
 }
