@@ -727,7 +727,8 @@
             <div class="detail-meta">{{ selectedPeriodItem.idoszakLabel }}</div>
           </div>
         </div>
-        <span class="status-icon-button detail-header-status" [class]="getPeriodStatusClass(selectedPeriodItem.status)">
+        <span class="status-icon-button detail-header-status detail-status-badge" [class]="getPeriodStatusClass(selectedPeriodItem.status)">
+          <span class="status-label">{{ selectedPeriodItem.status }}</span>
           <mat-icon>{{ getPeriodStatusIcon(selectedPeriodItem.status) }}</mat-icon>
         </span>
       </div>
@@ -760,8 +761,9 @@
       </div>
     </div>
     <span
-      class="status-icon-button detail-header-status"
+      class="status-icon-button detail-header-status detail-status-badge"
       [class]="'status-' + getStatusClass(selectedItem.status)">
+      <span class="status-label">{{ selectedItem.status }}</span>
       <mat-icon>{{ getStatusIcon(selectedItem.status || '') }}</mat-icon>
     </span>
   </div>
