@@ -700,10 +700,89 @@
 }
 
 .header-chevron {
-  font-size: 22px;
-  width: 22px;
-  height: 22px;
+  margin-left: auto;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
   color: rgba(15, 23, 42, 0.6);
+  transition: color 0.16s ease, transform 0.16s ease;
+}
+
+.card-header-action:hover .header-chevron {
+  color: rgba(15, 23, 42, 0.78);
+}
+
+/* Unified interaction feedback for clickable controls */
+:where(
+  .mobile-menu-btn-global,
+  .user-selector-btn-global,
+  .balance-card,
+  .mobile-menu-panel-global .menu-item,
+  .sidebar a[mat-list-item],
+  .sidebar button[mat-list-item].menu-item-action,
+  .user-header-link,
+  .user-exit-btn,
+  .card-header-action,
+  .header-icon-btn,
+  .appointment-row,
+  .issue-row,
+  .user-menu-link,
+  .user-menu-subheader,
+  .user-row,
+  .row-icon-btn,
+  .link-btn
+) {
+  transition:
+    transform 0.14s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+:where(
+  .mobile-menu-btn-global,
+  .user-selector-btn-global,
+  .balance-card,
+  .mobile-menu-panel-global .menu-item,
+  .sidebar a[mat-list-item],
+  .sidebar button[mat-list-item].menu-item-action,
+  .user-header-link,
+  .user-exit-btn,
+  .card-header-action,
+  .header-icon-btn,
+  .appointment-row,
+  .issue-row,
+  .user-menu-link,
+  .user-menu-subheader,
+  .user-row,
+  .row-icon-btn,
+  .link-btn
+):hover {
+  transform: translateY(-1px);
+}
+
+:where(
+  .mobile-menu-btn-global,
+  .user-selector-btn-global,
+  .balance-card,
+  .mobile-menu-panel-global .menu-item,
+  .sidebar a[mat-list-item],
+  .sidebar button[mat-list-item].menu-item-action,
+  .user-header-link,
+  .user-exit-btn,
+  .card-header-action,
+  .header-icon-btn,
+  .appointment-row,
+  .issue-row,
+  .user-menu-link,
+  .user-menu-subheader,
+  .user-row,
+  .row-icon-btn,
+  .link-btn
+):active {
+  transform: scale(0.97);
 }
 
 .user-row {

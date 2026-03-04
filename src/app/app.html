@@ -109,9 +109,12 @@
                 <span class="card-badge">{{ userAppointments.length }}</span>
                 <span class="card-title">Időpontfoglalás</span>
               </span>
-              <button class="header-icon-btn" type="button" (click)="$event.stopPropagation(); openUserPopup('addAppointment')">
-                <mat-icon>add</mat-icon>
-              </button>
+              <span class="card-header-actions">
+                <button class="header-icon-btn" type="button" (click)="$event.stopPropagation(); openUserPopup('addAppointment')">
+                  <mat-icon>add</mat-icon>
+                </button>
+                <mat-icon class="header-chevron" aria-hidden="true">{{ appointmentsOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
+              </span>
             </div>
             <div class="card-body appointment-list accordion-body" [class.open]="appointmentsOpen">
               <div class="accordion-inner">
@@ -137,6 +140,7 @@
                 <span class="card-badge">{{ getIssueTotal() }}</span>
                 <span class="card-title">Ügyek</span>
               </span>
+              <mat-icon class="header-chevron" aria-hidden="true">{{ issuesOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
             </div>
             <div class="card-body accordion-body" [class.open]="issuesOpen">
               <div class="accordion-inner">

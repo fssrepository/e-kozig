@@ -344,6 +344,60 @@ td { background: transparent; position: relative; z-index: 1; transition: backgr
 
 tr[mat-row], tr.mat-mdc-row, tr.mdc-data-table__row { cursor: pointer; }
 
+tr[mat-row].row-link::after,
+tr.mat-mdc-row.row-link::after,
+tr.mdc-data-table__row.row-link::after,
+tr.mat-row.row-link::after {
+  content: '\203A';
+  position: absolute;
+  right: 10px;
+  top: calc(50% - 4px);
+  transform: translateY(-50%);
+  font-size: 20px;
+  line-height: 1;
+  font-weight: 800;
+  color: rgba(15, 23, 42, 0.62);
+  z-index: 2;
+  pointer-events: none;
+  transition: transform 0.14s ease, color 0.14s ease;
+}
+
+tr[mat-row].row-link td:last-child,
+tr.mat-mdc-row.row-link td:last-child,
+tr.mdc-data-table__row.row-link td:last-child,
+tr.mat-row.row-link td:last-child {
+  padding-right: 30px !important;
+}
+
+tr[mat-row].row-link:hover::after,
+tr.mat-mdc-row.row-link:hover::after,
+tr.mdc-data-table__row.row-link:hover::after,
+tr.mat-row.row-link:hover::after {
+  transform: translateY(-50%) translateX(1px);
+  color: rgba(15, 23, 42, 0.8);
+}
+
+/* Unified interaction feedback for clickable controls in document/invoice screens */
+:where(.documents, .doc-popup)
+  :where(button:not([disabled]), .search-result, .panel-item, .draft-item) {
+  transition:
+    transform 0.14s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+:where(.documents, .doc-popup)
+  :where(button:not([disabled]), .search-result, .panel-item, .draft-item):hover {
+  transform: translateY(-1px);
+}
+
+:where(.documents, .doc-popup)
+  :where(button:not([disabled]), .search-result, .panel-item, .draft-item):active {
+  transform: scale(0.97);
+}
+
 /* Mobile table layout */
 .name-primary { font-weight: 600; }
 .name-primary {
