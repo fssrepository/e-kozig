@@ -21,7 +21,7 @@
           "builder": "@angular/build:application",
           "options": {
             "outputPath": {
-              "base": "dist/e-kozig",
+              "base": "dev/e-kozig",
               "browser": ""
             },
             "browser": "src/main.ts",
@@ -54,7 +54,7 @@
             },
             "development": {
               "outputPath": {
-                "base": "dist/e-kozig",
+                "base": "dev/e-kozig",
                 "browser": ""
               },
               "optimization": false,
