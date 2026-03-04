@@ -284,10 +284,12 @@
       <div class="popup-title">
         <h2>{{ getPopupTitle() }}</h2>
       </div>
-      <span class="popup-balance-value" *ngIf="activePopup === 'balance'">{{ balanceValue }}</span>
-      <button mat-icon-button class="popup-close" (click)="closePopup()" aria-label="Bezárás">
-        <mat-icon>close</mat-icon>
-      </button>
+      <div class="popup-header-actions">
+        <span class="popup-balance-value" *ngIf="activePopup === 'balance'">{{ balanceValue }}</span>
+        <button mat-icon-button class="popup-close" (click)="closePopup()" aria-label="Bezárás">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
     </div>
     <div class="popup-body">
       <div *ngIf="activePopup === 'contact'" class="contact-content">
