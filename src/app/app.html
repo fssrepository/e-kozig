@@ -41,8 +41,11 @@
           (click)="openPopup('balance')"
           aria-label="Egyenleg megnyitása"
         >
-          <span class="balance-title">Egyenleg</span>
-          <span class="balance-value">-200e Ft</span>
+          <span class="balance-copy">
+            <span class="balance-title">Egyenleg</span>
+            <span class="balance-value">-200e Ft</span>
+          </span>
+          <mat-icon class="balance-chevron" aria-hidden="true">chevron_right</mat-icon>
         </button>
       </div>
       <div class="menu-items">
@@ -90,6 +93,7 @@
             <span class="user-name">{{ activeUser.name }}</span>
             <span class="user-role">Aktív felhasználó</span>
           </div>
+          <mat-icon class="user-header-chevron" aria-hidden="true">chevron_right</mat-icon>
         </button>
         <button class="user-exit-btn" type="button" aria-label="Kilépés" (click)="openUserPopup('logoutConfirm')">
           <mat-icon>logout</mat-icon>
@@ -230,8 +234,11 @@
           (click)="openPopup('balance')"
           aria-label="Egyenleg megnyitása"
         >
-          <span class="balance-title">Egyenleg</span>
-          <span class="balance-value">-200e Ft</span>
+          <span class="balance-copy">
+            <span class="balance-title">Egyenleg</span>
+            <span class="balance-value">-200e Ft</span>
+          </span>
+          <mat-icon class="balance-chevron" aria-hidden="true">chevron_right</mat-icon>
         </button>
       </div>
       <mat-nav-list>

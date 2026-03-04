@@ -20,7 +20,10 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": "docs",
+            "outputPath": {
+              "base": "dist/e-kozig",
+              "browser": ""
+            },
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
@@ -31,7 +34,10 @@
           },
           "configurations": {
             "production": {
-              "outputPath": "docs",
+              "outputPath": {
+                "base": "docs",
+                "browser": ""
+              },
               "budgets": [
                 {
                   "type": "initial",
@@ -47,7 +53,10 @@
               "outputHashing": "all"
             },
             "development": {
-              "outputPath": "docs",
+              "outputPath": {
+                "base": "dist/e-kozig",
+                "browser": ""
+              },
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
