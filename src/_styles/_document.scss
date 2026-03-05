@@ -344,6 +344,62 @@ td { background: transparent; position: relative; z-index: 1; transition: backgr
 
 tr[mat-row], tr.mat-mdc-row, tr.mdc-data-table__row { cursor: pointer; }
 
+tr[mat-row].row-link::after,
+tr.mat-mdc-row.row-link::after,
+tr.mdc-data-table__row.row-link::after,
+tr.mat-row.row-link::after {
+  content: '\203A';
+  position: absolute;
+  right: 10px;
+  top: calc(50% - 4px);
+  transform: translateY(-50%);
+  font-size: 20px;
+  line-height: 1;
+  font-weight: 800;
+  color: rgba(15, 23, 42, 0.62);
+  z-index: 2;
+  pointer-events: none;
+  transition: transform 0.14s ease, color 0.14s ease;
+}
+
+tr[mat-row].row-link td:last-child,
+tr.mat-mdc-row.row-link td:last-child,
+tr.mdc-data-table__row.row-link td:last-child,
+tr.mat-row.row-link td:last-child {
+  padding-right: 30px !important;
+}
+
+tr[mat-row].row-link:hover::after,
+tr.mat-mdc-row.row-link:hover::after,
+tr.mdc-data-table__row.row-link:hover::after,
+tr.mat-row.row-link:hover::after {
+  transform: translateY(-50%) translateX(1px);
+  color: rgba(15, 23, 42, 0.8);
+}
+
+/* Unified interaction feedback for clickable controls in document/invoice screens */
+:where(.documents, .doc-popup)
+  :where(button:not([disabled]), .search-result, .panel-item, .draft-item) {
+  transition:
+    transform 0.14s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :where(.documents, .doc-popup)
+    :where(button:not([disabled]), .search-result, .panel-item, .draft-item):hover {
+    transform: translateY(-1px);
+  }
+}
+
+:where(.documents, .doc-popup)
+  :where(button:not([disabled]), .search-result, .panel-item, .draft-item):active {
+  transform: scale(0.97);
+}
+
 /* Mobile table layout */
 .name-primary { font-weight: 600; }
 .name-primary {
@@ -703,6 +759,53 @@ td.mat-column-icon {
 
 .detail-header-status {
   margin-left: auto;
+  margin-right: 0.5rem;
+}
+
+.detail-status-badge {
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  background: rgba(15, 23, 42, 0.06);
+  border-radius: 999px;
+  padding: 0.18rem 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 28px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.status-icon-button.detail-status-badge:hover {
+  transform: none;
+}
+
+.detail-status-badge .status-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(15, 23, 42, 0.78);
+}
+
+.detail-status-badge mat-icon {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  line-height: 16px;
+}
+
+.detail-status-badge.period-status-open,
+.detail-status-badge.status-lezarva,
+.detail-status-badge.status-felulvizsgalva {
+  border-color: rgba(46, 125, 50, 0.35);
+  background: rgba(46, 125, 50, 0.12);
+}
+
+.detail-status-badge.period-status-locked,
+.detail-status-badge.status-hiba,
+.detail-status-badge.status-elfogadasra-var,
+.detail-status-badge.status-felulbiralasra-var {
+  border-color: rgba(220, 38, 38, 0.3);
+  background: rgba(220, 38, 38, 0.12);
 }
 
 .detail-header-text {
@@ -1394,7 +1497,7 @@ td.mat-column-icon {
     flex-wrap: nowrap;
     -webkit-overflow-scrolling: touch;
     margin-bottom: 0.5rem;
-    padding: 0 0.5rem;
+    padding: 2px 0.5rem;
     position: relative;
     z-index: 2;
   }

@@ -257,7 +257,14 @@
           <td mat-cell *matCellDef="let element" class="datetime-cell">{{ formatDate(element.datetime) }}</td>
         </ng-container>
 
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.unread]="row.unread" [class.read]="!row.unread" (click)="selectTableRow(row)" style="cursor: pointer;"></tr>
+        <tr
+          mat-row
+          class="row-link"
+          *matRowDef="let row; columns: displayedColumns;"
+          [class.unread]="row.unread"
+          [class.read]="!row.unread"
+          (click)="selectTableRow(row)"
+        ></tr>
       </table>
       <div class="mobile-load-indicator" *ngIf="mobileLoadingMore">
         <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
@@ -696,7 +703,14 @@
               <td mat-cell *matCellDef="let element" class="period-range">{{ element.idoszakLabel }}</td>
             </ng-container>
 
-            <tr mat-row *matRowDef="let row; columns: periodDisplayedColumns;" (click)="selectPeriodRow(row)" style="cursor: pointer;" [class.period-open-row]="row.status === 'Nyitott'" [class.period-closed-row]="row.status === 'Lezárt'"></tr>
+            <tr
+              mat-row
+              class="row-link"
+              *matRowDef="let row; columns: periodDisplayedColumns;"
+              (click)="selectPeriodRow(row)"
+              [class.period-open-row]="row.status === 'Nyitott'"
+              [class.period-closed-row]="row.status === 'Lezárt'"
+            ></tr>
           </table>
         </div>
       </div>
@@ -713,7 +727,8 @@
             <div class="detail-meta">{{ selectedPeriodItem.idoszakLabel }}</div>
           </div>
         </div>
-        <span class="status-icon-button detail-header-status" [class]="getPeriodStatusClass(selectedPeriodItem.status)">
+        <span class="status-icon-button detail-header-status detail-status-badge" [class]="getPeriodStatusClass(selectedPeriodItem.status)">
+          <span class="status-label">{{ selectedPeriodItem.status }}</span>
           <mat-icon>{{ getPeriodStatusIcon(selectedPeriodItem.status) }}</mat-icon>
         </span>
       </div>
@@ -746,8 +761,9 @@
       </div>
     </div>
     <span
-      class="status-icon-button detail-header-status"
+      class="status-icon-button detail-header-status detail-status-badge"
       [class]="'status-' + getStatusClass(selectedItem.status)">
+      <span class="status-label">{{ selectedItem.status }}</span>
       <mat-icon>{{ getStatusIcon(selectedItem.status || '') }}</mat-icon>
     </span>
   </div>

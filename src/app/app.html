@@ -41,8 +41,11 @@
           (click)="openPopup('balance')"
           aria-label="Egyenleg megnyitása"
         >
-          <span class="balance-title">Egyenleg</span>
-          <span class="balance-value">-200e Ft</span>
+          <span class="balance-copy">
+            <span class="balance-title">Egyenleg</span>
+            <span class="balance-value">-200e Ft</span>
+          </span>
+          <mat-icon class="balance-chevron" aria-hidden="true">chevron_right</mat-icon>
         </button>
       </div>
       <div class="menu-items">
@@ -90,6 +93,7 @@
             <span class="user-name">{{ activeUser.name }}</span>
             <span class="user-role">Aktív felhasználó</span>
           </div>
+          <mat-icon class="user-header-chevron" aria-hidden="true">chevron_right</mat-icon>
         </button>
         <button class="user-exit-btn" type="button" aria-label="Kilépés" (click)="openUserPopup('logoutConfirm')">
           <mat-icon>logout</mat-icon>
@@ -105,9 +109,12 @@
                 <span class="card-badge">{{ userAppointments.length }}</span>
                 <span class="card-title">Időpontfoglalás</span>
               </span>
-              <button class="header-icon-btn" type="button" (click)="$event.stopPropagation(); openUserPopup('addAppointment')">
-                <mat-icon>add</mat-icon>
-              </button>
+              <span class="card-header-actions">
+                <button class="header-icon-btn" type="button" (click)="$event.stopPropagation(); openUserPopup('addAppointment')">
+                  <mat-icon>add</mat-icon>
+                </button>
+                <mat-icon class="header-chevron" aria-hidden="true">{{ appointmentsOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
+              </span>
             </div>
             <div class="card-body appointment-list accordion-body" [class.open]="appointmentsOpen">
               <div class="accordion-inner">
@@ -133,6 +140,7 @@
                 <span class="card-badge">{{ getIssueTotal() }}</span>
                 <span class="card-title">Ügyek</span>
               </span>
+              <mat-icon class="header-chevron" aria-hidden="true">{{ issuesOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
             </div>
             <div class="card-body accordion-body" [class.open]="issuesOpen">
               <div class="accordion-inner">
@@ -230,8 +238,11 @@
           (click)="openPopup('balance')"
           aria-label="Egyenleg megnyitása"
         >
-          <span class="balance-title">Egyenleg</span>
-          <span class="balance-value">-200e Ft</span>
+          <span class="balance-copy">
+            <span class="balance-title">Egyenleg</span>
+            <span class="balance-value">-200e Ft</span>
+          </span>
+          <mat-icon class="balance-chevron" aria-hidden="true">chevron_right</mat-icon>
         </button>
       </div>
       <mat-nav-list>
@@ -273,10 +284,12 @@
       <div class="popup-title">
         <h2>{{ getPopupTitle() }}</h2>
       </div>
-      <span class="popup-balance-value" *ngIf="activePopup === 'balance'">{{ balanceValue }}</span>
-      <button mat-icon-button class="popup-close" (click)="closePopup()" aria-label="Bezárás">
-        <mat-icon>close</mat-icon>
-      </button>
+      <div class="popup-header-actions">
+        <span class="popup-balance-value" *ngIf="activePopup === 'balance'">{{ balanceValue }}</span>
+        <button mat-icon-button class="popup-close" (click)="closePopup()" aria-label="Bezárás">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
     </div>
     <div class="popup-body">
       <div *ngIf="activePopup === 'contact'" class="contact-content">
