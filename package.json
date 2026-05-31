@@ -5,6 +5,7 @@
     "ng": "ng",
     "build": "ng build --configuration development",
     "build:prod": "ng build --configuration production",
+    "build:github": "ng build --configuration production --base-href /e-kozig/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
