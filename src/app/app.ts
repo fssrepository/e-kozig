@@ -175,19 +175,20 @@ export class App {
         { text: 'Ha egy utalás a főszámlára érkezik, azt a rendszer automatikusan felbonthatná az alszámlák között. (pl. egészségügyi járulék, nyugdíjjárulék, kamarai hozzájárulás, HIPA stb.).', level: 2 },
         { text: '"Vállalkozás" (Kft, Bt...)', level: 1 },
         { text: 'Adózási formák', level: 0 },
-        { text: 'Számlaalapú adózás: minden számla után egységes előleg, amelyet a NAV szétoszt az adószámlák között és bevallásként kiajánl.', level: 1 },
-        { text: 'Külföldi távmunka esetén is a számla kelte szerinti MNB középárfolyam legyen az alap; banki eladási árfolyam csak jelzett eltérésként.', level: 2 },
-        { text: 'A számla 90 napos türelmi idővel legyen pótolható vagy javítható, hogy az ÁFA és a bevételi alap ne csússzon szét.', level: 2 },
-        { text: 'Ha a valós viszony munkaviszony jellegű, a rendszer ne KATA-ba kényszerítsen, hanem a befizetést munkavállalói terhekhez mérje.', level: 2 },
-        { text: 'Átalányadó egyszerűsítése: (100% - költséghányad) * egységes kulcs, könyvelő nélkül, NAV-kiajánlással.', level: 1 },
-        { text: 'VSZJA: tételes költségek automatikus vagy AI-alapú kategorizálása bejövő számlákból, emberi jóváhagyással.', level: 1 },
+        { text: 'Számlaalapú progresszív adózás: a NAV a számlák alapján kiajánlja a bevallást és a fizetendő adót; a progresszív adókulcs 9-35% között mozoghat.', level: 1 },
+        { text: 'Alap számlaalapú adózás: a kiállított számlák után számolt progresszív adó és járulék.', level: 2 },
+        { text: 'Átalányadó: ugyanennek költséghányados változata, ahol a NAV a bevételből levonja a költséghányadot.', level: 2 },
+        { text: 'VSZJA: tételes, költségszámlás elszámolás, ahol a bejövő számlákat automatikusan, később AI-alapon kell kategorizálni.', level: 2 },
+        { text: 'Kényszervállalkozásnál a dolgozó befizetheti az alkalmazotti terheknek megfelelő adót és járulékot, így az ő oldala rendezett; a NAV a foglalkoztatót ellenőrzi a be nem jelentett munkaviszony és a meg nem fizetett munkáltatói bérjárulék miatt.', level: 2 },
+        { text: 'Közös számlaalapú szabályok:', level: 1 },
+        { text: 'Külföldi távmunka számláinál a számla kelte szerinti MNB középárfolyam legyen az adóalap számításának alapja.', level: 2 },
+        { text: 'A számla 90 napig legyen pótolható vagy javítható; a javítás a bevételi alapban, költségalapban vagy járulékalapban jelenjen meg.', level: 2 },
         { text: 'Közös elemek:', level: 1 },
         { text: 'Alanyi adómentes határ', level: 2 },
         { text: 'Minimum a minimálbér utáni járulékfizetés (garantált bérminimum eltörlése)', level: 2 },
         { text: 'Adókulcsot csökkentő tételek (pl. családi kedvezmény)', level: 2 },
         { text: 'Adó-visszaigénylési lehetőség (pl. ha az éves jövedelem nem éri el a minimálbér összegét)', level: 2 },
-        { text: 'Nem a régi KATA hibáit kell megismételni, hanem az adózási torzításokat kell csökkenteni.', level: 2 },
-        { text: 'A KATA kivezetésnél 3M-es határ eltörlése adóév végéig, majd számla alapú adózássá formálása okozta volna a legkevesebb káoszt.', level: 1 }
+        { text: 'A cél az adózási torzítás csökkentése: aki dolgozik és fizetni akar, annak legyen rendezett befizetési útja akkor is, ha a másik fél a foglalkoztatási kötelezettségét nem teljesíti.', level: 2 }
       ]
     },
     {
