@@ -102,6 +102,7 @@ export class App {
     {
       title: 'Képviseletek',
       items: [
+        { text: 'Cél: a könyvelő és a képviselő saját jogosultsággal dolgozzon, ne a vállalkozó Ügyfélkapu-jelszavával.', level: 0 },
         { text: 'Lista az aktuális képviseletekről és azok jogosultságairól (törlés gomb a végén)', level: 0 },
         { text: 'Képviselt hozzáadása gomb a könyvelő oldalán', level: 0 },
         { text: 'Képviselet meghatalmazás kérő űrlap betöltése - integrált Onya (jogosultság + önkormányzat - hipa checkbox)', level: 1 },
@@ -128,6 +129,14 @@ export class App {
         { text: '„Az Ön nevében új adóbevallás került benyújtásra. Kérjük, tekintse át az Ügyfélportál [megadott menüpontjában]. Ha mindent rendben talál, fogadja el; ha nem reagál 30 napon belül, a bevallást automatikusan elfogadottnak tekintjük.”', level: 2 },
         { text: '„Az adóbevallás sikeresen benyújtásra került.”', level: 2 }
       ]
+    },
+    {
+      title: 'Adatvédelem és audit',
+      items: [
+        { text: 'Minden képviseleti, bevallási és jogosultsági művelet legyen naplózott, visszakereshető és az adózó számára érthetően látható.', level: 0 },
+        { text: 'A technikai üzenet menjen a könyvelőnek, de a vállalkozó kapjon rövid, emberi nyelvű tájékoztatást arról, mi változott a nevében.', level: 0 },
+        { text: 'A DÁP/NAV azonosítás és jogosultságkezelés legyen közös logikára fűzve, hogy az adatkezelés ne széttöredezett felületeken történjen.', level: 0 }
+      ]
     }
   ];
   protected readonly balancePanels: BalancePanelItem[] = [
@@ -137,19 +146,32 @@ export class App {
         { text: 'A különböző jogcímekhez tartozó számlák főszámla alá rendezése.', level: 0 },
         { text: '"Természetes Személy" (Egyéni vállalkozó, Munkanélküli stb.)', level: 1 },
         { text: 'Ha egy utalás a főszámlára érkezik, azt a rendszer automatikusan felbonthatná az alszámlák között. (pl. egészségügyi járulék, nyugdíjjárulék, kamarai hozzájárulás, HIPA stb.).', level: 2 },
+        { text: 'A NAV fizetési értesítője működjön közüzemi számlaként: egyértelmű összeg, jogcím, határidő és befizetési azonosító.', level: 1 },
+        { text: 'A határidőre rendezett fizetési értesítő lezárt időszak legyen; utólag ne írja át visszamenőleg az adószámlát.', level: 2 },
+        { text: 'Későbbi korrekció csak külön, látható elszámoló vagy helyesbítő tételként jelenjen meg, saját határidővel.', level: 2 },
         { text: '"Vállalkozás" (Kft, Bt...)', level: 1 },
         { text: 'Adózási formák', level: 0 },
-        { text: 'Számlaalapú adózás (fix %, a bérköltség munkavállalót terhelő részéhez igazított mérték - külföldi távmunka is)', level: 1 },
-        { text: 'Fix költségelszámolás alapú adózás (átalányadó)', level: 1 },
-        { text: 'Tételes költségelszámolás alapú adózás (VSZJA)', level: 1 },
-        { text: '', level: 1 },
+        { text: 'Számlaalapú adózás: minden számla után egységes előleg, amelyet a NAV szétoszt az adószámlák között és bevallásként kiajánl.', level: 1 },
+        { text: 'Külföldi távmunka esetén is a számla kelte szerinti MNB középárfolyam legyen az alap; banki eladási árfolyam csak jelzett eltérésként.', level: 2 },
+        { text: 'A számla 90 napos türelmi idővel legyen pótolható vagy javítható, hogy az ÁFA és a bevételi alap ne csússzon szét.', level: 2 },
+        { text: 'Ha a valós viszony munkaviszony jellegű, a rendszer ne KATA-ba kényszerítsen, hanem a befizetést munkavállalói terhekhez mérje.', level: 2 },
+        { text: 'Átalányadó egyszerűsítése: (100% - költséghányad) * egységes kulcs, könyvelő nélkül, NAV-kiajánlással.', level: 1 },
+        { text: 'VSZJA: tételes költségek automatikus vagy AI-alapú kategorizálása bejövő számlákból, emberi jóváhagyással.', level: 1 },
         { text: 'Közös elemek:', level: 1 },
         { text: 'Alanyi adómentes határ', level: 2 },
         { text: 'Minimum a minimálbér utáni járulékfizetés (garantált bérminimum eltörlése)', level: 2 },
         { text: 'Adókulcsot csökkentő tételek (pl. családi kedvezmény)', level: 2 },
         { text: 'Adó-visszaigénylési lehetőség (pl. ha az éves jövedelem nem éri el a minimálbér összegét)', level: 2 },
-        { text: 'Mindig MNB közép a számla kiállítás pillanatában (se banki eladási, se forgalmi alapú)', level: 2 },
+        { text: 'Nem a régi KATA hibáit kell megismételni, hanem az adózási torzításokat kell csökkenteni.', level: 2 },
         { text: 'A KATA kivezetésnél 3M-es határ eltörlése adóév végéig, majd számla alapú adózássá formálása okozta volna a legkevesebb káoszt.', level: 1 }
+      ]
+    },
+    {
+      title: 'Bevezetés és tesztelés',
+      items: [
+        { text: 'Az új adózási vagy NAV/DÁP folyamat először párhuzamosan fusson a régi mellett, hogy éles használatból legyen tapasztalat.', level: 0 },
+        { text: 'Példa ütemezés: szeptemberben választható indulás, januárban a régi folyamat kivezetése a tapasztalatok alapján.', level: 1 },
+        { text: 'A fő kockázat nem a képernyőterv, hanem az, hogy ami elméletben működik, a valós ügyintézésben gyakran máshogy viselkedik.', level: 1 }
       ]
     },
     {
@@ -164,15 +186,25 @@ export class App {
       subpanels: [
         {
           title: 'Fizetési tájékoztatók',
-          items: ['Aktuális fizetési kötelezettségek összesítése']
+          items: [
+            'Aktuális fizetési kötelezettségek összesítése',
+            'Közüzemi számla jellegű NAV értesítő: fizetendő összeg, jogcím, határidő, befizetési azonosító',
+            'Lezárt, határidőre befizetett időszak visszamenőleg nem módosítható az adószámlán'
+          ]
         },
         {
           title: 'Pótléklevezetés',
-          items: ['Késedelmi pótlékok részletezése időszakonként']
+          items: [
+            'Késedelmi pótlékok részletezése időszakonként',
+            'Pótlék csak az eredeti határidő és a látható korrekciós tétel alapján keletkezzen'
+          ]
         },
         {
           title: 'Adóteljesítmény',
-          items: ['Befizetések és teljesítések kimutatása']
+          items: [
+            'Befizetések és teljesítések kimutatása',
+            'A már teljesített NAV fizetési értesítők külön lezárt állapotban jelenjenek meg'
+          ]
         },
         {
           title: 'Köztartozásmentes adózói adatbázis (KOMA)',

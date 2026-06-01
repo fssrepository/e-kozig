@@ -253,10 +253,31 @@
   color: rgba(15, 23, 42, 0.9);
 }
 
+.readme-content h3 {
+  margin: 1rem 0 0.55rem;
+  color: rgba(15, 23, 42, 0.88);
+  font-size: 1rem;
+}
+
 .readme-content p {
   color: rgba(15, 23, 42, 0.76);
   line-height: 1.5;
   margin-bottom: 0.75rem;
+}
+
+.concept-list {
+  margin: 0.2rem 0 1rem;
+  padding-left: 1.1rem;
+  color: rgba(15, 23, 42, 0.76);
+  line-height: 1.45;
+}
+
+.concept-list li {
+  margin-bottom: 0.55rem;
+}
+
+.concept-list strong {
+  color: rgba(15, 23, 42, 0.9);
 }
 
 .readme-content a {

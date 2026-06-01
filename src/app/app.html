@@ -321,7 +321,7 @@
               <mat-panel-title>{{ panel.title }}</mat-panel-title>
             </mat-expansion-panel-header>
             <div class="accordion-content" *ngIf="panel.items && panel.items.length">
-              <ul class="popup-list" *ngIf="panel.title === 'Képviseletek' || panel.title === 'Értesítő szabályok'; else popupParagraphs">
+              <ul class="popup-list" *ngIf="panel.title === 'Képviseletek' || panel.title === 'Értesítő szabályok' || panel.title === 'Adatvédelem és audit'; else popupParagraphs">
                 <li *ngFor="let item of panel.items" class="popup-list-item" [class]="'popup-list-item level-' + getItemLevel(item)">
                   {{ getItemText(item) }}
                 </li>
