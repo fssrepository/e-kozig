@@ -27,7 +27,7 @@
       .label { font: 800 17px Arial, sans-serif; fill: #0f172a; }
       .text { font: 400 15px Arial, sans-serif; fill: #334155; }
       .intro { font: 400 15px Arial, sans-serif; fill: #334155; }
-      .small { font: 400 13px Arial, sans-serif; fill: #475569; }
+      .small { font: 400 14px Arial, sans-serif; fill: #475569; }
       .metric { font: 800 18px Arial, sans-serif; fill: #0f172a; }
       .arrow-blue { fill: none; stroke: #2563eb; stroke-width: 4; stroke-linecap: round; marker-end: url(#arrowBlue); }
       .arrow-green { fill: none; stroke: #16a34a; stroke-width: 4; stroke-linecap: round; marker-end: url(#arrowGreen); }
