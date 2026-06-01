@@ -169,10 +169,10 @@ export class App {
       items: [
         { text: 'A befizetési rendszer működhet számviteli szempontból, mégis nehéz az adózónak: több adónem, alszámla, előleg, járulék és önkormányzati tétel között kell eldöntenie, pontosan hova menjen a pénz.', level: 0 },
         { text: 'A konkrét kockázat az, hogy az adózó fizetett, de rossz alszámlára, rossz jogcímre vagy később átvezetendő tételre. Ilyenkor a saját oldalán tartozást lát, miközben nem fizetési szándék hiányzott, hanem egyértelmű fizetési útmutató.', level: 0 },
-        { text: 'Ezért a NAV a számlákból, befizetésekből és választott adózási módból kiajánlott bevallást és fizetési tervet készíthetne: az adózó ellenőriz, javít, jóváhagy, de nem neki kell kitalálnia a teljes technikai szétosztást.', level: 0 },
-        { text: 'A különböző jogcímekhez tartozó számlák főszámla alá rendezése.', level: 0 },
+        { text: 'Ezért egy adószámlára történjen a befizetés: az adózó ellenőrzi és jóváhagyja a NAV által kiajánlott bevallást és fizetési tervet, a NAV pedig a befizetést szétosztja a jogcímek között.', level: 0 },
+        { text: 'A különböző jogcímek ne külön adózói találgatást igényeljenek, hanem a NAV-oldali szétosztásban jelenjenek meg.', level: 0 },
         { text: '"Természetes Személy" (Egyéni vállalkozó, Munkanélküli stb.)', level: 1 },
-        { text: 'Ha egy utalás a főszámlára érkezik, azt a rendszer automatikusan felbonthatná az alszámlák között. (pl. egészségügyi járulék, nyugdíjjárulék, kamarai hozzájárulás, HIPA stb.).', level: 2 },
+        { text: 'Ha egy utalás az egy adószámlára érkezik, azt a NAV automatikusan felosztja a megfelelő jogcímek között. (pl. egészségügyi járulék, nyugdíjjárulék, kamarai hozzájárulás, HIPA stb.).', level: 2 },
         { text: '"Vállalkozás" (Kft, Bt...)', level: 1 },
         { text: 'Adózási formák', level: 0 },
         { text: 'Számlaalapú progresszív adózás: a NAV a számlák alapján kiajánlja a bevallást és a fizetendő adót; a progresszív adókulcs 9-35% között mozoghat.', level: 1 },

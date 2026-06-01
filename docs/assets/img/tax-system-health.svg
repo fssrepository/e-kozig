@@ -26,6 +26,7 @@
       .section { font: 800 20px Arial, sans-serif; fill: #0f172a; }
       .label { font: 800 17px Arial, sans-serif; fill: #0f172a; }
       .text { font: 400 15px Arial, sans-serif; fill: #334155; }
+      .intro { font: 400 15px Arial, sans-serif; fill: #334155; }
       .small { font: 400 13px Arial, sans-serif; fill: #475569; }
       .metric { font: 800 18px Arial, sans-serif; fill: #0f172a; }
       .arrow-blue { fill: none; stroke: #2563eb; stroke-width: 4; stroke-linecap: round; marker-end: url(#arrowBlue); }
@@ -38,32 +39,32 @@
   <text class="title" x="70" y="70">Új adórendszer-egészség</text>
   <text class="subtitle" x="70" y="105">Kevesebb adminisztratív stressz, tisztább felelősség, stabilabb adóbevétel.</text>
 
-  <rect class="card blue-card" x="60" y="145" width="360" height="575" rx="18"/>
+  <rect class="card blue-card" x="60" y="145" width="390" height="575" rx="18"/>
   <text class="section" x="90" y="185">1. Számlaalapú progresszív adó</text>
-  <text class="text" x="90" y="215">A NAV a számlák alapján kiajánlja</text>
-  <text class="text" x="90" y="238">a bevallást és a fizetendő adót.</text>
+  <text class="intro" x="90" y="216">A NAV kiajánlja a bevallást, és egy adószámlán</text>
+  <text class="intro" x="90" y="238">szétosztja a befizetést jogcímekre.</text>
 
-  <rect class="card" x="90" y="270" width="300" height="68" rx="12"/>
+  <rect class="card" x="90" y="270" width="330" height="68" rx="12"/>
   <text class="label" x="112" y="298">Adókulcs: 9-35%</text>
   <text class="small" x="112" y="321">progresszív, jövedelemhez igazodik</text>
 
-  <rect class="card" x="90" y="360" width="300" height="72" rx="12"/>
+  <rect class="card" x="90" y="360" width="330" height="72" rx="12"/>
   <text class="label" x="112" y="389">Alap számlaalapú mód</text>
   <text class="small" x="112" y="413">kiállított számlák után adó + járulék</text>
 
-  <rect class="card" x="90" y="452" width="300" height="72" rx="12"/>
+  <rect class="card" x="90" y="452" width="330" height="72" rx="12"/>
   <text class="label" x="112" y="481">Átalányadó</text>
   <text class="small" x="112" y="505">költséghányad levonása után progresszív adó</text>
 
-  <rect class="card" x="90" y="544" width="300" height="72" rx="12"/>
+  <rect class="card" x="90" y="544" width="330" height="72" rx="12"/>
   <text class="label" x="112" y="573">VSZJA</text>
   <text class="small" x="112" y="597">költségszámlák, automatikus / AI kategorizálás</text>
 
-  <rect class="card" x="90" y="636" width="300" height="56" rx="12"/>
+  <rect class="card" x="90" y="636" width="330" height="56" rx="12"/>
   <text class="small" x="112" y="658">Közös: MNB árfolyam +</text>
   <text class="small" x="112" y="678">90 napon belüli számlakiállítás</text>
 
-  <path class="arrow-blue" d="M420 432 C462 432 482 432 525 432"/>
+  <path class="arrow-blue" d="M450 432 C482 432 500 432 525 432"/>
 
   <rect class="card green-card" x="525" y="145" width="370" height="575" rx="18"/>
   <text class="section" x="555" y="185">2. Kényszervállalkozó védelme</text>
@@ -110,7 +111,7 @@
   <rect class="card" x="1030" y="640" width="280" height="60" rx="12"/>
   <text class="metric" x="1052" y="677">Egészségesebb társadalom</text>
 
-  <rect class="card red-card" x="70" y="765" width="1260" height="72" rx="16"/>
-  <text class="section" x="100" y="797">Mit vált ki?</text>
-  <text class="text" x="100" y="823">bizonytalan jogviszony → félelem a NAV-tól → adminisztratív stressz → munkapiaci inaktivitás → szűkülő adóalap</text>
+  <rect class="card red-card" x="70" y="790" width="1260" height="84" rx="16"/>
+  <text class="section" x="100" y="820">Mit vált ki?</text>
+  <text class="text" x="100" y="846">alszámla-találgatás + bizonytalan jogviszony → félelem a NAV-tól → adminisztratív stressz → munkapiaci inaktivitás → szűkülő adóalap</text>
 </svg>
