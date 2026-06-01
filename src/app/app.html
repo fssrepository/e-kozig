@@ -321,7 +321,7 @@
               <mat-panel-title>{{ panel.title }}</mat-panel-title>
             </mat-expansion-panel-header>
             <div class="accordion-content" *ngIf="panel.items && panel.items.length">
-              <ul class="popup-list" *ngIf="panel.title === 'Képviseletek' || panel.title === 'Értesítő szabályok' || panel.title === 'Adatvédelem és audit'; else popupParagraphs">
+              <ul class="popup-list" *ngIf="panel.title === 'Képviseletek' || panel.title === 'Értesítő szabályok' || panel.title === 'Adatvédelem és audit' || panel.title === 'Minőségbiztosítás'; else popupParagraphs">
                 <li *ngFor="let item of panel.items" class="popup-list-item" [class]="'popup-list-item level-' + getItemLevel(item)">
                   {{ getItemText(item) }}
                 </li>
@@ -329,6 +329,10 @@
               <ng-template #popupParagraphs>
                 <p *ngFor="let item of panel.items">{{ getItemText(item) }}</p>
               </ng-template>
+              <figure class="qa-process-figure" *ngIf="panel.title === 'Minőségbiztosítás'">
+                <img src="assets/img/process.png" alt="Folyamatábra" class="qa-process-image">
+                <figcaption>Folyamatábra a prototípus és a háttérfolyamatok együttműködéséről.</figcaption>
+              </figure>
             </div>
           </mat-expansion-panel>
         </mat-accordion>

@@ -84,65 +84,93 @@
   </div>
 
   <section class="readme-content" *ngIf="isNavIssue(); else nonNavHome">
-    <h2>E-Közig prototípus (Itt a nav.gov.hu főoldal van!)</h2>
+    <h2>DÁP ügyféloldali prototípus</h2>
     <p>
-      A legtöbb közigazgatási fejlesztés (például a NAV Ügyfélportál) zárt, integrált
-      környezetben készül, ezért az utólagos módosítás lassú és rendkívül drága.
+      Ez a DÁP menüszerkezetben megjelenített NAV / Adóügy prototípus-szelet.
     </p>
-    <p>
-      Ha a <a href="https://fssrepository.github.io/e-kozig/" target="_blank" rel="noopener">felületi prototípus</a>
-      már a fejlesztés korai fázisában elérhető véleményezésre a
-      felhasználók számára, a NAV meglepetések nélkül alakíthatja ki a
-      háttérfolyamatokat, akár 80% költségmegtakarítást elérve.
-      A korai felületi prototípuson <b>(laptop és mobil)</b> végzett korrekció órákban, míg a későbbi integrált
-      rendszerben végzett javítás hónapokban mérhető.
-    </p>
-    <p>
-      A GitHub integrált környezetet biztosít a közös munkához:
-      <a href="https://github.com/fssrepository/e-kozig/" target="_blank" rel="noopener">forráskód</a>
-      és
-      <a href="https://github.com/fssrepository/e-kozig/issues" target="_blank" rel="noopener">vitafórum</a>.
-      Így a külső szakmai szervezetek (például a könyvelői kamara) bevonása garantálja a
-      hatékony közös karbantartást és a magasabb minőséget.
-    </p>
-    <h3>Koncepciós fókuszpontok</h3>
-    <ul class="concept-list">
-      <li>
-        <strong>Fokozatos bevezetés:</strong>
-        az új folyamat párhuzamosan is elindítható a régi mellett, így a valós használat
-        már a végleges kivezetés előtt megmutatja a hibákat.
-      </li>
-      <li>
-        <strong>Jogosultság és adatvédelem:</strong>
-        a képviselői műveleteknek saját jogosultságot, auditnaplót és érthető vállalkozói
-        értesítést kell kapniuk, nem Ügyfélkapu-jelszó megosztást.
-      </li>
-      <li>
-        <strong>NAV által előkészített bevallás:</strong>
-        a számlákból, befizetésekből és választott adózási módból a rendszer kiajánlható
-        bevallást készíthet, amelyet az adózó csak ellenőriz.
-      </li>
-      <li>
-        <strong>Egyszerűbb adólogika:</strong>
-        számla kelte szerinti MNB középárfolyam, pótolható számla, egységesebb előleg és
-        automatikus költségkategorizálás csökkentené a könyvelési kényszert.
-      </li>
-      <li>
-        <strong>Közüzemi számla logika:</strong>
-        a NAV fizetési értesítője legyen határidőre befizethető, lezárt időszak után pedig
-        ne írja át visszamenőleg az adószámlát, hanem külön korrekciós tételt mutasson.
-      </li>
+
+    <h3>A prototípusban érintett NAV IT-rendszerek</h3>
+    <ul>
+      <li><strong>NAV Ügyfélportál - Dokumentumok:</strong> dokumentumlista, keresés, szűrés, státusz és ügyfél szerinti áttekintés.</li>
+      <li><strong>ONYA / ÁNYK / ÁBEV Java / eBEV:</strong> beadott űrlapok, nyugták, szerveroldali visszajelzések és hibaüzenetek ügyféloldali követése.</li>
+      <li><strong>Online Számla:</strong> számlalista, bizonylatnézet, időszaknézet és számlaalapú adózási koncepció.</li>
+      <li><strong>eBEV / Adószámla:</strong> egyenleg, befizetés, köztartozás, pótléklevezetés és fizetési tájékoztató.</li>
+      <li><strong>NAV Adónaptár:</strong> esedékes és hiányzó bevallások, határidők, átmeneti bevezetési időszakok.</li>
+      <li><strong>Képviseleti jogosultságok / meghatalmazások:</strong> könyvelői képviselet, HIPA, adónem-választás, vállalkozói jóváhagyás és értesítés.</li>
+      <li><strong>Tárhely / Cégkapu értesítési logika:</strong> bevallási, képviseleti, adószámla- és státuszváltozási értesítések.</li>
     </ul>
-    <figure>
-      <img src="assets/img/process.png" alt="Folyamatábra" class="process">
-      <figcaption class="caption">Folyamatábra a prototípus és a háttérfolyamatok együttműködéséről.</figcaption>
-    </figure>
   </section>
 
   <ng-template #nonNavHome>
     <section class="readme-content">
       <h2>{{ selectedIssueLabel() || 'Kezdőlap' }}</h2>
       <p>{{ selectedIssue() }}</p>
+      <div [ngSwitch]="selectedIssueLabel()">
+        <section *ngSwitchCase="'Bűnügy'">
+          <h3>Miért kell erősebb eljárási garancia?</h3>
+          <p>
+            Az eljárás formailag haladhat akkor is, ha a gyanúsított nem látja pontosan,
+            mivel gyanúsítják, milyen iratok alapján járnak el, ki az előadó és hogyan
+            érheti el a kirendelt védőt. A védekezési jog viszont csak akkor használható,
+            ha ezek az adatok írásban, visszakereshetően és vallomástételtől függetlenül
+            rendelkezésre állnak.
+          </p>
+          <p>
+            Ez különösen akkor lényeges, ha a telefonját vagy laptopját lefoglalják.
+            Ilyenkor nemcsak egy eszköz hiányzik, hanem a kapcsolatok, dokumentumok,
+            időpontok és ügyintézési csatornák is kieshetnek. Ezért kell külön biztosítani,
+            hogy az értesítések postán vagy tárhelyen is eljussanak hozzá, és a védő
+            aktivitása ellenőrizhető legyen.
+          </p>
+          <ul>
+            <li>A pontos gyanúsítás, az eljárási iratok, a rendőri előadó és a kirendelt védő adatai vallomástételtől függetlenül kerüljenek átadásra vagy tárhelyre/postára.</li>
+            <li>Előadó- vagy védőváltozáskor automatikus értesítés menjen, mert a lefoglalt telefon miatt a gyanúsított nem biztos, hogy a korábbi csatornákon elérhető.</li>
+            <li>A kihallgatásról alapértelmezett hangfelvétel készüljön, hogy később ellenőrizhető legyen a bánásmód és a jegyzőkönyv pontossága.</li>
+            <li>A kirendelt védő passzivitására legyen panasz- és státuszfolyamat, mert a védelem hiánya az egész eljárást torzíthatja.</li>
+            <li>Telefon és laptop lefoglalása csak arányosan, időkorláttal történjen; híváslista-ellenőrzésnél legalább két évre visszamenőleg lehessen vizsgálni.</li>
+          </ul>
+        </section>
+
+        <section *ngSwitchCase="'Jog'">
+          <h3>Miért kell követhető és jóvátehető eljárás?</h3>
+          <p>
+            Egy hatósági vagy bírósági eljárás működhet formálisan, mégsem lesz az ügyfél
+            számára ellenőrizhető, ha az iratok, kézbesítések, határidők, ügyintézői
+            lépések és döntési indokok külön helyeken, összefüggés nélkül jelennek meg.
+          </p>
+          <p>
+            A cél az, hogy az ügyfél ne csak a végeredményt lássa, hanem azt is, milyen
+            lépések vezettek oda, mikor kellett volna reagálnia, és milyen jogorvoslat
+            maradt nyitva. Ha a sérelem közérdekű hibára mutat rá, a jóvátételnek is
+            legyen ellenőrizhető közérdekű hatása, ne csak egy egyedi ügy lezárása.
+          </p>
+          <ul>
+            <li>Minden lényeges eljárási lépés legyen időrendben, igazolható kézbesítéssel és érthető indokolással visszakereshető.</li>
+            <li>A határidő, az iratátadás, a képviseleti adat és az ügyintézői döntés ne külön szigetekben jelenjen meg, hanem egy ügytörténetben.</li>
+            <li>Rendszerhiba vagy jogsértő gyakorlat esetén a jóvátétel ne csak formális lezárás legyen, hanem ellenőrizhető közérdekű hatása is lehessen.</li>
+          </ul>
+        </section>
+
+        <section *ngSwitchCase="'Egészségügy'">
+          <h3>Miért kell krízishelyzeti moratórium?</h3>
+          <p>
+            Betegség, műtét, baleset, pszichés krízis vagy gondnoksági helyzet esetén
+            előfordulhat, hogy valaki átmenetileg nem képes határidőket figyelni,
+            tárhelyet kezelni vagy hivatalos döntésekre reagálni.
+          </p>
+          <p>
+            A hatóság saját oldalán ilyenkor sokszor csak lejárt határidőt vagy elmaradt
+            választ lát, nem magát az akadályoztatást. Ezért kell a krízishelyzetet
+            hivatalosan, időszakhoz kötötten láthatóvá tenni, hogy ne utólag kelljen
+            bizonygatni, miért nem tudott az érintett eljárni.
+          </p>
+          <ul>
+            <li>Legyen hivatalos, időszakhoz kötött ügyintézési moratórium, amelyet erre jogosult személy rögzíthet.</li>
+            <li>Az EESZT-ben rögzített státusz a NAV és más hivatalok számára is jelezze, hogy határidő- vagy végrehajtási védelem szükséges.</li>
+            <li>A moratórium ne törölje az ügyet, hanem akadályozza meg, hogy a rendszer automatikusan büntesse az átmenetileg cselekvőképtelen ügyfelet.</li>
+          </ul>
+        </section>
+      </div>
     </section>
   </ng-template>
 </div>

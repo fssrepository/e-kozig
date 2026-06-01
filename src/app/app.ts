@@ -102,13 +102,16 @@ export class App {
     {
       title: 'Képviseletek',
       items: [
-        { text: 'Cél: a könyvelő és a képviselő saját jogosultsággal dolgozzon, ne a vállalkozó Ügyfélkapu-jelszavával.', level: 0 },
+        { text: 'A képviseleti ügyintézés technikailag működhet, de a gyakorlatban gyakran jelszómegosztásra tolja a feleket. A könyvelő több felületen intéz NAV, ONYA, HIPA vagy adónem-választási ügyet, ezért a vállalkozó sokszor a saját belépését adja át.', level: 0 },
+        { text: 'Ez azért baj, mert vita esetén nem lesz ügyféloldalon bizonyítható felelősségi lánc: ki jelentkezett be, ki adott be bevallást, ki módosított jogosultságot, ki kezelte az önkormányzati adót, és miről kapott értesítést a vállalkozó.', level: 0 },
+        { text: 'A kívánt működés: a könyvelő saját azonosítással dolgozik, a vállalkozó pedig a saját tárhelyén látja és hagyja jóvá a képviseletet, a HIPA-jogosultságot és az adónemhez kapcsolódó jogosultságokat.', level: 0 },
         { text: 'Lista az aktuális képviseletekről és azok jogosultságairól (törlés gomb a végén)', level: 0 },
         { text: 'Képviselt hozzáadása gomb a könyvelő oldalán', level: 0 },
         { text: 'Képviselet meghatalmazás kérő űrlap betöltése - integrált Onya (jogosultság + önkormányzat - hipa checkbox)', level: 1 },
         { text: 'Könyvelő beküldi a képviseleti meghatalmazás igénylést (kitölti az ürlapot), amit a vállalkozó a saját tárhelyén elfogad', level: 1 },
         { text: 'Könyvelő beküldi a hipa adónem választó ürlapot is a NAV-nak (nem Önkormányzat felületén)', level: 1 },
-        { text: 'Ezzel ki lehet küszöbölni, hogy a vállalkozó kényszerből megossza az ügyfélkapus jelszavát a könyvelővel!', level: 1 }
+        { text: 'Így a könyvelő felelőssége is ténylegesen ellenőrizhető: ha a képviseleti jogosultságával hibásan jár el, annak legyen kamarai vagy fegyelmi következménye.', level: 0 },
+        { text: 'Miután a saját jogosultságos működés elérhető, a vállalkozó Ügyfélkapu-jelszavának könyvelő általi használata legyen tiltott, naplózható és visszakereshetően szankcionálható.', level: 1 }
       ]
     },
     {
@@ -118,10 +121,17 @@ export class App {
     {
       title: 'Értesítő szabályok',
       items: [
-        { text: 'A GDPR alapján a vállalkozónak is kell értesítőt küldeni a képviseleti műveletekről! (adatai változtak)', level: 0 },
-        { text: 'A vállalkozó beállíthatja:', level: 0 },
+        { text: 'A technikai nyugta a beadónak hasznos, de nem ugyanaz, mint a képviselt vállalkozó érthető tájékoztatása. Ha a könyvelő bead egy bevallást, önellenőrzést vagy jogosultsági kérelmet, az adózónak is látnia kell, hogy az ő nevében milyen ügy indult el.', level: 0 },
+        { text: 'Az ügyféloldali hiány az, hogy egy adónem-átsorolás, TB vagy biztosítási státuszváltozás, új bevallás, önellenőrzés vagy adószámla-korrekció már határidőt, pótlékot vagy ellátási jogosultságot érinthet, miközben az adózó csak utólag érti meg, mi történt.', level: 0 },
+        { text: 'Ezért a vállalkozónak rövid, emberi nyelvű tárhelyes értesítést kell kapnia: mi változott, ki indította, melyik időszakot érinti, hol nézhető meg a részlet, és kell-e jóváhagynia.', level: 0 },
+        { text: 'Beállítható események:', level: 0 },
         { text: 'Mely képviseleti műveletekről szeretne értesítést a vállalkozó a tárhelyén (e-mail)', level: 1 },
         { text: 'Mely képviseleti műveleteket szeretné el is fogadni a tárhelyén (e-mail), mielőtt aktiválódik (30 nap múlva automatikusan elfogadasra kerül)', level: 1 },
+        { text: 'Kritikus értesítési események:', level: 0 },
+        { text: 'automatikus adónem-átsorolás vagy adózási státusz változás', level: 1 },
+        { text: 'jogosultsági, biztosítási vagy minimum TB fizetési helyzet változása', level: 1 },
+        { text: 'új bevallás vagy önellenőrzés benyújtása a vállalkozó nevében', level: 1 },
+        { text: 'adószámla-változás, különösen ha lezárt időszakot vagy visszamenőleges korrekciót érint', level: 1 },
         { text: 'A tárhelyre érkező üzenet formája, amikor A könyvelő benyújtja az adóbevallást és a NAV feldolgozza azt:', level: 0 },
         { text: 'A könyvelőnek visszaküld egy technikai vagy hibaüzenetet a szokásos módon', level: 1 },
         { text: 'A vállalkozónak rövid, közérthető tájékoztatást küld', level: 1 },
@@ -133,9 +143,23 @@ export class App {
     {
       title: 'Adatvédelem és audit',
       items: [
-        { text: 'Minden képviseleti, bevallási és jogosultsági művelet legyen naplózott, visszakereshető és az adózó számára érthetően látható.', level: 0 },
-        { text: 'A technikai üzenet menjen a könyvelőnek, de a vállalkozó kapjon rövid, emberi nyelvű tájékoztatást arról, mi változott a nevében.', level: 0 },
-        { text: 'A DÁP/NAV azonosítás és jogosultságkezelés legyen közös logikára fűzve, hogy az adatkezelés ne széttöredezett felületeken történjen.', level: 0 }
+        { text: 'A több rendszer önmagában nem probléma. A gond akkor keletkezik, ha a DÁP, NAV, ONYA és jogosultsági felületek eseményei az adózó oldalán nem állnak össze egy bizonyítható, időrendi ügytörténetté.', level: 0 },
+        { text: 'Ha később vita van egy bevallásról, képviseletről, vállalkozás-szüneteltetésről vagy adószámla-változásról, akkor nem elég egy belső technikai napló. Az adózónak is látnia kell: ki indította, milyen jogosultsággal, mikor, milyen adatra hivatkozva, és kapott-e róla értesítést.', level: 0 },
+        { text: 'Ezért minden képviseleti, bevallási, jogosultsági és adószámla-módosító művelethez ügyfél által olvasható eseménynapló kell, amely később bizonyítékként is értelmezhető.', level: 0 },
+        { text: 'A DÁP/NAV azonosítás és jogosultságkezelés legyen közös logikára fűzve, hogy az adatkezelés ne széttöredezett felületeken történjen.', level: 1 }
+      ]
+    },
+    {
+      title: 'Minőségbiztosítás',
+      items: [
+        { text: 'Probléma:', level: 0 },
+        { text: 'Az állami informatikai rendszerek sokszor zárt fejlesztésben készülnek, ezért a tervezési és programozási hibák csak éles ügyintézés közben derülnek ki. Ilyenkor a felhasználó lesz a tesztalany a saját kárán.', level: 1 },
+        { text: 'NAV-ügyben ez azért különösen súlyos, mert egy IT-hiba is határidőt, pótlékot, hibás bevallást vagy bizonyíthatatlan ügytörténetet okozhat, miközben a következmény az adózónál jelenik meg.', level: 1 },
+        { text: 'Konkrét példa az Ügyfélportál Dokumentumok része: ügyszám, iktatószám, nyugta, tárhelynapló, szerveroldali hibaüzenet és generált dokumentum nem mindig áll össze egy ellenőrizhető ügyidővonallá.', level: 1 },
+        { text: 'Javaslat:', level: 0 },
+        { text: 'A NAV-nak és más állami szervnek a saját IT-hibáit soron kívül el kell ismernie és javítania kell; informatikai hibánál ne az ügyfél viselje a rendszerhiba következményét.', level: 1 },
+        { text: 'Legyen szervezetektől független IT-minőségbiztosító szakmai csapat, amely állami informatikai projekteket tesztel, felhasználói hibajelzéseket fogad, tervezési hibákra javítást javasol, és a költségek arányosságát is ellenőrizheti.', level: 1 },
+        { text: 'A NAV-rendszerek DÁP / Ügyfélportál felületbe integrált prototípusa ezt szolgálja: élesítés előtt lehessen kipróbálni, javítani és szakmai vitára bocsátani a folyamatot.', level: 1 }
       ]
     }
   ];
@@ -143,12 +167,12 @@ export class App {
     {
       title: 'Befizetés',
       items: [
+        { text: 'A befizetési rendszer működhet számviteli szempontból, mégis nehéz az adózónak: több adónem, alszámla, előleg, járulék és önkormányzati tétel között kell eldöntenie, pontosan hova menjen a pénz.', level: 0 },
+        { text: 'A konkrét kockázat az, hogy az adózó fizetett, de rossz alszámlára, rossz jogcímre vagy később átvezetendő tételre. Ilyenkor a saját oldalán tartozást lát, miközben nem fizetési szándék hiányzott, hanem egyértelmű fizetési útmutató.', level: 0 },
+        { text: 'Ezért a NAV a számlákból, befizetésekből és választott adózási módból kiajánlott bevallást és fizetési tervet készíthetne: az adózó ellenőriz, javít, jóváhagy, de nem neki kell kitalálnia a teljes technikai szétosztást.', level: 0 },
         { text: 'A különböző jogcímekhez tartozó számlák főszámla alá rendezése.', level: 0 },
         { text: '"Természetes Személy" (Egyéni vállalkozó, Munkanélküli stb.)', level: 1 },
         { text: 'Ha egy utalás a főszámlára érkezik, azt a rendszer automatikusan felbonthatná az alszámlák között. (pl. egészségügyi járulék, nyugdíjjárulék, kamarai hozzájárulás, HIPA stb.).', level: 2 },
-        { text: 'A NAV fizetési értesítője működjön közüzemi számlaként: egyértelmű összeg, jogcím, határidő és befizetési azonosító.', level: 1 },
-        { text: 'A határidőre rendezett fizetési értesítő lezárt időszak legyen; utólag ne írja át visszamenőleg az adószámlát.', level: 2 },
-        { text: 'Későbbi korrekció csak külön, látható elszámoló vagy helyesbítő tételként jelenjen meg, saját határidővel.', level: 2 },
         { text: '"Vállalkozás" (Kft, Bt...)', level: 1 },
         { text: 'Adózási formák', level: 0 },
         { text: 'Számlaalapú adózás: minden számla után egységes előleg, amelyet a NAV szétoszt az adószámlák között és bevallásként kiajánl.', level: 1 },
@@ -169,9 +193,16 @@ export class App {
     {
       title: 'Bevezetés és tesztelés',
       items: [
-        { text: 'Az új adózási vagy NAV/DÁP folyamat először párhuzamosan fusson a régi mellett, hogy éles használatból legyen tapasztalat.', level: 0 },
+        { text: 'Egy új adózási vagy NAV/DÁP folyamat papíron és technikailag is lehet működő, mégis csak valós használatban derül ki, hogy az adózó, könyvelő, NAV-ügyintéző, nyomtatvány és fizetési folyamat ugyanúgy értelmezi-e.', level: 0 },
+        { text: 'A kockázat nem az, hogy minden újítás rossz, hanem az, hogy teljes kötelező átállásnál az első gyakorlati értelmezési hibák már pótlékként, rossz bevallásként vagy elveszett határidőként az ügyfélnél jelennek meg.', level: 0 },
+        { text: 'Ezért az új adózási vagy NAV/DÁP folyamat először választhatóan, a régi mellett fusson. Így mérhető, hol nem egyértelmű az ügyféloldali út, mielőtt a régi folyamat végleg kivezetésre kerül.', level: 0 },
         { text: 'Példa ütemezés: szeptemberben választható indulás, januárban a régi folyamat kivezetése a tapasztalatok alapján.', level: 1 },
-        { text: 'A fő kockázat nem a képernyőterv, hanem az, hogy ami elméletben működik, a valós ügyintézésben gyakran máshogy viselkedik.', level: 1 }
+        { text: 'Az átmeneti időszakhoz kapcsolódhat promóciós, csökkentett adókulcs, hogy a vállalkozók önként kipróbálják az új rendszert.', level: 1 },
+        { text: 'A kedvezmény ne kivételezés legyen, hanem nyilvános tesztelési ösztönző: aki vállalja az új folyamatot, visszajelzést ad és segít finomhangolni.', level: 2 },
+        { text: 'Nem valós vészhelyzeti adóváltozásnál legalább 3 hónap felkészülési idő kellene a hatálybalépésig.', level: 1 },
+        { text: 'Ha a kormány korábban is bevezethette volna a módosítást, legyen legalább 6 hónapos átmeneti időszak a közlöny megjelenésétől.', level: 1 },
+        { text: 'A fő kockázat nem a képernyőterv, hanem az, hogy a szabály, a felület, a könyvelői gyakorlat és a NAV háttérfolyamat eltérően értelmezheti ugyanazt a helyzetet.', level: 1 },
+        { text: 'Hirtelen, visszamenőleges vagy néhány napos alkalmazkodási idejű átállás helyett legyen kötelező próbaidőszak és visszajelzési kör, dokumentált javítási listával.', level: 1 }
       ]
     },
     {
@@ -187,9 +218,10 @@ export class App {
         {
           title: 'Fizetési tájékoztatók',
           items: [
-            'Aktuális fizetési kötelezettségek összesítése',
-            'Közüzemi számla jellegű NAV értesítő: fizetendő összeg, jogcím, határidő, befizetési azonosító',
-            'Lezárt, határidőre befizetett időszak visszamenőleg nem módosítható az adószámlán'
+            { text: 'Az adószámla hatósági nyilvántartásként működhet, de az adózónak fizetéskor nem könyvelési logikára, hanem egy lezárható fizetési kötelezettségre van szüksége: mennyi, milyen jogcímen, melyik időszakra, meddig és milyen azonosítóval fizetendő.', level: 0 },
+            { text: 'Itt nem a későbbi NAV-oldali javítás lehetőségét kell megszüntetni. A lényeg az, hogy az adózó oldalán a múlt ne úgy változzon meg, mintha egy korábban határidőre teljesített fizetés akkor sem lett volna rendezett.', level: 0 },
+            { text: 'A javaslat szerint a NAV közüzemi számlához hasonló fizetési értesítőt állítana ki. Ha az adózó ezt határidőre befizeti, az adott értesítő ügyféloldalon lezárt teljesítés marad.', level: 1 },
+            { text: 'Későbbi NAV-oldali vagy bevallási korrekció továbbra is kezelhető, de külön elszámoló vagy helyesbítő tételként jelenjen meg, saját magyarázattal és saját határidővel. Így látszik, mi volt eredetileg teljesítve, és mi az új korrekció.', level: 1 }
           ]
         },
         {
@@ -202,8 +234,7 @@ export class App {
         {
           title: 'Adóteljesítmény',
           items: [
-            'Befizetések és teljesítések kimutatása',
-            'A már teljesített NAV fizetési értesítők külön lezárt állapotban jelenjenek meg'
+            'Befizetések és teljesítések kimutatása'
           ]
         },
         {
@@ -230,7 +261,6 @@ export class App {
       ]
     }
   ];
-
   protected readonly users: UserEntry[] = [
     {
       id: 'user-1',
