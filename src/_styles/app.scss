@@ -667,10 +667,10 @@
 }
 
 .header-icon-btn .mat-icon {
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
-  line-height: 18px;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
 }
 
 .header-icon-btn:hover {
@@ -1520,6 +1520,24 @@
 
 .popup-list-item.level-2::before {
   content: '';
+}
+
+.qa-process-figure {
+  margin: 1rem auto 0;
+  max-width: 620px;
+  text-align: center;
+}
+
+.qa-process-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.qa-process-figure figcaption {
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.56);
 }
 
 .contact-content {

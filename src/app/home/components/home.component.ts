@@ -37,6 +37,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   @ViewChild('searchWrapper') private searchWrapperRef?: ElementRef<HTMLElement>;
 
   searchOverlayTop = 52;
+  searchOverlayViewportTop = 52;
   searchOverlayHeight = 480;
 
   searchCtrl = new FormControl('');
@@ -212,15 +213,22 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
 
     const contentAreaElement = this.searchRowRef?.nativeElement.closest('.content-area') as HTMLElement | null;
     const blockRect = blockElement.getBoundingClientRect();
+    const rowRect = rowElement.getBoundingClientRect();
     const measuredTop = Math.max(44, rowElement.offsetTop + rowElement.offsetHeight + this.overlayGap);
+    const measuredViewportTop = Math.max(44, Math.ceil(rowRect.bottom + this.overlayGap));
     const clippingRect = (contentAreaElement ?? blockElement).getBoundingClientRect();
     const measuredHeight = Math.max(220, Math.floor(clippingRect.bottom - (blockRect.top + measuredTop)));
 
-    if (measuredTop === this.searchOverlayTop && measuredHeight === this.searchOverlayHeight) {
+    if (
+      measuredTop === this.searchOverlayTop &&
+      measuredViewportTop === this.searchOverlayViewportTop &&
+      measuredHeight === this.searchOverlayHeight
+    ) {
       return;
     }
 
     this.searchOverlayTop = measuredTop;
+    this.searchOverlayViewportTop = measuredViewportTop;
     this.searchOverlayHeight = measuredHeight;
     this.cdr.markForCheck();
   }

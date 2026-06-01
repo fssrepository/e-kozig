@@ -15,6 +15,14 @@
   text-align: center;
 }
 
+.tax-health-diagram {
+  display: block;
+  width: 100%;
+  max-width: 980px;
+  height: auto;
+  margin: 1.25rem auto 0;
+}
+
 .search-block {
   position: relative;
   width: 100%;
@@ -253,6 +261,12 @@
   color: rgba(15, 23, 42, 0.9);
 }
 
+.readme-content h3 {
+  margin: 1rem 0 0.55rem;
+  color: rgba(15, 23, 42, 0.88);
+  font-size: 1rem;
+}
+
 .readme-content p {
   color: rgba(15, 23, 42, 0.76);
   line-height: 1.5;
@@ -312,34 +326,46 @@
   }
 
   .search-row {
+    position: relative;
+    z-index: 901;
     padding: 0 64px;
   }
 
   .detail-panel {
     position: fixed;
-    inset: 0;
+    top: var(--search-overlay-viewport-top, var(--search-overlay-top, 52px));
+    left: 0;
+    right: 0;
+    bottom: 0;
     z-index: 900;
     padding: 0;
     background: var(--mat-sys-surface);
+    min-height: 0;
+    height: auto;
   }
 
   .detail-popup {
     position: fixed;
-    inset: 0;
+    top: var(--search-overlay-viewport-top, var(--search-overlay-top, 52px));
+    left: 0;
+    right: 0;
+    bottom: 0;
     z-index: 900;
     padding: 0;
     background: var(--mat-sys-surface);
+    min-height: 0;
+    height: auto;
   }
 
   .detail-panel-inner {
-    max-height: 100dvh;
-    height: 100dvh;
+    max-height: none;
+    height: 100%;
     border-radius: 0;
   }
 
   .detail-popup-inner {
-    max-height: 100dvh;
-    height: 100dvh;
+    max-height: none;
+    height: 100%;
     border-radius: 0;
   }
 
