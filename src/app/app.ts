@@ -182,7 +182,7 @@ export class App {
         { text: 'Kényszervállalkozásnál a dolgozó befizetheti az alkalmazotti terheknek megfelelő adót és járulékot, így az ő oldala rendezett; a NAV a foglalkoztatót ellenőrzi a be nem jelentett munkaviszony és a meg nem fizetett munkáltatói bérjárulék miatt.', level: 2 },
         { text: 'Közös számlaalapú szabályok:', level: 1 },
         { text: 'Külföldi távmunka számláinál a számla kelte szerinti MNB középárfolyam legyen az adóalap számításának alapja.', level: 2 },
-        { text: 'A számla 90 napig legyen pótolható vagy javítható; a javítás a bevételi alapban, költségalapban vagy járulékalapban jelenjen meg.', level: 2 },
+        { text: 'A számlakiállítás 90 napon belüli legyen, hogy a számla a valós teljesítéshez és adózási időszakhoz rendezhető legyen.', level: 2 },
         { text: 'Közös elemek:', level: 1 },
         { text: 'Alanyi adómentes határ', level: 2 },
         { text: 'Minimum a minimálbér utáni járulékfizetés (garantált bérminimum eltörlése)', level: 2 },
