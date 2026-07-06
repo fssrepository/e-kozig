@@ -82,8 +82,14 @@ export class FormEditorStoreService {
         }
       };
 
+      const fail = (error: unknown) => {
+        this.dbPromise = undefined;
+        reject(error instanceof Error ? error : new Error('IndexedDB open failed.'));
+      };
+
       request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
+      request.onerror = () => fail(request.error);
+      request.onblocked = () => fail(new Error('IndexedDB open was blocked.'));
     });
 
     return this.dbPromise;
@@ -135,9 +141,10 @@ export class FormEditorStoreService {
     return new Promise((resolve, reject) => {
       const transaction = db.transaction(storeName, 'readwrite');
       const store = transaction.objectStore(storeName);
-      const request = store.put(item);
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
+      store.put(item);
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error);
+      transaction.onabort = () => reject(transaction.error);
     });
   }
 
@@ -145,9 +152,10 @@ export class FormEditorStoreService {
     return new Promise((resolve, reject) => {
       const transaction = db.transaction(storeName, 'readwrite');
       const store = transaction.objectStore(storeName);
-      const request = store.delete(key);
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
+      store.delete(key);
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error);
+      transaction.onabort = () => reject(transaction.error);
     });
   }
 
