@@ -31,12 +31,12 @@ export class FormEditorStoreService {
 
   async saveTemplate(template: FormTemplate): Promise<void> {
     const db = await this.openDb();
-    await this.put(db, TEMPLATE_STORE, this.clone(template));
+    await this.put(db, TEMPLATE_STORE, this.compactTemplate(template));
   }
 
   async saveSectionTemplate(section: FormSectionDefinition): Promise<void> {
     const db = await this.openDb();
-    await this.put(db, SECTION_STORE, this.clone(section));
+    await this.put(db, SECTION_STORE, section);
   }
 
   async deleteSectionTemplate(sectionId: string): Promise<void> {
@@ -53,7 +53,7 @@ export class FormEditorStoreService {
 
   async saveDocument(document: FormDocument): Promise<void> {
     const db = await this.openDb();
-    await this.put(db, DOCUMENT_STORE, this.clone(document));
+    await this.put(db, DOCUMENT_STORE, document);
   }
 
   private openDb(): Promise<IDBDatabase> {
@@ -96,7 +96,7 @@ export class FormEditorStoreService {
     }
 
     await Promise.all(
-      DEFAULT_FORM_TEMPLATES.map(template => this.put(db, TEMPLATE_STORE, this.clone(template)))
+      DEFAULT_FORM_TEMPLATES.map(template => this.put(db, TEMPLATE_STORE, this.compactTemplate(template)))
     );
   }
 
@@ -153,5 +153,9 @@ export class FormEditorStoreService {
 
   private clone<T>(value: T): T {
     return JSON.parse(JSON.stringify(value));
+  }
+
+  private compactTemplate(template: FormTemplate): FormTemplate {
+    return { ...template, sections: [] };
   }
 }

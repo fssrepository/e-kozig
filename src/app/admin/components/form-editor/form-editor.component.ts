@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, OnInit, ViewChild, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -111,6 +111,7 @@ interface FormElementPaletteItem {
 })
 export class FormEditorComponent implements OnInit {
   private readonly store = inject(FormEditorStoreService);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly formTitleSectionPrefix = 'form-title-';
   private readonly formTabsSectionPrefix = 'form-tabs-';
   private readonly groupedSectionNavCode = 'SABLON';
@@ -119,6 +120,8 @@ export class FormEditorComponent implements OnInit {
   private readonly formElementDragType = 'application/x-e-kozig-form-element';
   private readonly formFieldDragType = 'application/x-e-kozig-form-field';
   private readonly autoMobileViewportQuery = '(max-width: 760px)';
+  private readonly stencilSaveSpinnerMs = 1000;
+  private readonly stencilSaveSuccessMs = 350;
   private stencilSavePendingTimer = 0;
   private stencilSaveSuccessTimer = 0;
   private stencilFeedbackRunId = 0;
@@ -335,6 +338,7 @@ export class FormEditorComponent implements OnInit {
       console.error(error);
     } finally {
       this.loading = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -728,7 +732,7 @@ export class FormEditorComponent implements OnInit {
       navCode: this.activeTemplate.navCode || 'CUSTOM',
       updatedAt: new Date().toISOString()
     };
-    template.sections = template.pages.flatMap(page => page.sections);
+    template.sections = [];
 
     this.saving = true;
     try {
@@ -1235,8 +1239,7 @@ export class FormEditorComponent implements OnInit {
     this.saving = true;
     try {
       await this.store.saveSectionTemplate(section);
-      const savedSections = (await this.store.getSectionTemplates()).map(item => this.normalizeSectionTemplate(item));
-      this.sectionLibrary = savedSections;
+      this.upsertSectionLibrary(section);
       this.selectSectionTemplate(section.id);
       this.selectedLibrarySectionId = section.id;
       this.statusMessage = 'Sablon mentve.';
@@ -1385,7 +1388,7 @@ export class FormEditorComponent implements OnInit {
     this.saving = true;
     try {
       await this.store.saveSectionTemplate(section);
-      this.sectionLibrary = (await this.store.getSectionTemplates()).map(item => this.normalizeSectionTemplate(item));
+      this.upsertSectionLibrary(section);
       this.selectedLibrarySectionId = section.id;
       this.clearTemplateFieldSelection();
       this.statusMessage = 'Kijelölt mezőkből sablon mentve.';
@@ -1790,9 +1793,9 @@ export class FormEditorComponent implements OnInit {
         updatedAt: new Date().toISOString()
       };
       await this.store.saveTemplate(template);
-      this.activeTemplate = this.normalizeTemplate(template);
+      this.activeTemplate = template;
       this.templates = this.templates
-        .map(item => (item.id === template.id ? this.clone(this.activeTemplate as FormTemplate) : item))
+        .map(item => (item.id === template.id ? template : item))
         .sort((a, b) => a.name.localeCompare(b.name, 'hu'));
       this.builderEditing = false;
       this.statusMessage = 'Űrlapszerkezet mentve.';
@@ -2168,7 +2171,7 @@ export class FormEditorComponent implements OnInit {
       });
       this.arrangePageSections(page, normalized.grid);
     });
-    normalized.sections = normalized.pages.flatMap(page => page.sections);
+    normalized.sections = [];
     return normalized;
   }
 
@@ -2526,6 +2529,13 @@ export class FormEditorComponent implements OnInit {
     return normalized;
   }
 
+  private upsertSectionLibrary(section: FormSectionDefinition): void {
+    this.sectionLibrary = [
+      section,
+      ...this.sectionLibrary.filter(item => item.id !== section.id)
+    ].sort((a, b) => a.title.localeCompare(b.title, 'hu'));
+  }
+
   private normalizeFields(fields: FormFieldDefinition[]): FormFieldDefinition[] {
     const occupied = new Set<string>();
     return fields.map(field => {
@@ -2701,7 +2711,7 @@ export class FormEditorComponent implements OnInit {
       return;
     }
     this.refreshPageChromeSections();
-    this.activeTemplate.sections = this.activeTemplate.pages.flatMap(page => page.sections);
+    this.activeTemplate.sections = [];
   }
 
   private initializeFieldValues(): void {
@@ -2749,18 +2759,16 @@ export class FormEditorComponent implements OnInit {
   private runStencilSaveFeedback(saveAction: () => Promise<void>): void {
     this.startStencilSaveAnimation();
 
-    window.setTimeout(() => {
-      void saveAction()
-        .then(() => {
-          const saved =
-            this.statusMessage === 'Űrlapszerkezet mentve.'
-            || this.statusMessage === 'Sablon mentve.';
-          if (saved) {
-            this.statusMessage = '';
-          }
-        })
-        .catch(error => console.error(error));
-    }, 0);
+    void saveAction()
+      .then(() => {
+        const saved =
+          this.statusMessage === 'Űrlapszerkezet mentve.'
+          || this.statusMessage === 'Sablon mentve.';
+        if (saved) {
+          this.statusMessage = '';
+        }
+      })
+      .catch(error => console.error(error));
   }
 
   private startStencilSaveAnimation(): void {
@@ -2781,8 +2789,8 @@ export class FormEditorComponent implements OnInit {
           return;
         }
         this.stencilSaveSuccess = false;
-      }, 450);
-    }, 1000);
+      }, this.stencilSaveSuccessMs);
+    }, this.stencilSaveSpinnerMs);
   }
 
   private resetStencilSaveFeedback(): void {

@@ -154,8 +154,9 @@
 
 .selector-group button[mat-icon-button].selector-stencil.saved,
 .selector-group button[mat-icon-button].selector-stencil.saved.active {
-  background: #14843c;
-  color: #fff;
+  background: #14843c !important;
+  color: #fff !important;
+  animation: stencil-save-flash 350ms ease-out;
 }
 
 .selector-divider {
@@ -314,6 +315,16 @@
 @keyframes stencil-save-spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes stencil-save-flash {
+  from {
+    background: #0f6f35;
+  }
+
+  to {
+    background: #14843c;
   }
 }
 
@@ -882,7 +893,7 @@
   min-width: 0;
 }
 
-.form-canvas.is-mobile .form-field-section:not(.form-section--tall):not(:has(.form-field-element--header)):not(:has(.form-field-element--multiline)),
+.form-canvas.is-mobile .form-field-section:not(.form-section--tall):not(.form-field-section--header):not(.form-field-section--multiline),
 .form-canvas.is-mobile .form-tabs-section:not(.form-section--tall) {
   align-self: stretch;
 }
@@ -964,14 +975,14 @@
   padding: 0;
 }
 
-.form-field-section:not(.form-section--tall):not(:has(.form-field-element--header)):not(:has(.form-field-element--multiline)),
+.form-field-section:not(.form-section--tall):not(.form-field-section--header):not(.form-field-section--multiline),
 .form-tabs-section:not(.form-section--tall) {
   align-self: start;
   min-height: var(--editor-line-height);
   height: var(--editor-line-height);
 }
 
-.form-field-section:not(.form-section--tall):not(:has(.form-field-element--header)):not(:has(.form-field-element--multiline)) .form-field-element,
+.form-field-section:not(.form-section--tall):not(.form-field-section--header):not(.form-field-section--multiline) .form-field-element,
 .form-tabs-section:not(.form-section--tall) .page-carousel--canvas {
   min-height: var(--editor-line-height);
   height: var(--editor-line-height);
@@ -1175,7 +1186,7 @@
   height: 100%;
 }
 
-::ng-deep .form-field-section:not(:has(.form-field-element--header)):not(:has(.form-field-element--multiline)) .rendered-field .mat-mdc-text-field-wrapper {
+::ng-deep .form-field-section:not(.form-field-section--header):not(.form-field-section--multiline) .rendered-field .mat-mdc-text-field-wrapper {
   height: var(--editor-line-height);
 }
 

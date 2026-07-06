@@ -237,6 +237,8 @@
               [class.form-title-section]="isFormTitleSection(section)"
               [class.form-tabs-section]="isPageTabsSection(section)"
               [class.form-field-section]="isFormFieldSection(section)"
+              [class.form-field-section--header]="isFormFieldSection(section) && section.fields[0]?.type === 'header'"
+              [class.form-field-section--multiline]="isFormFieldSection(section) && section.fields[0]?.type === 'textarea'"
               [class.form-group-section]="isGroupedFormSection(section)"
               [class.form-section--tall]="section.layout.rowSpan > 1"
               [class.selected]="isFormSectionSelected(section)"
