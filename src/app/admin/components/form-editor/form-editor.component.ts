@@ -2664,6 +2664,12 @@ export class FormEditorComponent implements OnInit {
     this.stencilSavePending = true;
     this.stencilSaveSuccess = false;
     const startedAt = Date.now();
+    let spinnerDone = false;
+
+    this.stencilSavePendingTimer = window.setTimeout(() => {
+      spinnerDone = true;
+      this.stencilSavePending = false;
+    }, 1000);
 
     await saveAction();
 
@@ -2672,16 +2678,27 @@ export class FormEditorComponent implements OnInit {
       || this.statusMessage === 'Sablon mentve.';
     if (saved) {
       this.statusMessage = '';
-      this.stencilSaveSuccess = true;
     }
 
-    const remaining = Math.max(0, 900 - (Date.now() - startedAt));
-    this.stencilSavePendingTimer = window.setTimeout(() => {
+    const flash = () => {
       this.stencilSavePending = false;
+      this.stencilSaveSuccess = saved;
+      this.stencilSaveSuccessTimer = window.setTimeout(() => {
+        this.stencilSaveSuccess = false;
+      }, 450);
+    };
+
+    const remaining = Math.max(0, 1000 - (Date.now() - startedAt));
+    if (spinnerDone || remaining === 0) {
+      flash();
+      return;
+    }
+
+    window.clearTimeout(this.stencilSavePendingTimer);
+    this.stencilSavePendingTimer = window.setTimeout(() => {
+      spinnerDone = true;
+      flash();
     }, remaining);
-    this.stencilSaveSuccessTimer = window.setTimeout(() => {
-      this.stencilSaveSuccess = false;
-    }, 1200);
   }
 
   private syncViewportFromScreen(): void {
