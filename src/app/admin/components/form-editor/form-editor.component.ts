@@ -794,33 +794,34 @@ export class FormEditorComponent implements OnInit {
   }
 
   onPageCarouselDragOver(event: DragEvent): void {
-    if (!this.builderEditing || this.getDragData(event, this.formElementDragType) !== 'page') {
+    if (!this.builderEditing || !this.hasDragData(event, this.formElementDragType)) {
       return;
     }
 
     event.preventDefault();
+    event.stopPropagation();
     if (event.dataTransfer) {
       event.dataTransfer.dropEffect = 'copy';
     }
   }
 
   onPageCarouselDrop(event: DragEvent): void {
-    if (!this.builderEditing || this.getDragData(event, this.formElementDragType) !== 'page') {
+    if (!this.builderEditing || !this.isPageElementDrag(event)) {
       return;
     }
 
     event.preventDefault();
-    this.addPage();
+    event.stopPropagation();
+    this.addPage(this.getPageDropLayout(event));
   }
 
   onFormCanvasDragOver(event: DragEvent): void {
-    const formElement = this.getDragData(event, this.formElementDragType) as FormElementType;
     if (
       !this.builderEditing
       || (
         !this.hasDragData(event, this.sectionDragType)
         && !this.hasDragData(event, this.fieldDragType)
-        && !this.formElementPalette.some(item => item.type === formElement)
+        && !this.hasDragData(event, this.formElementDragType)
       )
     ) {
       return;
@@ -838,7 +839,7 @@ export class FormEditorComponent implements OnInit {
     }
 
     const formElement = this.getDragData(event, this.formElementDragType);
-    if (formElement === 'page') {
+    if (formElement === 'page' || (!formElement && this.isPageElementDrag(event))) {
       event.preventDefault();
       this.addPage(this.getPageDropLayout(event));
       return;
@@ -2965,6 +2966,12 @@ export class FormEditorComponent implements OnInit {
 
   private hasDragData(event: DragEvent, type: string): boolean {
     return Array.from(event.dataTransfer?.types ?? []).includes(type);
+  }
+
+  private isPageElementDrag(event: DragEvent): boolean {
+    const formElement = this.getDragData(event, this.formElementDragType);
+    return formElement === 'page'
+      || (!formElement && this.hasDragData(event, this.formElementDragType) && this.formElementPalette.every(item => item.type === 'page'));
   }
 
   private getDragData(event: DragEvent, type: string): string {
