@@ -1,0 +1,921 @@
+<div class="form-editor-page">
+  <div class="editor-loading" *ngIf="loading">
+    <mat-progress-spinner mode="indeterminate" diameter="36"></mat-progress-spinner>
+  </div>
+
+  <ng-container *ngIf="!loading && activeTemplate as template">
+    <header class="editor-toolbar">
+      <div class="compact-selectors">
+        <div class="selector-group" [class.active]="panelMode === 'form' || panelMode === 'template'">
+          <mat-form-field appearance="outline" class="toolbar-select">
+            <mat-select [ngModel]="selectedTemplateId" (selectionChange)="selectTemplate($event.value)" aria-label="Űrlap kiválasztása">
+              <mat-option *ngFor="let item of templates; trackBy: trackById" [value]="item.id">
+                {{ item.name }} · {{ item.navCode }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <span class="selector-secondary-actions">
+            <button mat-mini-fab class="selector-new" type="button" color="primary" (click)="openNewWizardDialog()" matTooltip="Új űrlap" aria-label="Új űrlap">
+              <mat-icon>add</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              class="selector-stencil"
+              type="button"
+              [class.active]="builderEditing || panelMode === 'template'"
+              [class.saving]="stencilSavePending"
+              [class.saved]="stencilSaveSuccess"
+              (click)="handleStencilAction()"
+              [matTooltip]="builderEditing || panelMode === 'template' ? 'Megtekintés' : 'Stencil szerkesztés'"
+              [attr.aria-label]="builderEditing || panelMode === 'template' ? 'Megtekintés' : 'Stencil szerkesztés'"
+            >
+              <mat-icon>{{ builderEditing || panelMode === 'template' ? 'visibility' : 'format_shapes' }}</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              class="selector-sidebar"
+              type="button"
+              [class.active]="!sideMenuCollapsed"
+              (click)="toggleSideMenu()"
+              [matTooltip]="sideMenuCollapsed ? 'Oldalsáv mutatása' : 'Oldalsáv elrejtése'"
+              [attr.aria-label]="sideMenuCollapsed ? 'Oldalsáv mutatása' : 'Oldalsáv elrejtése'"
+            >
+              <mat-icon>view_sidebar</mat-icon>
+            </button>
+            <span class="selector-divider"></span>
+            <button
+              mat-icon-button
+              class="viewport-toggle active"
+              type="button"
+              [class.auto-mobile]="autoMobileViewport"
+              [disabled]="autoMobileViewport"
+              (click)="toggleViewport()"
+              [matTooltip]="autoMobileViewport ? 'Mobil nézet automatikusan kiválasztva' : (viewport === 'desktop' ? 'Váltás mobil nézetre' : 'Váltás asztali nézetre')"
+              [attr.aria-label]="autoMobileViewport ? 'Mobil nézet automatikusan kiválasztva' : (viewport === 'desktop' ? 'Váltás mobil nézetre' : 'Váltás asztali nézetre')"
+            >
+              <mat-icon>{{ viewport === 'desktop' ? 'desktop_windows' : 'phone_iphone' }}</mat-icon>
+            </button>
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <div class="status-row" *ngIf="statusMessage && statusMessage !== 'Űrlapszerkezet mentve.' && statusMessage !== 'Sablon mentve.'">
+      {{ statusMessage }}
+    </div>
+
+    <section class="editor-shell" [class.side-menu-collapsed]="sideMenuCollapsed">
+      <aside class="builder-panel" [class.locked]="panelMode === 'form' && !builderEditing" *ngIf="!sideMenuCollapsed">
+        <ng-container *ngIf="panelMode === 'form'">
+          <div class="panel-section">
+            <button type="button" class="panel-section-toggle" (click)="elementsPanelOpen = !elementsPanelOpen" [attr.aria-expanded]="elementsPanelOpen">
+              <span>Elemek</span>
+              <mat-icon>{{ elementsPanelOpen ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </button>
+            <div class="panel-section-content" *ngIf="elementsPanelOpen">
+              <div class="field-palette form-field-palette">
+                <button
+                  type="button"
+                  *ngFor="let item of formElementPalette"
+                  draggable="true"
+                  [attr.aria-disabled]="!builderEditing"
+                  (dragstart)="onFormElementDragStart($event, item.type)"
+                  (click)="addFormElement(item.type)"
+                >
+                  <mat-icon>{{ item.icon }}</mat-icon>
+                  <span>{{ item.label }}</span>
+                </button>
+                <button
+                  type="button"
+                  *ngFor="let item of fieldPalette"
+                  draggable="true"
+                  [attr.aria-disabled]="!builderEditing"
+                  (dragstart)="onPaletteDragStart($event, item.type)"
+                  (click)="addFieldToActiveForm(item.type)"
+                >
+                  <mat-icon>{{ item.icon }}</mat-icon>
+                  <span>{{ item.label }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-section sablon-panel-section">
+            <button type="button" class="panel-section-toggle" (click)="sablonPanelOpen = !sablonPanelOpen" [attr.aria-expanded]="sablonPanelOpen">
+              <span>Sablonok</span>
+              <mat-icon>{{ sablonPanelOpen ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </button>
+            <div class="panel-section-content" *ngIf="sablonPanelOpen">
+              <mat-form-field appearance="outline" class="full-field compact-filter">
+                <input matInput placeholder="Keresés" aria-label="Sablon keresés" [(ngModel)]="sectionFilter">
+              </mat-form-field>
+              <div class="sablon-library-list">
+                <div
+                  class="sablon-library-item"
+                  *ngFor="let section of filteredSectionLibrary; trackBy: trackById"
+                  draggable="true"
+                  [attr.aria-disabled]="!builderEditing"
+                  (dragstart)="onSectionPaletteDragStart($event, section.id)"
+                  (click)="addSection(section.id)"
+                  (keydown.enter)="addSection(section.id)"
+                  role="button"
+                  tabindex="0"
+                >
+                  <span class="sablon-card-head">
+                    <strong>{{ section.title }}</strong>
+                    <small>{{ section.navCode || 'CUSTOM' }}</small>
+                  </span>
+                  <span class="sablon-card-preview">
+                    <span class="sablon-preview-grid">
+                      <span
+                        class="sablon-preview-shape"
+                        [style.width.%]="getSablonPreviewWidth(section)"
+                        [style.height.px]="getSablonPreviewHeight(section)"
+                      ></span>
+                      <span class="sablon-size">{{ getSablonSizeLabel(section) }}</span>
+                    </span>
+                  </span>
+                  <button
+                    type="button"
+                    class="sablon-delete-button"
+                    (click)="deleteSectionTemplate(section.id, $event)"
+                    matTooltip="Sablon törlése"
+                    aria-label="Sablon törlése"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="panelMode === 'template' && activeSectionTemplate as block">
+          <div class="panel-section">
+            <button type="button" class="panel-section-toggle" (click)="elementsPanelOpen = !elementsPanelOpen" [attr.aria-expanded]="elementsPanelOpen">
+              <span>Elemek</span>
+              <mat-icon>{{ elementsPanelOpen ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </button>
+            <div class="panel-section-content" *ngIf="elementsPanelOpen">
+              <div class="field-palette">
+                <button
+                  type="button"
+                  *ngFor="let item of fieldPalette"
+                  draggable="true"
+                  (dragstart)="onPaletteDragStart($event, item.type)"
+                  (click)="addFieldToActiveSectionTemplate(item.type)"
+                >
+                  <mat-icon>{{ item.icon }}</mat-icon>
+                  <span>{{ item.label }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-section sablon-panel-section">
+            <button type="button" class="panel-section-toggle" (click)="sablonPanelOpen = !sablonPanelOpen" [attr.aria-expanded]="sablonPanelOpen">
+              <span>Sablonok</span>
+              <mat-icon>{{ sablonPanelOpen ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </button>
+            <div class="panel-section-content" *ngIf="sablonPanelOpen">
+              <mat-form-field appearance="outline" class="full-field compact-filter">
+                <input matInput placeholder="Keresés" aria-label="Sablon keresés" [(ngModel)]="sectionFilter">
+              </mat-form-field>
+              <div class="sablon-library-list">
+                <div
+                  class="sablon-library-item"
+                  *ngFor="let section of filteredSectionLibrary; trackBy: trackById"
+                  draggable="true"
+                  (dragstart)="onSectionPaletteDragStart($event, section.id)"
+                  role="button"
+                  tabindex="0"
+                >
+                  <span class="sablon-card-head">
+                    <strong>{{ section.title }}</strong>
+                    <small>{{ section.navCode || 'CUSTOM' }}</small>
+                  </span>
+                  <span class="sablon-card-preview">
+                    <span class="sablon-preview-grid">
+                      <span
+                        class="sablon-preview-shape"
+                        [style.width.%]="getSablonPreviewWidth(section)"
+                        [style.height.px]="getSablonPreviewHeight(section)"
+                      ></span>
+                      <span class="sablon-size">{{ getSablonSizeLabel(section) }}</span>
+                    </span>
+                  </span>
+                  <button
+                    type="button"
+                    class="sablon-delete-button"
+                    (click)="deleteSectionTemplate(section.id, $event)"
+                    matTooltip="Sablon törlése"
+                    aria-label="Sablon törlése"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </aside>
+
+      <main class="workspace" [class.mobile-preview]="viewport === 'mobile'">
+        <div class="preview-frame" *ngIf="panelMode === 'form'">
+          <div
+            #formCanvas
+            class="form-canvas"
+            [class.is-mobile]="viewport === 'mobile'"
+            [class.builder-editing]="builderEditing"
+            [class.has-compound-selection]="hasMultiFormSelection"
+            [style.--grid-columns]="gridColumns"
+            [ngStyle]="gridStyle"
+            (dragover)="onFormCanvasDragOver($event)"
+            (drop)="onFormCanvasDrop($event)"
+          >
+            <section
+              class="form-section form-container-element"
+              [class.form-title-section]="isFormTitleSection(section)"
+              [class.form-tabs-section]="isPageTabsSection(section)"
+              [class.form-field-section]="isFormFieldSection(section)"
+              [class.form-field-section--header]="isFormFieldSection(section) && section.fields[0]?.type === 'header'"
+              [class.form-field-section--multiline]="isFormFieldSection(section) && section.fields[0]?.type === 'textarea'"
+              [class.form-group-section]="isGroupedFormSection(section)"
+              [class.form-section--tall]="section.layout.rowSpan > 1"
+              [class.selected]="isFormSectionSelected(section)"
+              [class.dragging]="isFormSectionDragging(section)"
+              *ngFor="let section of activeSections; trackBy: trackById"
+              [style.grid-column]="getGridColumn(section)"
+              [style.grid-row]="getGridRow(section)"
+              (pointerdown)="selectFormSection(section, $event)"
+            >
+              <div class="section-header container-header" *ngIf="!isFormFieldSection(section) && !isPageTabsSection(section)">
+                <app-canvas-element-chrome
+                  [label]="section.title"
+                  [subLabel]="isFormTitleSection(section) ? (section.navCode || template.navCode) : ''"
+                  [editing]="builderEditing"
+                  [hideActions]="shouldHideFormSectionChrome(section)"
+                  (dragPointerDown)="startDrag($event, section)"
+                  (menuClick)="openSectionSettings(section, $event)"
+                ></app-canvas-element-chrome>
+              </div>
+
+              <button
+                *ngIf="isPageTabsSection(section) && getPageForTabSection(section) as tabPage"
+                class="page-carousel--canvas"
+                type="button"
+                [class.active]="isActivePageTabSection(section)"
+                (click)="activatePageTabSection(section, $event)"
+              >
+                <app-canvas-element-chrome
+                  [label]="tabPage.title"
+                  [badge]="getPageIndexForTabSection(section) + 1"
+                  [editing]="builderEditing"
+                  [hideActions]="shouldHideFormSectionChrome(section)"
+                  (dragPointerDown)="startDrag($event, section)"
+                  (menuClick)="openPageSettings(getPageIndexForTabSection(section), $event)"
+                ></app-canvas-element-chrome>
+              </button>
+
+              <div class="section-fields" *ngIf="!isFormTitleSection(section) && !isPageTabsSection(section)" (dragover)="onContainerDragOver($event, section)" (drop)="onContainerDrop($event, section)">
+                <ng-container>
+                <div class="container-empty" *ngIf="builderEditing && !section.fields.length">
+                  Húzz ide elemeket vagy sablont
+                </div>
+                <div
+                  class="field-editor form-field-element"
+                  [class.form-field-element--header]="field.type === 'header'"
+                  [class.form-field-element--multiline]="field.type === 'textarea'"
+                  [class.form-field-element--checkbox]="field.type === 'checkbox'"
+                  *ngFor="let field of section.fields; trackBy: trackById"
+                  [style.grid-column]="getFieldGridColumn(field)"
+                  [style.grid-row]="getFieldGridRow(field)"
+                >
+                  <div class="form-field-toolbar" *ngIf="builderEditing && !isGroupedFormSection(section)">
+                    <app-canvas-element-chrome
+                      [label]="field.label"
+                      [editing]="builderEditing"
+                      [hideActions]="shouldHideFormSectionChrome(section)"
+                      (dragPointerDown)="startDrag($event, section)"
+                      (menuClick)="openFormFieldSettings(section, field, $event)"
+                    ></app-canvas-element-chrome>
+                  </div>
+
+                  <ng-container *ngIf="!builderEditing || !isFormFieldSection(section)">
+                    <div
+                      class="rendered-header"
+                      [class.rendered-header--single]="field.headerVariant === 'single'"
+                      [class.rendered-header--no-line]="field.headerLine === false"
+                      [style.background]="field.headerBackground || null"
+                      *ngIf="field.type === 'header'; else formFieldBody"
+                    >
+                      <span>{{ field.label }}</span>
+                      <small *ngIf="field.headerVariant !== 'single' && (field.subtitle || field.placeholder)">
+                        {{ field.subtitle || field.placeholder }}
+                      </small>
+                    </div>
+
+                    <ng-template #formFieldBody>
+                      <mat-checkbox *ngIf="field.type === 'checkbox'; else nonCheckboxField" [(ngModel)]="fieldValues[field.id]" [name]="field.id" [disabled]="builderEditing">
+                        {{ field.label }}
+                      </mat-checkbox>
+
+                      <ng-template #nonCheckboxField>
+                        <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type !== 'select' && field.type !== 'textarea'">
+                          <input matInput [type]="getInputType(field)" [placeholder]="field.placeholder || field.label" [(ngModel)]="fieldValues[field.id]" [name]="field.id" [readonly]="builderEditing">
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type === 'textarea'">
+                          <textarea matInput rows="3" [placeholder]="field.placeholder || field.label" [(ngModel)]="fieldValues[field.id]" [name]="field.id" [readonly]="builderEditing"></textarea>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type === 'select'">
+                          <mat-select [(ngModel)]="fieldValues[field.id]" [name]="field.id" [placeholder]="field.label" [disabled]="builderEditing">
+                            <mat-option *ngFor="let option of field.options ?? []" [value]="option.value">
+                              {{ option.label }}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </ng-template>
+                    </ng-template>
+                  </ng-container>
+                </div>
+                </ng-container>
+              </div>
+
+              <span *ngIf="builderEditing && canResizeFormSection(section)" class="resize-handle handle-north" (pointerdown)="startResize($event, section, 'n')"></span>
+              <span *ngIf="builderEditing && canResizeFormSection(section)" class="resize-handle handle-east" (pointerdown)="startResize($event, section, 'e')"></span>
+              <span *ngIf="builderEditing && canResizeFormSection(section)" class="resize-handle handle-south" (pointerdown)="startResize($event, section, 's')"></span>
+              <span *ngIf="builderEditing && canResizeFormSection(section)" class="resize-handle handle-west" (pointerdown)="startResize($event, section, 'w')"></span>
+              <span *ngIf="builderEditing && canResizeFormSection(section)" class="resize-handle handle-corner handle-nw" (pointerdown)="startResize($event, section, 'nw')"></span>
+              <span *ngIf="builderEditing && canResizeFormSection(section)" class="resize-handle handle-corner handle-ne" (pointerdown)="startResize($event, section, 'ne')"></span>
+              <span *ngIf="builderEditing && canResizeFormSection(section)" class="resize-handle handle-corner handle-sw" (pointerdown)="startResize($event, section, 'sw')"></span>
+              <span *ngIf="builderEditing && canResizeFormSection(section)" class="resize-handle handle-corner handle-se" (pointerdown)="startResize($event, section, 'se')"></span>
+            </section>
+
+            <div
+              class="form-selection-outline"
+              *ngIf="builderEditing && hasMultiFormSelection"
+              [style.grid-column]="getFormSelectionGridColumn()"
+              [style.grid-row]="getFormSelectionGridRow()"
+              (pointerdown)="$event.stopPropagation()"
+              (click)="$event.stopPropagation()"
+            ></div>
+
+            <button
+              *ngIf="builderEditing && hasMultiFormSelection"
+              type="button"
+              class="form-selection-menu-button"
+              [style.grid-column]="getFormSelectionGridColumn()"
+              [style.grid-row]="getFormSelectionGridRow()"
+              (pointerdown)="$event.stopPropagation()"
+              (click)="openFormSelectionSettings($event)"
+              matTooltip="Kijelölés műveletei"
+              aria-label="Kijelölés műveletei"
+            >
+              <mat-icon>more_horiz</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="preview-frame template-frame" *ngIf="panelMode === 'template' && activeSectionTemplate as block">
+          <div class="document-bar">
+            <div>
+              <span class="document-title">{{ block.title }}</span>
+              <span class="document-code">{{ block.navCode || 'CUSTOM' }}</span>
+            </div>
+            <div class="document-state">
+              <span>Sablon editor</span>
+            </div>
+          </div>
+
+          <div
+            class="template-builder-surface"
+            (dragover)="onTemplateSurfaceDragOver($event)"
+            (drop)="onTemplateSurfaceDrop($event)"
+          >
+            <div class="template-empty-state" *ngIf="!activeSectionTemplateFields.length">
+              <mat-icon>playlist_add</mat-icon>
+              <strong>Húzz ide mező típust a bal oldalról</strong>
+              <span>Vagy kattints egy mező típusra, és bekerül ebbe a sablonba.</span>
+            </div>
+
+            <article
+              class="template-field-element"
+              [class.selected]="isTemplateFieldSelected(field)"
+              [class.template-field-element--header]="field.type === 'header'"
+              [class.template-field-element--multiline]="field.type === 'textarea'"
+              [class.template-field-element--checkbox]="field.type === 'checkbox'"
+              [class.template-field-element--select]="field.type === 'select'"
+              *ngFor="let field of activeSectionTemplateFields; let i = index; trackBy: trackById"
+              [style.grid-column]="getFieldGridColumn(field)"
+              [style.grid-row]="getFieldGridRow(field)"
+              (click)="selectTemplateField(field, $event)"
+            >
+              <div class="template-field-control">
+                <button
+                  type="button"
+                  class="template-field-grip"
+                  (pointerdown)="startTemplateFieldDrag($event, field)"
+                  (click)="$event.preventDefault(); $event.stopPropagation()"
+                  aria-label="Mező mozgatása"
+                >
+                  <mat-icon>drag_indicator</mat-icon>
+                </button>
+
+                <span class="template-field-input-preview" *ngIf="field.type !== 'checkbox'">
+                  <span>{{ field.label || 'Szöveg' }}</span>
+                  <strong *ngIf="field.required">*</strong>
+                </span>
+
+                <span class="template-field-checkbox-preview" *ngIf="field.type === 'checkbox'">
+                  <span class="template-field-checkbox-box"></span>
+                  <span>{{ field.label || 'Checkbox' }}</span>
+                  <strong *ngIf="field.required">*</strong>
+                </span>
+
+                <mat-icon class="template-field-select-caret" *ngIf="field.type === 'select'">expand_more</mat-icon>
+
+                <button
+                  type="button"
+                  class="template-field-more"
+                  (click)="openTemplateFieldSettings(field, $event)"
+                  matTooltip="Mező beállításai"
+                  aria-label="Mező beállításai"
+                >
+                  <mat-icon>more_horiz</mat-icon>
+                </button>
+              </div>
+
+              <span class="field-edge-handle field-edge-top" (pointerdown)="startTemplateFieldResize($event, field, 'n')"></span>
+              <span class="field-edge-handle field-edge-right" (pointerdown)="startTemplateFieldResize($event, field, 'e')"></span>
+              <span class="field-edge-handle field-edge-bottom" (pointerdown)="startTemplateFieldResize($event, field, 's')"></span>
+              <span class="field-edge-handle field-edge-left" (pointerdown)="startTemplateFieldResize($event, field, 'w')"></span>
+              <span class="field-resize-handle field-handle-nw" (pointerdown)="startTemplateFieldResize($event, field, 'nw')"></span>
+              <span class="field-resize-handle field-handle-ne" (pointerdown)="startTemplateFieldResize($event, field, 'ne')"></span>
+              <span class="field-resize-handle field-handle-sw" (pointerdown)="startTemplateFieldResize($event, field, 'sw')"></span>
+              <span class="field-resize-handle field-handle-se" (pointerdown)="startTemplateFieldResize($event, field, 'se')"></span>
+            </article>
+
+            <div class="selection-template-overlay" *ngIf="hasMultiTemplateSelection" (click)="$event.stopPropagation()">
+              <span>{{ selectedTemplateFieldIds.length }} elem kijelölve</span>
+              <mat-form-field appearance="outline" class="selection-name-field">
+                <mat-label>Sablonnév</mat-label>
+                <input matInput [(ngModel)]="selectionTemplateName">
+              </mat-form-field>
+              <button mat-raised-button color="primary" type="button" (click)="saveSelectedFieldsAsSablon($event)" [disabled]="saving">
+                <mat-icon>save</mat-icon>
+                <span>Mentés</span>
+              </button>
+              <button mat-icon-button type="button" (click)="clearTemplateFieldSelection($event)" aria-label="Kijelölés törlése">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </section>
+  </ng-container>
+</div>
+
+<section class="new-wizard-popup" *ngIf="newWizardDialogOpen">
+  <div class="new-wizard-backdrop" (click)="closeNewWizardDialog()"></div>
+  <form class="new-wizard-panel" (ngSubmit)="confirmCreateWizard()" (click)="$event.stopPropagation()">
+    <div class="field-settings-header">
+      <div>
+        <span>Új űrlap</span>
+        <strong>Űrlap létrehozása</strong>
+      </div>
+      <button mat-icon-button type="button" (click)="closeNewWizardDialog()" aria-label="Bezárás">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="field-settings-body">
+      <mat-form-field appearance="outline" class="full-field">
+        <mat-label>Űrlap neve</mat-label>
+        <input matInput name="newWizardName" [(ngModel)]="newWizardName">
+      </mat-form-field>
+    </div>
+    <div class="field-settings-actions">
+      <button mat-stroked-button type="button" (click)="closeNewWizardDialog()">Mégse</button>
+      <button mat-raised-button color="primary" type="submit" [disabled]="saving">
+        <mat-icon>save</mat-icon>
+        <span>Létrehozás</span>
+      </button>
+    </div>
+  </form>
+</section>
+
+<section class="page-settings-popup" *ngIf="pageSettingsOpen && selectedPageForSettings as page">
+  <div class="field-settings-backdrop" (click)="closePageSettings()"></div>
+  <div class="field-settings-panel" (click)="$event.stopPropagation()">
+    <div class="field-settings-header">
+      <div>
+        <span>Oldal / tab</span>
+        <strong>{{ page.title }}</strong>
+      </div>
+      <button mat-icon-button type="button" (click)="closePageSettings()" aria-label="Bezárás">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="field-settings-body">
+      <mat-form-field appearance="outline" class="full-field">
+        <mat-label>Tab neve</mat-label>
+        <input matInput [(ngModel)]="page.title">
+      </mat-form-field>
+    </div>
+
+    <div class="field-settings-actions">
+      <button
+        mat-stroked-button
+        type="button"
+        color="warn"
+        (click)="removeSelectedPage()"
+        [disabled]="(activeTemplate?.pages?.length || 0) <= 1"
+      >
+        <mat-icon>delete</mat-icon>
+        <span>Törlés</span>
+      </button>
+      <button mat-raised-button color="primary" type="button" (click)="closePageSettings()">
+        <mat-icon>done</mat-icon>
+        <span>Kész</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="field-settings-popup" *ngIf="formSelectionSettingsOpen && hasMultiFormSelection">
+  <div class="field-settings-backdrop" (click)="closeFormSelectionSettings()"></div>
+  <div class="field-settings-panel" (click)="$event.stopPropagation()">
+    <div class="field-settings-header">
+      <div>
+        <span>Kijelölés</span>
+        <strong>{{ selectedFormSectionIds.length }} elem</strong>
+      </div>
+      <button mat-icon-button type="button" (click)="closeFormSelectionSettings()" aria-label="Bezárás">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="field-settings-body">
+      <mat-form-field appearance="outline" class="full-field">
+        <mat-label>Sablonnév</mat-label>
+        <input matInput [(ngModel)]="formSelectionTemplateName">
+      </mat-form-field>
+    </div>
+
+    <div class="field-settings-actions">
+      <button mat-stroked-button type="button" (click)="clearFormSectionSelection()">
+        <mat-icon>close</mat-icon>
+        <span>Kijelölés törlése</span>
+      </button>
+      <button mat-raised-button color="primary" type="button" (click)="wrapSelectedFormSectionsAsSablon()" [disabled]="saving || wrappableFormSections.length < 2">
+        <mat-icon>inventory_2</mat-icon>
+        <span>Wrap</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="field-settings-popup" *ngIf="sectionSettingsOpen && selectedSectionForSettings as section">
+  <div class="field-settings-backdrop" (click)="closeSectionSettings()"></div>
+  <div class="field-settings-panel" (click)="$event.stopPropagation()">
+    <div class="field-settings-header">
+      <div>
+        <span>Elem beállításai</span>
+        <strong>{{ section.title || 'Elem' }}</strong>
+      </div>
+      <button mat-icon-button type="button" (click)="closeSectionSettings()" aria-label="Bezárás">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="field-settings-body">
+      <mat-form-field appearance="outline" class="full-field">
+        <mat-label>Címke</mat-label>
+        <input matInput [(ngModel)]="section.title">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-field">
+        <mat-label>Kód</mat-label>
+        <input matInput [(ngModel)]="section.navCode">
+      </mat-form-field>
+
+      <mat-checkbox [(ngModel)]="section.mandatory">Kötelező elem</mat-checkbox>
+
+      <div class="field-settings-layout">
+        <mat-form-field appearance="outline" class="full-field">
+          <mat-label>Szélesség</mat-label>
+          <input matInput type="number" min="2" [max]="gridColumns" [(ngModel)]="section.layout.colSpan">
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-field">
+          <mat-label>Magasság</mat-label>
+          <input matInput type="number" min="1" [max]="gridRows" [(ngModel)]="section.layout.rowSpan">
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="field-settings-actions">
+      <button mat-stroked-button type="button" *ngIf="isGroupedFormSection(section)" (click)="unwrapSelectedSection()">
+        <mat-icon>call_split</mat-icon>
+        <span>Felbontás</span>
+      </button>
+      <button mat-stroked-button type="button" (click)="duplicateSelectedSection()">
+        <mat-icon>content_copy</mat-icon>
+        <span>Másolás</span>
+      </button>
+      <button mat-stroked-button type="button" color="warn" (click)="removeSelectedSection()">
+        <mat-icon>delete</mat-icon>
+        <span>Törlés</span>
+      </button>
+      <button mat-raised-button color="primary" type="button" (click)="closeSectionSettings()">
+        <mat-icon>done</mat-icon>
+        <span>Kész</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="field-settings-popup" *ngIf="formFieldSettingsOpen && selectedFormField as field">
+  <div class="field-settings-backdrop" (click)="closeFormFieldSettings()"></div>
+  <div class="field-settings-panel" (click)="$event.stopPropagation()">
+    <div class="field-settings-header">
+      <div>
+        <span>Elem beállításai</span>
+        <strong>{{ field.label || 'Elem' }}</strong>
+      </div>
+      <button mat-icon-button type="button" (click)="closeFormFieldSettings()" aria-label="Bezárás">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="field-settings-body">
+      <mat-form-field appearance="outline" class="full-field">
+        <mat-label>Címke</mat-label>
+        <input matInput [(ngModel)]="field.label">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-field">
+        <mat-label>Típus</mat-label>
+        <mat-select [(ngModel)]="field.type" (selectionChange)="updateFormFieldType(field)">
+          <mat-option value="header">Címsor</mat-option>
+          <mat-option value="text">Szöveg</mat-option>
+          <mat-option value="textarea">Hosszú szöveg</mat-option>
+          <mat-option value="select">Választólista</mat-option>
+          <mat-option value="checkbox">Checkbox</mat-option>
+          <mat-option value="date">Dátum</mat-option>
+          <mat-option value="number">Szám</mat-option>
+          <mat-option value="email">E-mail</mat-option>
+          <mat-option value="tel">Telefon</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <ng-container *ngIf="field.type === 'header'">
+        <mat-form-field appearance="outline" class="full-field">
+          <mat-label>Második sor</mat-label>
+          <input matInput [(ngModel)]="field.subtitle">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-field">
+          <mat-label>Címsor mód</mat-label>
+          <mat-select [(ngModel)]="field.headerVariant">
+            <mat-option value="double">Két sor</mat-option>
+            <mat-option value="single">Egy sor</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-field">
+          <mat-label>Háttérszín</mat-label>
+          <input matInput type="color" [(ngModel)]="field.headerBackground">
+        </mat-form-field>
+
+        <mat-checkbox [(ngModel)]="field.headerLine">Alsó vonal</mat-checkbox>
+      </ng-container>
+
+      <mat-checkbox *ngIf="field.type !== 'header'" [(ngModel)]="field.required">Kötelező mező</mat-checkbox>
+
+      <mat-form-field appearance="outline" class="full-field" *ngIf="field.type === 'select'">
+        <mat-label>Lista értékek</mat-label>
+        <textarea matInput rows="4" [ngModel]="getFieldOptionsText(field)" (ngModelChange)="setFormFieldOptions(field, $event)"></textarea>
+      </mat-form-field>
+
+      <div class="field-settings-layout">
+        <div class="field-settings-stepper">
+          <span>Szélesség</span>
+          <button mat-icon-button type="button" (click)="resizeFormField(field, -1)" aria-label="Keskenyebb">
+            <mat-icon>remove</mat-icon>
+          </button>
+          <strong>{{ field.layout?.colSpan || 6 }}/12</strong>
+          <button mat-icon-button type="button" (click)="resizeFormField(field, 1)" aria-label="Szélesebb">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+
+        <div class="field-settings-stepper" *ngIf="field.type === 'textarea' || field.type === 'header'">
+          <span>Magasság</span>
+          <button mat-icon-button type="button" (click)="resizeFormField(field, 0, -1)" aria-label="Alacsonyabb">
+            <mat-icon>remove</mat-icon>
+          </button>
+          <strong>{{ field.layout?.rowSpan || 1 }}</strong>
+          <button mat-icon-button type="button" (click)="resizeFormField(field, 0, 1)" aria-label="Magasabb">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-settings-actions">
+      <button mat-stroked-button type="button" color="warn" (click)="removeSelectedFormField()">
+        <mat-icon>delete</mat-icon>
+        <span>Törlés</span>
+      </button>
+      <button mat-raised-button color="primary" type="button" (click)="closeFormFieldSettings()">
+        <mat-icon>done</mat-icon>
+        <span>Kész</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="field-settings-popup" *ngIf="fieldSettingsOpen && selectedTemplateField as field">
+  <div class="field-settings-backdrop" (click)="closeTemplateFieldSettings()"></div>
+  <div class="field-settings-panel" (click)="$event.stopPropagation()">
+    <div class="field-settings-header">
+      <div>
+        <span>Mező beállításai</span>
+        <strong>{{ field.label || 'Mező' }}</strong>
+      </div>
+      <button mat-icon-button type="button" (click)="closeTemplateFieldSettings()" aria-label="Bezárás">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="field-settings-body">
+      <mat-form-field appearance="outline" class="full-field">
+        <mat-label>Címke</mat-label>
+        <input matInput [(ngModel)]="field.label">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-field">
+        <mat-label>Típus</mat-label>
+        <mat-select [(ngModel)]="field.type" (selectionChange)="updateTemplateFieldType(field)">
+          <mat-option value="header">Címsor</mat-option>
+          <mat-option value="text">Szöveg</mat-option>
+          <mat-option value="textarea">Hosszú szöveg</mat-option>
+          <mat-option value="select">Választólista</mat-option>
+          <mat-option value="checkbox">Checkbox</mat-option>
+          <mat-option value="date">Dátum</mat-option>
+          <mat-option value="number">Szám</mat-option>
+          <mat-option value="email">E-mail</mat-option>
+          <mat-option value="tel">Telefon</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <ng-container *ngIf="field.type === 'header'">
+        <mat-form-field appearance="outline" class="full-field">
+          <mat-label>Második sor</mat-label>
+          <input matInput [(ngModel)]="field.subtitle">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-field">
+          <mat-label>Címsor mód</mat-label>
+          <mat-select [(ngModel)]="field.headerVariant">
+            <mat-option value="double">Két sor</mat-option>
+            <mat-option value="single">Egy sor</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-field">
+          <mat-label>Háttérszín</mat-label>
+          <input matInput type="color" [(ngModel)]="field.headerBackground">
+        </mat-form-field>
+
+        <mat-checkbox [(ngModel)]="field.headerLine">Alsó vonal</mat-checkbox>
+      </ng-container>
+
+      <mat-checkbox *ngIf="field.type !== 'header'" [(ngModel)]="field.required">Kötelező mező</mat-checkbox>
+
+      <mat-form-field appearance="outline" class="full-field" *ngIf="field.type === 'select'">
+        <mat-label>Lista értékek</mat-label>
+        <textarea matInput rows="4" [ngModel]="getFieldOptionsText(field)" (ngModelChange)="setFieldOptions(field, $event)"></textarea>
+      </mat-form-field>
+
+      <div class="field-settings-layout">
+        <div class="field-settings-stepper">
+          <span>Szélesség</span>
+          <button mat-icon-button type="button" (click)="resizeTemplateField(field, -1)" aria-label="Keskenyebb">
+            <mat-icon>remove</mat-icon>
+          </button>
+          <strong>{{ field.layout?.colSpan || 6 }}/12</strong>
+          <button mat-icon-button type="button" (click)="resizeTemplateField(field, 1)" aria-label="Szélesebb">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+
+        <div class="field-settings-stepper" *ngIf="field.type === 'textarea' || field.type === 'header'">
+          <span>Magasság</span>
+          <button mat-icon-button type="button" (click)="resizeTemplateField(field, 0, -1)" aria-label="Alacsonyabb">
+            <mat-icon>remove</mat-icon>
+          </button>
+          <strong>{{ field.layout?.rowSpan || 1 }}</strong>
+          <button mat-icon-button type="button" (click)="resizeTemplateField(field, 0, 1)" aria-label="Magasabb">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-settings-actions">
+      <button mat-stroked-button type="button" color="warn" (click)="removeTemplateField(field.id)">
+        <mat-icon>delete</mat-icon>
+        <span>Törlés</span>
+      </button>
+      <button mat-raised-button color="primary" type="button" (click)="closeTemplateFieldSettings()">
+        <mat-icon>done</mat-icon>
+        <span>Kész</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="onya-preview-popup" *ngIf="previewTemplate as formTemplate">
+  <div class="onya-preview-backdrop" (click)="closeOnyaPreview()"></div>
+  <div class="onya-preview-panel" (click)="$event.stopPropagation()">
+    <div class="onya-topline">
+      <span>Bejelentkezett felhasználó</span>
+      <strong>{{ currentUser.fullName }}</strong>
+      <span>{{ currentUser.taxId }}</span>
+      <button mat-icon-button type="button" class="preview-close" (click)="closeOnyaPreview()" aria-label="Bezárás">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="document-bar">
+      <div>
+        <span class="document-title">{{ formTemplate.name }}</span>
+        <span class="document-code">{{ formTemplate.navCode }}</span>
+      </div>
+      <div class="document-state">
+        <span>ONYA előnézet</span>
+        <span>Csak olvasás</span>
+      </div>
+    </div>
+
+    <nav class="page-carousel" aria-label="ONYA előnézeti oldalak">
+      <button
+        type="button"
+        *ngFor="let page of previewPages; let i = index; trackBy: trackById"
+        [class.active]="i === previewPageIndex"
+        (click)="setPreviewPage(i)"
+      >
+        <span>{{ i + 1 }}</span>
+        <strong>{{ page.title }}</strong>
+      </button>
+    </nav>
+
+    <div class="onya-preview-body">
+      <section class="form-section preview-section" *ngFor="let section of previewSections; trackBy: trackById">
+        <div class="section-header">
+          <mat-icon aria-hidden="true">description</mat-icon>
+          <span class="preview-section-title">{{ section.title }}</span>
+          <span class="section-position">{{ section.navCode || 'Sablon' }}</span>
+        </div>
+        <div class="section-fields">
+          <div
+            class="field-editor"
+            *ngFor="let field of section.fields; trackBy: trackById"
+            [style.grid-column]="getFieldGridColumn(field)"
+            [style.grid-row]="getFieldGridRow(field)"
+          >
+            <div class="field-label-row" *ngIf="field.type !== 'header'">
+              <span class="field-label-input">{{ field.label }}</span>
+              <span class="preview-required">{{ field.required ? 'Kötelező' : 'Opcionális' }}</span>
+            </div>
+
+            <div class="rendered-header" *ngIf="field.type === 'header'; else previewFieldBody">{{ field.label }}</div>
+
+            <ng-template #previewFieldBody>
+              <mat-checkbox *ngIf="field.type === 'checkbox'; else previewNotCheckbox" [(ngModel)]="previewFieldValues[field.id]" [name]="'preview-' + field.id" disabled>
+                {{ field.label }}
+              </mat-checkbox>
+              <ng-template #previewNotCheckbox>
+                <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type !== 'select' && field.type !== 'textarea'">
+                  <input matInput [type]="getInputType(field)" [(ngModel)]="previewFieldValues[field.id]" [name]="'preview-' + field.id" readonly>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type === 'textarea'">
+                  <textarea matInput rows="3" [(ngModel)]="previewFieldValues[field.id]" [name]="'preview-' + field.id" readonly></textarea>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type === 'select'">
+                  <mat-select [(ngModel)]="previewFieldValues[field.id]" [name]="'preview-' + field.id" disabled>
+                    <mat-option *ngFor="let option of field.options ?? []" [value]="option.value">
+                      {{ option.label }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </ng-template>
+            </ng-template>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,1 @@
+import{Q as n,ea as t}from"./chunk-ACOU644C.js";var a=class e{selectedIssue=t(null);selectedIssueLabel=t(null);setIssue(l,s){this.selectedIssueLabel.set(l),this.selectedIssue.set(s)}static \u0275fac=function(s){return new(s||e)};static \u0275prov=n({token:e,factory:e.\u0275fac,providedIn:"root"})};export{a};
