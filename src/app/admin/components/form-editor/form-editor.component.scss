@@ -915,6 +915,7 @@
 .form-title-section .container-header {
   flex: 1;
   min-height: 100%;
+  align-items: start;
   border-bottom: 0;
   background: #fff;
 }
@@ -924,9 +925,18 @@
   display: none;
 }
 
+.form-tabs-section {
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
 .form-tabs-section .section-fields {
-  align-content: start;
-  padding: 0.45rem;
+  overflow: visible;
+  padding: 0;
+  display: flex;
+  align-items: flex-start;
 }
 
 .title-element-copy {
@@ -1207,11 +1217,11 @@
   min-height: 34px;
   height: 100%;
   display: grid;
-  align-content: center;
+  align-content: start;
   gap: 0.1rem;
   border-bottom: 2px solid #0067b1;
   color: #0f2f4a;
-  padding: 0.35rem 0.45rem;
+  padding: 0.5rem 0.45rem 0.35rem;
   box-sizing: border-box;
 }
 
