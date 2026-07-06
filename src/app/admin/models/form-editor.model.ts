@@ -78,6 +78,7 @@ export interface FormTemplatePage {
   id: string;
   title: string;
   mandatory: boolean;
+  layout?: FormSectionLayout;
   sections: FormSectionDefinition[];
 }
 

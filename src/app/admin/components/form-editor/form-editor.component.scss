@@ -1,4 +1,8 @@
 :host {
+  --editor-action-size: 24px;
+  --editor-action-gap: 0.5rem;
+  --editor-action-space: calc(0.55rem + var(--editor-action-size) + var(--editor-action-gap));
+  --editor-line-height: 42px;
   display: block;
   height: 100%;
   min-height: 0;
@@ -732,13 +736,21 @@
   border-radius: 4px;
   background: #fff;
   min-width: 128px;
-  min-height: 42px;
+  min-height: var(--editor-line-height);
   padding: 0.35rem 0.5rem;
   color: #1f2933;
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: var(--editor-action-gap);
   cursor: pointer;
+}
+
+.page-carousel button,
+.form-field-section .form-field-element {
+  border: 1px solid #cbd8e6;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 47, 74, 0.06);
 }
 
 .page-carousel button.active {
@@ -746,9 +758,9 @@
   background: #e8f3fb;
 }
 
-.page-carousel span {
-  width: 24px;
-  height: 24px;
+.page-tab-number {
+  width: var(--editor-action-size);
+  height: var(--editor-action-size);
   border-radius: 50%;
   background: #0067b1;
   color: #fff;
@@ -780,51 +792,13 @@
   min-width: min(128px, 100%);
 }
 
-.page-tab-grip {
-  width: 22px;
-  height: 24px;
-  border: 1px solid #c5d3e2;
-  border-radius: 4px;
-  background: #f8fbff;
-  color: #6b7d90;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 1px 3px rgba(15, 47, 74, 0.18);
-  flex: 0 0 auto;
-}
-
-.page-tab-grip mat-icon {
-  width: 15px;
-  height: 15px;
-  font-size: 15px;
-}
-
 .page-tab-more {
   margin-left: auto;
-  width: 24px;
-  height: 24px;
-  border: 1px solid #c5d3e2;
-  border-radius: 50%;
-  background: #fff;
-  color: #6b7d90;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 1px 4px rgba(15, 47, 74, 0.2);
+}
+
+.page-tab-grip,
+.page-tab-more {
   flex: 0 0 auto;
-}
-
-.page-tab-more:hover {
-  border-color: #9fb7cf;
-  background: #eef3f8;
-  color: #0f2f4a;
-}
-
-.page-tab-more mat-icon {
-  width: 17px;
-  height: 17px;
-  font-size: 17px;
 }
 
 .form-canvas {
@@ -905,11 +879,18 @@
   height: 100%;
   min-height: 0;
   overflow: visible;
-  border: 0;
-  border-radius: 0;
   padding: 0;
-  background: transparent;
-  box-shadow: none;
+}
+
+.form-field-section:not(:has(.form-field-element--header)):not(:has(.form-field-element--multiline)) {
+  align-self: start;
+  min-height: var(--editor-line-height);
+  height: var(--editor-line-height);
+}
+
+.form-field-section:not(:has(.form-field-element--header)):not(:has(.form-field-element--multiline)) .form-field-element {
+  min-height: var(--editor-line-height);
+  height: var(--editor-line-height);
 }
 
 .form-title-section .container-header {
@@ -991,10 +972,12 @@
 
 .container-grip,
 .form-field-grip,
+.page-tab-grip,
 .container-more,
-.form-field-more {
-  width: 24px;
-  height: 24px;
+.form-field-more,
+.page-tab-more {
+  width: var(--editor-action-size);
+  height: var(--editor-action-size);
   border: 1px solid #c8d6e3;
   border-radius: 5px;
   background: #fff;
@@ -1006,23 +989,27 @@
 }
 
 .container-more,
-.form-field-more {
+.form-field-more,
+.page-tab-more {
   border-radius: 50%;
 }
 
 .builder-editing .container-grip,
-.form-field-grip {
+.form-field-grip,
+.page-tab-grip {
   cursor: move;
 }
 
 .container-more,
-.form-field-more {
+.form-field-more,
+.page-tab-more {
   padding: 0;
   cursor: pointer;
 }
 
 .container-more:hover,
-.form-field-more:hover {
+.form-field-more:hover,
+.page-tab-more:hover {
   border-color: #7caed6;
   color: #0067b1;
 }
@@ -1145,8 +1132,8 @@
 }
 
 ::ng-deep .builder-editing .form-field-element .rendered-field .mat-mdc-text-field-wrapper {
-  padding-left: 2.25rem;
-  padding-right: 2.25rem;
+  padding-left: var(--editor-action-space);
+  padding-right: var(--editor-action-space);
 }
 
 ::ng-deep .form-field-section .rendered-field {
@@ -1162,6 +1149,10 @@
   height: 100%;
 }
 
+::ng-deep .form-field-section:not(:has(.form-field-element--header)):not(:has(.form-field-element--multiline)) .rendered-field .mat-mdc-text-field-wrapper {
+  height: var(--editor-line-height);
+}
+
 ::ng-deep .form-field-section .rendered-field .mat-mdc-form-field-flex,
 ::ng-deep .form-field-section .rendered-field .mat-mdc-form-field-infix {
   height: 100%;
@@ -1169,10 +1160,39 @@
 
 ::ng-deep .form-field-section .rendered-field .mat-mdc-form-field-infix {
   min-height: 0;
+  min-width: 0;
   display: flex;
   align-items: center;
   padding-top: 0;
   padding-bottom: 0;
+}
+
+::ng-deep .form-field-section .rendered-field input.mat-mdc-input-element,
+::ng-deep .form-field-section .mat-mdc-select-value-text,
+::ng-deep .form-field-section .mat-mdc-select-placeholder {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+::ng-deep .form-field-section .mat-mdc-checkbox {
+  max-width: 100%;
+  padding-left: var(--editor-action-space);
+  padding-right: var(--editor-action-space);
+  box-sizing: border-box;
+}
+
+::ng-deep .form-field-section .mat-mdc-checkbox .mdc-form-field,
+::ng-deep .form-field-section .mat-mdc-checkbox .mdc-label {
+  min-width: 0;
+  max-width: 100%;
+}
+
+::ng-deep .form-field-section .mat-mdc-checkbox .mdc-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 ::ng-deep .form-field-section .form-field-element--multiline .rendered-field .mat-mdc-form-field-infix {
@@ -1187,8 +1207,8 @@
 }
 
 .builder-editing .form-field-element--header .rendered-header {
-  padding-left: 2.25rem;
-  padding-right: 2.25rem;
+  padding-left: var(--editor-action-space);
+  padding-right: var(--editor-action-space);
 }
 
 .field-editor:last-child {
