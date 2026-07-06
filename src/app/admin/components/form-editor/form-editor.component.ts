@@ -22,6 +22,7 @@ import {
   SECTION_LIBRARY
 } from '../../models/form-editor.model';
 import { FormEditorStoreService } from '../../services/form-editor-store.service';
+import { CanvasElementChromeComponent } from './canvas-element-chrome.component';
 
 type ResizeDirection = 'n' | 'e' | 's' | 'w' | 'se' | 'nw' | 'ne' | 'sw';
 type FormElementType = 'page';
@@ -100,7 +101,8 @@ interface FormElementPaletteItem {
     MatInputModule,
     MatProgressSpinnerModule,
     MatSelectModule,
-    MatTooltipModule
+    MatTooltipModule,
+    CanvasElementChromeComponent
   ],
   templateUrl: './form-editor.component.html',
   styleUrls: ['./form-editor.component.scss']
@@ -113,7 +115,6 @@ export class FormEditorComponent implements OnInit {
   private readonly sectionDragType = 'application/x-e-kozig-section-id';
   private readonly formElementDragType = 'application/x-e-kozig-form-element';
   private readonly formFieldDragType = 'application/x-e-kozig-form-field';
-  private readonly pageDragType = 'application/x-e-kozig-page-index';
 
   @ViewChild('formCanvas') formCanvas?: ElementRef<HTMLElement>;
 
@@ -476,6 +477,7 @@ export class FormEditorComponent implements OnInit {
   }
 
   closePageSettings(): void {
+    this.refreshPageChromeSections();
     this.pageSettingsOpen = false;
     this.selectedPageSettingsIndex = null;
   }
@@ -531,6 +533,7 @@ export class FormEditorComponent implements OnInit {
       sections: []
     };
     this.activeTemplate.pages = [...this.activeTemplate.pages, page];
+    this.refreshPageChromeSections();
     this.setActivePage(this.activeTemplate.pages.length - 1);
     this.syncTemplateSections();
   }
@@ -550,6 +553,7 @@ export class FormEditorComponent implements OnInit {
     this.activeTemplate.pages = this.activeTemplate.pages.filter((_, index) => index !== this.activePageIndex);
     this.activePageIndex = Math.max(0, this.activePageIndex - 1);
     this.customFieldSectionId = this.activeSections[0]?.id ?? '';
+    this.refreshPageChromeSections();
     this.syncTemplateSections();
   }
 
@@ -569,6 +573,7 @@ export class FormEditorComponent implements OnInit {
       this.activePageIndex -= 1;
     }
     this.customFieldSectionId = this.activeSections[0]?.id ?? '';
+    this.refreshPageChromeSections();
     this.syncTemplateSections();
   }
 
@@ -579,48 +584,6 @@ export class FormEditorComponent implements OnInit {
     const index = this.selectedPageSettingsIndex;
     this.closePageSettings();
     this.removePage(index);
-  }
-
-  onPageTabDragStart(event: DragEvent, index: number): void {
-    if (!this.builderEditing) {
-      event.preventDefault();
-      return;
-    }
-
-    event.stopPropagation();
-    event.dataTransfer?.setData(this.pageDragType, String(index));
-    if (event.dataTransfer) {
-      event.dataTransfer.effectAllowed = 'move';
-    }
-  }
-
-  onPageTabDragOver(event: DragEvent): void {
-    if (!this.builderEditing || !this.hasDragData(event, this.pageDragType)) {
-      return;
-    }
-
-    event.preventDefault();
-    if (event.dataTransfer) {
-      event.dataTransfer.dropEffect = 'move';
-    }
-  }
-
-  onPageTabDrop(event: DragEvent, targetIndex: number): void {
-    if (!this.activeTemplate || !this.builderEditing) {
-      return;
-    }
-
-    const sourceIndex = Number(this.getDragData(event, this.pageDragType));
-    if (!Number.isInteger(sourceIndex) || sourceIndex < 0 || sourceIndex >= this.activeTemplate.pages.length) {
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-    const target = event.currentTarget as HTMLElement;
-    const rect = target.getBoundingClientRect();
-    const insertAfter = event.clientX > rect.left + rect.width / 2;
-    this.movePage(sourceIndex, targetIndex + (insertAfter ? 1 : 0));
   }
 
   async createWizard(name = 'Új űrlap'): Promise<void> {
@@ -1747,11 +1710,13 @@ export class FormEditorComponent implements OnInit {
     }
 
     const target = event.target as HTMLElement;
-    if (!target.closest('.container-grip, .form-field-grip')) {
+    if (!target.closest('.canvas-element-grip')) {
       return;
     }
 
     event.preventDefault();
+    event.stopPropagation();
+    this.selectedFormSectionId = section.id;
     const canvas = this.formCanvas?.nativeElement;
     const canvasWidth = canvas?.getBoundingClientRect().width ?? 960;
     this.resizeState = null;
@@ -1990,6 +1955,24 @@ export class FormEditorComponent implements OnInit {
     return section.id.startsWith(this.formTabsSectionPrefix);
   }
 
+  getPageForTabSection(section: FormSectionDefinition): FormTemplatePage | null {
+    if (!this.activeTemplate || !this.isPageTabsSection(section)) {
+      return null;
+    }
+    return this.activeTemplate.pages.find(page => page.id === section.navCode) ?? null;
+  }
+
+  getPageIndexForTabSection(section: FormSectionDefinition): number {
+    if (!this.activeTemplate || !this.isPageTabsSection(section)) {
+      return -1;
+    }
+    return this.activeTemplate.pages.findIndex(page => page.id === section.navCode);
+  }
+
+  isActivePageTabSection(section: FormSectionDefinition): boolean {
+    return this.getPageIndexForTabSection(section) === this.activePageIndex;
+  }
+
   isFormFieldSection(section: FormSectionDefinition): boolean {
     return !this.isFormTitleSection(section) && !this.isPageTabsSection(section) && section.fields.length === 1;
   }
@@ -2062,51 +2045,70 @@ export class FormEditorComponent implements OnInit {
 
   private ensurePageChromeSections(template: FormTemplate, page: FormTemplatePage): void {
     page.sections = page.sections ?? [];
-    const hasTitle = page.sections.some(section => this.isFormTitleSection(section));
-    const hasTabs = page.sections.some(section => this.isPageTabsSection(section));
-    if (!hasTitle || !hasTabs) {
-      page.sections.forEach(section => {
-        if (!this.isFormTitleSection(section) && !this.isPageTabsSection(section)) {
-          section.layout = {
-            ...section.layout,
-            row: (section.layout?.row ?? 1) + ((!hasTitle ? 1 : 0) + (!hasTabs ? 1 : 0))
-          };
-        }
-      });
-    }
+    const titleSection = page.sections.find(section => this.isFormTitleSection(section)) ?? {
+      id: `${this.formTitleSectionPrefix}${page.id}`,
+      title: template.name,
+      navCode: template.navCode,
+      description: 'Űrlap címsor',
+      mandatory: false,
+      layout: { col: 1, row: 1, colSpan: 6, rowSpan: 1 },
+      fields: []
+    };
+    titleSection.title = template.name;
+    titleSection.navCode = template.navCode;
+    titleSection.fields = [];
 
-    if (!hasTitle) {
-      page.sections.unshift({
-        id: `${this.formTitleSectionPrefix}${page.id}`,
-        title: template.name,
-        navCode: template.navCode,
-        description: 'Űrlap címsor',
-        mandatory: false,
-        layout: { col: 1, row: 1, colSpan: 6, rowSpan: 1 },
-        fields: []
-      });
-    }
-
-    if (!hasTabs) {
-      const insertIndex = page.sections.findIndex(section => !this.isFormTitleSection(section));
-      const tabSection: FormSectionDefinition = {
-        id: `${this.formTabsSectionPrefix}${page.id}`,
-        title: 'Oldalak',
-        navCode: 'TABS',
-        description: 'Űrlap oldalak',
-        mandatory: false,
-        layout: { col: 1, row: 2, colSpan: 6, rowSpan: 1 },
+    const existingTabs = page.sections.filter(section => this.isPageTabsSection(section));
+    const legacyTab = existingTabs.find(section => section.navCode === 'TABS');
+    const existingTabsByPageId = new Map(
+      existingTabs
+        .filter(section => section.navCode && section.navCode !== 'TABS')
+        .map(section => [section.navCode as string, section])
+    );
+    const tabSections = template.pages.map((targetPage, index) => {
+      const existing = existingTabsByPageId.get(targetPage.id);
+      const fallbackLayout = this.getDefaultTabLayout(index, template.grid.columns);
+      const section: FormSectionDefinition = existing ?? {
+        id: `${this.formTabsSectionPrefix}${page.id}-${targetPage.id}`,
+        title: targetPage.title,
+        navCode: targetPage.id,
+        description: 'Űrlap oldal',
+        mandatory: targetPage.mandatory,
+        layout: index === 0 && legacyTab ? legacyTab.layout : fallbackLayout,
         fields: []
       };
-      if (insertIndex < 0) {
-        page.sections.push(tabSection);
-      } else {
-        page.sections.splice(insertIndex, 0, tabSection);
-      }
-    }
+      section.title = targetPage.title;
+      section.navCode = targetPage.id;
+      section.description = 'Űrlap oldal';
+      section.mandatory = targetPage.mandatory;
+      section.layout = this.normalizeSectionCanvasLayout(section.layout, fallbackLayout);
+      section.fields = [];
+      return section;
+    });
+
+    const contentSections = page.sections.filter(section => !this.isFormTitleSection(section) && !this.isPageTabsSection(section));
+    page.sections = [titleSection, ...tabSections, ...contentSections];
 
     const maxRow = Math.max(...page.sections.map(section => (section.layout?.row ?? 1) + (section.layout?.rowSpan ?? 1) - 1), template.grid.rows);
     template.grid.rows = this.clamp(maxRow, 12, 24);
+  }
+
+  private refreshPageChromeSections(): void {
+    if (!this.activeTemplate) {
+      return;
+    }
+    this.activeTemplate.pages.forEach(page => this.ensurePageChromeSections(this.activeTemplate as FormTemplate, page));
+  }
+
+  private getDefaultTabLayout(index: number, columns = this.gridColumns): FormSectionLayout {
+    const colSpan = 2;
+    const tabsPerRow = Math.max(1, Math.floor(columns / colSpan));
+    return {
+      col: 1 + (index % tabsPerRow) * colSpan,
+      row: 2 + Math.floor(index / tabsPerRow),
+      colSpan,
+      rowSpan: 1
+    };
   }
 
   private flattenPageFieldSections(page: FormTemplatePage): void {
@@ -2360,6 +2362,7 @@ export class FormEditorComponent implements OnInit {
     if (!this.activeTemplate) {
       return;
     }
+    this.refreshPageChromeSections();
     this.activeTemplate.sections = this.activeTemplate.pages.flatMap(page => page.sections);
   }
 
@@ -2478,25 +2481,6 @@ export class FormEditorComponent implements OnInit {
       colSpan,
       rowSpan
     };
-  }
-
-  private movePage(sourceIndex: number, requestedTargetIndex: number): void {
-    if (!this.activeTemplate || sourceIndex === requestedTargetIndex) {
-      return;
-    }
-
-    const pages = [...this.activeTemplate.pages];
-    const activePageId = this.activePage?.id;
-    const [page] = pages.splice(sourceIndex, 1);
-    let targetIndex = requestedTargetIndex;
-    if (sourceIndex < targetIndex) {
-      targetIndex -= 1;
-    }
-    pages.splice(this.clamp(targetIndex, 0, pages.length), 0, page);
-    this.activeTemplate.pages = pages;
-    const nextActiveIndex = pages.findIndex(item => item.id === activePageId);
-    this.activePageIndex = nextActiveIndex >= 0 ? nextActiveIndex : 0;
-    this.syncTemplateSections();
   }
 
   private ensureGridContains(row: number, column: number): void {
