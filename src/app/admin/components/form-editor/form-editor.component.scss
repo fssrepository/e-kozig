@@ -56,7 +56,7 @@
 .selector-group {
   min-width: min(590px, 100%);
   display: grid;
-  grid-template-columns: minmax(190px, 1fr) 40px 36px auto;
+  grid-template-columns: minmax(230px, 1fr) auto;
   align-items: center;
   gap: 0.35rem;
   padding: 0.25rem 0.35rem;
@@ -65,8 +65,9 @@
 }
 
 .selector-group.active {
-  border-color: #9fc5e3;
-  background: #eef7fd;
+  border-color: #78aedc;
+  background: #dceefb;
+  box-shadow: 0 1px 2px rgba(0, 103, 177, 0.12);
 }
 
 .selector-group label {
@@ -1576,6 +1577,26 @@
   }
 }
 
+@media (min-width: 881px) {
+  .editor-toolbar {
+    min-height: 48px;
+    justify-content: flex-end;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .compact-selectors {
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .selector-group {
+    width: min(620px, 100%);
+  }
+}
+
 @media (max-width: 880px) {
   .form-editor-page {
     height: auto;
@@ -1592,30 +1613,24 @@
   }
 
   .selector-group {
-    grid-template-columns: 40px minmax(0, 1fr) 40px;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
-      "new select stencil"
-      "secondary secondary secondary";
+      "select"
+      "secondary";
     width: 100%;
     min-width: 0;
   }
 
   .selector-group .toolbar-select {
     grid-area: select;
-  }
-
-  .selector-group .selector-new {
-    grid-area: new;
-  }
-
-  .selector-group .selector-stencil {
-    grid-area: stencil;
-    justify-self: end;
+    width: min(100%, calc(100vw - 7.5rem));
+    justify-self: center;
   }
 
   .selector-group .selector-secondary-actions {
     grid-area: secondary;
     justify-self: center;
+    flex-wrap: nowrap;
   }
 
   .selector-group .selector-secondary-actions .selector-divider {

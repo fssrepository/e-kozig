@@ -14,21 +14,21 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
-          <button mat-mini-fab class="selector-new" type="button" color="primary" (click)="openNewWizardDialog()" matTooltip="Új űrlap" aria-label="Új űrlap">
-            <mat-icon>add</mat-icon>
-          </button>
-          <button
-            mat-icon-button
-            class="selector-stencil"
-            type="button"
-            [class.active]="builderEditing || panelMode === 'template'"
-            (click)="handleStencilAction()"
-            [matTooltip]="builderEditing || panelMode === 'template' ? 'Mentés' : 'Stencil szerkesztés'"
-            [attr.aria-label]="builderEditing || panelMode === 'template' ? 'Mentés' : 'Stencil szerkesztés'"
-          >
-            <mat-icon>{{ builderEditing || panelMode === 'template' ? 'save' : 'format_shapes' }}</mat-icon>
-          </button>
           <span class="selector-secondary-actions">
+            <button mat-mini-fab class="selector-new" type="button" color="primary" (click)="openNewWizardDialog()" matTooltip="Új űrlap" aria-label="Új űrlap">
+              <mat-icon>add</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              class="selector-stencil"
+              type="button"
+              [class.active]="builderEditing || panelMode === 'template'"
+              (click)="handleStencilAction()"
+              [matTooltip]="builderEditing || panelMode === 'template' ? 'Mentés' : 'Stencil szerkesztés'"
+              [attr.aria-label]="builderEditing || panelMode === 'template' ? 'Mentés' : 'Stencil szerkesztés'"
+            >
+              <mat-icon>{{ builderEditing || panelMode === 'template' ? 'save' : 'format_shapes' }}</mat-icon>
+            </button>
             <button mat-icon-button class="selector-preview" type="button" (click)="showFormPanel(); openOnyaPreview()" matTooltip="ONYA előnézet" aria-label="ONYA előnézet">
               <mat-icon>visibility</mat-icon>
             </button>
