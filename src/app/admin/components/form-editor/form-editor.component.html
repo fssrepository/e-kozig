@@ -276,6 +276,9 @@
                 </div>
                 <div
                   class="field-editor form-field-element"
+                  [class.form-field-element--header]="field.type === 'header'"
+                  [class.form-field-element--multiline]="field.type === 'textarea'"
+                  [class.form-field-element--checkbox]="field.type === 'checkbox'"
                   *ngFor="let field of section.fields; trackBy: trackById"
                   [style.grid-column]="getFieldGridColumn(field)"
                   [style.grid-row]="getFieldGridRow(field)"

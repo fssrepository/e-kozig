@@ -1064,9 +1064,10 @@
 
 .form-field-toolbar {
   position: absolute;
-  top: 0.28rem;
+  top: 50%;
   left: 0.28rem;
   right: 0.28rem;
+  transform: translateY(-50%);
   z-index: 3;
   min-height: 24px;
   display: flex;
@@ -1078,12 +1079,23 @@
   pointer-events: none;
 }
 
+.form-field-element--header .form-field-toolbar,
+.form-field-element--multiline .form-field-toolbar {
+  top: 0.28rem;
+  transform: none;
+}
+
 .form-field-toolbar .form-field-grip,
 .form-field-toolbar .form-field-more {
   pointer-events: auto;
 }
 
 ::ng-deep .builder-editing .form-field-element .rendered-field .mat-mdc-text-field-wrapper {
+  padding-left: 2.25rem;
+  padding-right: 2.25rem;
+}
+
+.builder-editing .form-field-element--header .rendered-header {
   padding-left: 2.25rem;
   padding-right: 2.25rem;
 }

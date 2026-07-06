@@ -128,8 +128,7 @@ export class FormEditorComponent implements OnInit {
     { type: 'tel', label: 'Telefon', icon: 'phone' }
   ];
   readonly formElementPalette: FormElementPaletteItem[] = [
-    { type: 'page', label: 'Oldal / tab', description: 'Új űrlapoldal a varázslóban', icon: 'tab' },
-    { type: 'container', label: 'Konténer', description: 'Feliratos mezőcsoport a vásznon', icon: 'crop_square' }
+    { type: 'page', label: 'Oldal / tab', description: 'Új űrlapoldal a varázslóban', icon: 'tab' }
   ];
   readonly currentUser = DEFAULT_USER_PROFILE;
 
