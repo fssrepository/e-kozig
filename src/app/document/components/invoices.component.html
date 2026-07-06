@@ -212,6 +212,10 @@
     </div>
   </div>
 
+  <div class="page-loading-overlay" *ngIf="loading">
+    <mat-progress-spinner diameter="48" mode="indeterminate"></mat-progress-spinner>
+  </div>
+
   <div class="table-stack">
     <div class="pull-indicator" *ngIf="isMobileView && (pullActive || pullRefreshing)">
       <mat-progress-spinner
