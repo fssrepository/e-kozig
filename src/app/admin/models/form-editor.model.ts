@@ -1,6 +1,7 @@
 export type FormEditorViewport = 'desktop' | 'mobile';
 
 export type FormFieldType =
+  | 'header'
   | 'text'
   | 'textarea'
   | 'date'

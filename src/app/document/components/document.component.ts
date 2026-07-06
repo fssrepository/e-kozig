@@ -1424,7 +1424,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
   private getOnyaFieldLayout(field: FormFieldDefinition): { col?: number; row?: number; colSpan: number; rowSpan: number } {
     const fallback = this.getOnyaDefaultFieldLayout(field.type);
     const colSpan = this.clampNumber(field.layout?.colSpan ?? fallback.colSpan, 2, 12);
-    const maxRowSpan = field.type === 'textarea' ? 4 : 1;
+    const maxRowSpan = field.type === 'textarea' ? 4 : field.type === 'header' ? 3 : 1;
     return {
       col: field.layout?.col ? this.clampNumber(field.layout.col, 1, Math.max(1, 12 - colSpan + 1)) : undefined,
       row: field.layout?.row ? this.clampNumber(field.layout.row, 1, 40) : undefined,
@@ -1434,6 +1434,9 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private getOnyaDefaultFieldLayout(type: FormFieldDefinition['type']): { colSpan: number; rowSpan: number } {
+    if (type === 'header') {
+      return { colSpan: 12, rowSpan: 1 };
+    }
     if (type === 'textarea') {
       return { colSpan: 12, rowSpan: 2 };
     }

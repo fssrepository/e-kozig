@@ -39,6 +39,11 @@ export class FormEditorStoreService {
     await this.put(db, SECTION_STORE, this.clone(section));
   }
 
+  async deleteSectionTemplate(sectionId: string): Promise<void> {
+    const db = await this.openDb();
+    await this.delete(db, SECTION_STORE, sectionId);
+  }
+
   async getDocuments(): Promise<FormDocument[]> {
     const db = await this.openDb();
     return this.getAll<FormDocument>(db, DOCUMENT_STORE).then(items =>
@@ -131,6 +136,16 @@ export class FormEditorStoreService {
       const transaction = db.transaction(storeName, 'readwrite');
       const store = transaction.objectStore(storeName);
       const request = store.put(item);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  private delete(db: IDBDatabase, storeName: string, key: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(storeName, 'readwrite');
+      const store = transaction.objectStore(storeName);
+      const request = store.delete(key);
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
     });

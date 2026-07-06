@@ -16,6 +16,7 @@ import {
   FormFieldLayout,
   FormFieldType,
   FormSectionDefinition,
+  FormSectionLayout,
   FormTemplate,
   FormTemplatePage,
   SECTION_LIBRARY
@@ -23,6 +24,7 @@ import {
 import { FormEditorStoreService } from '../../services/form-editor-store.service';
 
 type ResizeDirection = 'n' | 'e' | 's' | 'w' | 'se' | 'nw' | 'ne' | 'sw';
+type FormElementType = 'page';
 
 interface ResizeState {
   sectionId: string;
@@ -76,6 +78,13 @@ interface FieldPaletteItem {
   icon: string;
 }
 
+interface FormElementPaletteItem {
+  type: FormElementType;
+  label: string;
+  description: string;
+  icon: string;
+}
+
 @Component({
   selector: 'app-form-editor',
   standalone: true,
@@ -96,11 +105,15 @@ interface FieldPaletteItem {
 })
 export class FormEditorComponent implements OnInit {
   private readonly store = inject(FormEditorStoreService);
+  private readonly fieldDragType = 'application/x-e-kozig-field-type';
+  private readonly sectionDragType = 'application/x-e-kozig-section-id';
+  private readonly formElementDragType = 'application/x-e-kozig-form-element';
 
   @ViewChild('formCanvas') formCanvas?: ElementRef<HTMLElement>;
 
   sectionLibrary: FormSectionDefinition[] = SECTION_LIBRARY.map(section => this.clone(section));
   readonly fieldPalette: FieldPaletteItem[] = [
+    { type: 'header', label: 'Címsor', icon: 'title' },
     { type: 'text', label: 'Szöveg', icon: 'short_text' },
     { type: 'textarea', label: 'Hosszú szöveg', icon: 'notes' },
     { type: 'select', label: 'Választólista', icon: 'arrow_drop_down_circle' },
@@ -109,6 +122,9 @@ export class FormEditorComponent implements OnInit {
     { type: 'number', label: 'Szám', icon: 'pin' },
     { type: 'email', label: 'E-mail', icon: 'alternate_email' },
     { type: 'tel', label: 'Telefon', icon: 'phone' }
+  ];
+  readonly formElementPalette: FormElementPaletteItem[] = [
+    { type: 'page', label: 'Oldal / tab', description: 'Új űrlapoldal a varázslóban', icon: 'tab' }
   ];
   readonly currentUser = DEFAULT_USER_PROFILE;
 
@@ -137,6 +153,9 @@ export class FormEditorComponent implements OnInit {
   microFieldRequired = false;
   microFieldOptions = 'Igen\nNem';
   selectedTemplateFieldId: string | null = null;
+  selectedTemplateFieldIds: string[] = [];
+  sectionFilter = '';
+  selectionTemplateName = '';
   fieldSettingsOpen = false;
   previewTemplate: FormTemplate | null = null;
   previewPageIndex = 0;
@@ -171,10 +190,32 @@ export class FormEditorComponent implements OnInit {
   }
 
   get selectedTemplateField(): FormFieldDefinition | null {
-    if (!this.selectedTemplateFieldId) {
+    const fieldId = this.selectedTemplateFieldId ?? this.selectedTemplateFieldIds.at(-1);
+    if (!fieldId) {
       return null;
     }
-    return this.activeSectionTemplateFields.find(field => field.id === this.selectedTemplateFieldId) ?? null;
+    return this.activeSectionTemplateFields.find(field => field.id === fieldId) ?? null;
+  }
+
+  get selectedTemplateFields(): FormFieldDefinition[] {
+    const selected = new Set(this.selectedTemplateFieldIds);
+    return this.activeSectionTemplateFields.filter(field => selected.has(field.id));
+  }
+
+  get hasMultiTemplateSelection(): boolean {
+    return this.selectedTemplateFieldIds.length > 1;
+  }
+
+  get filteredSectionLibrary(): FormSectionDefinition[] {
+    const filter = this.sectionFilter.trim().toLocaleLowerCase('hu');
+    if (!filter) {
+      return this.sectionLibrary;
+    }
+    return this.sectionLibrary.filter(section =>
+      section.title.toLocaleLowerCase('hu').includes(filter)
+      || (section.navCode ?? '').toLocaleLowerCase('hu').includes(filter)
+      || (section.description ?? '').toLocaleLowerCase('hu').includes(filter)
+    );
   }
 
   get previewPages(): FormTemplatePage[] {
@@ -253,6 +294,8 @@ export class FormEditorComponent implements OnInit {
     this.activeSectionTemplate = this.normalizeSectionTemplate(section);
     this.selectedSectionId = section.id;
     this.selectedTemplateFieldId = this.activeSectionTemplate.fields[0]?.id ?? null;
+    this.selectedTemplateFieldIds = this.selectedTemplateFieldId ? [this.selectedTemplateFieldId] : [];
+    this.selectionTemplateName = '';
     this.fieldSettingsOpen = false;
     this.refreshFieldOptionDrafts();
     if (activatePanel) {
@@ -426,24 +469,109 @@ export class FormEditorComponent implements OnInit {
   }
 
   addSelectedSection(): void {
-    const source = this.sectionLibrary.find(section => section.id === this.selectedLibrarySectionId);
-    if (!source || !this.activeTemplate || !this.activePage || !this.builderEditing) {
-      return;
-    }
-
-    const section = this.cloneSectionForInsert(source);
-    section.layout.row = this.getNextRow();
-    section.layout.col = 1;
-    this.ensureGridContains(section.layout.row + section.layout.rowSpan - 1, section.layout.col + section.layout.colSpan - 1);
-    this.activePage.sections = [...this.activePage.sections, section];
-    section.fields.forEach(field => this.initializeFieldValue(field));
-    this.customFieldSectionId = section.id;
-    this.syncTemplateSections();
+    this.addSectionFromLibrary(this.selectedLibrarySectionId);
   }
 
   addSection(sectionId: string): void {
     this.selectedLibrarySectionId = sectionId;
-    this.addSelectedSection();
+    this.addSectionFromLibrary(sectionId);
+  }
+
+  onFormElementDragStart(event: DragEvent, type: FormElementType): void {
+    if (!this.builderEditing) {
+      event.preventDefault();
+      return;
+    }
+
+    event.dataTransfer?.setData(this.formElementDragType, type);
+    event.dataTransfer?.setData('text/plain', type);
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'copy';
+    }
+  }
+
+  onSectionPaletteDragStart(event: DragEvent, sectionId: string): void {
+    if (this.panelMode === 'form' && !this.builderEditing) {
+      event.preventDefault();
+      return;
+    }
+
+    event.dataTransfer?.setData(this.sectionDragType, sectionId);
+    event.dataTransfer?.setData('text/plain', sectionId);
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'copy';
+    }
+  }
+
+  onPageCarouselDragOver(event: DragEvent): void {
+    if (!this.builderEditing || this.getDragData(event, this.formElementDragType) !== 'page') {
+      return;
+    }
+
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'copy';
+    }
+  }
+
+  onPageCarouselDrop(event: DragEvent): void {
+    if (!this.builderEditing || this.getDragData(event, this.formElementDragType) !== 'page') {
+      return;
+    }
+
+    event.preventDefault();
+    this.addPage();
+  }
+
+  onFormCanvasDragOver(event: DragEvent): void {
+    if (!this.builderEditing || (!this.hasDragData(event, this.sectionDragType) && this.getDragData(event, this.formElementDragType) !== 'page')) {
+      return;
+    }
+
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'copy';
+    }
+  }
+
+  onFormCanvasDrop(event: DragEvent): void {
+    if (!this.builderEditing) {
+      return;
+    }
+
+    const formElement = this.getDragData(event, this.formElementDragType);
+    if (formElement === 'page') {
+      event.preventDefault();
+      this.addPage();
+      return;
+    }
+
+    const sectionId = this.getDragData(event, this.sectionDragType);
+    if (!sectionId) {
+      return;
+    }
+
+    const source = this.sectionLibrary.find(section => section.id === sectionId);
+    if (!source) {
+      return;
+    }
+
+    event.preventDefault();
+    this.selectedLibrarySectionId = sectionId;
+    this.addSectionFromLibrary(sectionId, this.getFormDropLayout(event, source));
+  }
+
+  getSablonSizeLabel(section: FormSectionDefinition): string {
+    const layout = section.layout ?? { col: 1, row: 1, colSpan: 4, rowSpan: 1 };
+    return `${layout.colSpan}/12 · ${layout.rowSpan} sor`;
+  }
+
+  getSablonPreviewWidth(section: FormSectionDefinition): number {
+    return (this.clamp(section.layout?.colSpan ?? 4, 1, 12) / 12) * 100;
+  }
+
+  getSablonPreviewHeight(section: FormSectionDefinition): number {
+    return 12 + this.clamp(section.layout?.rowSpan ?? 1, 1, 4) * 12;
   }
 
   duplicateSection(section: FormSectionDefinition): void {
@@ -528,7 +656,7 @@ export class FormEditorComponent implements OnInit {
       id: `${this.slugify(fieldLabel)}-${this.createShortId()}`,
       label: fieldLabel,
       type,
-      required: this.microFieldRequired,
+      required: type === 'header' ? false : this.microFieldRequired,
       layout: {
         ...this.getDefaultFieldLayout(type),
         ...placement
@@ -543,6 +671,8 @@ export class FormEditorComponent implements OnInit {
     this.activeSectionTemplate.fields = [...this.activeSectionTemplate.fields, field];
     this.settleTemplateField(field.id);
     this.selectedTemplateFieldId = field.id;
+    this.selectedTemplateFieldIds = [field.id];
+    this.selectionTemplateName = '';
     this.fieldSettingsOpen = false;
     this.fieldOptionDrafts[field.id] = field.options?.map(option => option.label).join('\n') ?? '';
     this.upsertActiveSectionTemplate();
@@ -642,8 +772,9 @@ export class FormEditorComponent implements OnInit {
     }
 
     this.activeSectionTemplate.fields = this.activeSectionTemplate.fields.filter(field => field.id !== fieldId);
-    if (this.selectedTemplateFieldId === fieldId) {
-      this.selectedTemplateFieldId = this.activeSectionTemplate.fields[0]?.id ?? null;
+    this.selectedTemplateFieldIds = this.selectedTemplateFieldIds.filter(id => id !== fieldId);
+    if (this.selectedTemplateFieldId === fieldId || !this.selectedTemplateFieldIds.length) {
+      this.selectedTemplateFieldId = this.selectedTemplateFieldIds.at(-1) ?? null;
       this.fieldSettingsOpen = false;
     }
     delete this.fieldOptionDrafts[fieldId];
@@ -652,18 +783,137 @@ export class FormEditorComponent implements OnInit {
 
   selectTemplateField(field: FormFieldDefinition, event?: Event): void {
     event?.stopPropagation();
+    const mouseEvent = event as MouseEvent | undefined;
+    if (mouseEvent?.ctrlKey || mouseEvent?.metaKey) {
+      this.fieldSettingsOpen = false;
+      this.selectedTemplateFieldIds = this.selectedTemplateFieldIds.includes(field.id)
+        ? this.selectedTemplateFieldIds.filter(id => id !== field.id)
+        : [...this.selectedTemplateFieldIds, field.id];
+      this.selectedTemplateFieldId = this.selectedTemplateFieldIds.at(-1) ?? null;
+      if (this.hasMultiTemplateSelection && !this.selectionTemplateName.trim()) {
+        this.selectionTemplateName = `${this.activeSectionTemplate?.title || 'Sablon'} részlet`;
+      }
+      return;
+    }
+
     this.selectedTemplateFieldId = field.id;
+    this.selectedTemplateFieldIds = [field.id];
   }
 
   openTemplateFieldSettings(field: FormFieldDefinition, event?: Event): void {
     event?.preventDefault();
     event?.stopPropagation();
     this.selectedTemplateFieldId = field.id;
+    this.selectedTemplateFieldIds = [field.id];
     this.fieldSettingsOpen = true;
   }
 
   closeTemplateFieldSettings(): void {
     this.fieldSettingsOpen = false;
+  }
+
+  isTemplateFieldSelected(field: FormFieldDefinition): boolean {
+    return this.selectedTemplateFieldIds.includes(field.id);
+  }
+
+  clearTemplateFieldSelection(event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    this.selectedTemplateFieldId = null;
+    this.selectedTemplateFieldIds = [];
+    this.selectionTemplateName = '';
+    this.fieldSettingsOpen = false;
+  }
+
+  async saveSelectedFieldsAsSablon(event?: Event): Promise<void> {
+    event?.preventDefault();
+    event?.stopPropagation();
+    const selectedFields = this.selectedTemplateFields;
+    if (!selectedFields.length) {
+      return;
+    }
+
+    const title = this.selectionTemplateName.trim() || 'Új sablon';
+    const suffix = this.createShortId();
+    const fieldsWithLayout = selectedFields.map(field => ({
+      field,
+      layout: this.normalizeFieldLayout(field)
+    }));
+    const minCol = Math.min(...fieldsWithLayout.map(item => item.layout.col ?? 1));
+    const minRow = Math.min(...fieldsWithLayout.map(item => item.layout.row ?? 1));
+    const maxCol = Math.max(...fieldsWithLayout.map(item => (item.layout.col ?? 1) + item.layout.colSpan - 1));
+    const maxRow = Math.max(...fieldsWithLayout.map(item => (item.layout.row ?? 1) + item.layout.rowSpan - 1));
+
+    const section = this.normalizeSectionTemplate({
+      id: `${this.slugify(title)}-${suffix}`,
+      title,
+      navCode: this.slugify(title).toUpperCase().slice(0, 16) || 'CUSTOM',
+      description: 'Kijelölt mezőkből mentett sablon',
+      mandatory: false,
+      layout: {
+        col: 1,
+        row: 1,
+        colSpan: this.clamp(maxCol - minCol + 1, 2, 12),
+        rowSpan: this.clamp(maxRow - minRow + 1, 1, 16)
+      },
+      fields: fieldsWithLayout.map(({ field, layout }) => ({
+        ...this.clone(field),
+        id: `${field.id}-${suffix}`,
+        layout: {
+          col: (layout.col ?? 1) - minCol + 1,
+          row: (layout.row ?? 1) - minRow + 1,
+          colSpan: layout.colSpan,
+          rowSpan: layout.rowSpan
+        }
+      }))
+    });
+
+    this.saving = true;
+    try {
+      await this.store.saveSectionTemplate(section);
+      this.sectionLibrary = (await this.store.getSectionTemplates()).map(item => this.normalizeSectionTemplate(item));
+      this.selectedLibrarySectionId = section.id;
+      this.clearTemplateFieldSelection();
+      this.statusMessage = 'Kijelölt mezőkből sablon mentve.';
+    } catch (error) {
+      this.statusMessage = 'A kijelölt mezők sablonként mentése sikertelen.';
+      console.error(error);
+    } finally {
+      this.saving = false;
+    }
+  }
+
+  async deleteSectionTemplate(sectionId: string, event?: Event): Promise<void> {
+    event?.preventDefault();
+    event?.stopPropagation();
+    if (!this.sectionLibrary.some(section => section.id === sectionId)) {
+      return;
+    }
+
+    this.saving = true;
+    try {
+      await this.store.deleteSectionTemplate(sectionId);
+      this.sectionLibrary = (await this.store.getSectionTemplates()).map(item => this.normalizeSectionTemplate(item));
+      if (this.selectedLibrarySectionId === sectionId) {
+        this.selectedLibrarySectionId = this.sectionLibrary[0]?.id ?? '';
+      }
+      if (this.selectedSectionId === sectionId) {
+        const nextSection = this.sectionLibrary[0];
+        if (nextSection) {
+          this.selectSectionTemplate(nextSection.id, this.panelMode === 'template');
+        } else {
+          this.activeSectionTemplate = null;
+          this.selectedSectionId = '';
+          this.clearTemplateFieldSelection();
+        }
+      }
+      this.statusMessage = 'Sablon törölve.';
+    } catch (error) {
+      this.statusMessage = 'A sablon törlése sikertelen.';
+      console.error(error);
+    } finally {
+      this.saving = false;
+    }
   }
 
   moveTemplateField(fieldId: string, direction: -1 | 1): void {
@@ -691,7 +941,11 @@ export class FormEditorComponent implements OnInit {
       col: currentLayout.col,
       row: currentLayout.row
     };
-    if (field.type === 'select') {
+    if (field.type === 'header') {
+      field.required = false;
+      field.options = undefined;
+      delete this.fieldOptionDrafts[field.id];
+    } else if (field.type === 'select') {
       field.options = field.options?.length ? field.options : this.parseOptions(this.microFieldOptions);
       this.fieldOptionDrafts[field.id] = field.options.map(option => option.label).join('\n');
     } else {
@@ -771,6 +1025,7 @@ export class FormEditorComponent implements OnInit {
     this.dragState = null;
     this.fieldDragState = null;
     this.selectedTemplateFieldId = field.id;
+    this.selectedTemplateFieldIds = [field.id];
     this.fieldResizeState = {
       fieldId: field.id,
       direction,
@@ -786,6 +1041,7 @@ export class FormEditorComponent implements OnInit {
   }
 
   onPaletteDragStart(event: DragEvent, type: FormFieldType): void {
+    event.dataTransfer?.setData(this.fieldDragType, type);
     event.dataTransfer?.setData('text/plain', type);
     if (event.dataTransfer) {
       event.dataTransfer.effectAllowed = 'copy';
@@ -793,6 +1049,12 @@ export class FormEditorComponent implements OnInit {
   }
 
   onTemplateSurfaceDragOver(event: DragEvent): void {
+    const hasField = this.hasDragData(event, this.fieldDragType);
+    const hasSection = this.hasDragData(event, this.sectionDragType);
+    if (!hasField && !hasSection) {
+      return;
+    }
+
     event.preventDefault();
     if (event.dataTransfer) {
       event.dataTransfer.dropEffect = 'copy';
@@ -801,7 +1063,16 @@ export class FormEditorComponent implements OnInit {
 
   onTemplateSurfaceDrop(event: DragEvent): void {
     event.preventDefault();
-    const type = event.dataTransfer?.getData('text/plain') as FormFieldType;
+    const sectionId = this.getDragData(event, this.sectionDragType);
+    if (sectionId) {
+      const source = this.sectionLibrary.find(section => section.id === sectionId);
+      if (source) {
+        this.addSectionFieldsToActiveSectionTemplate(sectionId, this.getTemplateSectionDropLayout(event, source));
+      }
+      return;
+    }
+
+    const type = (event.dataTransfer?.getData(this.fieldDragType) || event.dataTransfer?.getData('text/plain')) as FormFieldType;
     if (!this.fieldPalette.some(item => item.type === type)) {
       return;
     }
@@ -822,6 +1093,66 @@ export class FormEditorComponent implements OnInit {
       col: this.clamp(Math.floor(x / columnWidth) + 1, 1, Math.max(1, 12 - colSpan + 1)),
       row: this.clamp(Math.floor(y / 40) + 1, 1, 40)
     };
+  }
+
+  private getTemplateSectionDropLayout(event: DragEvent, section: FormSectionDefinition): Partial<FormFieldLayout> {
+    const surface = ((event.currentTarget as HTMLElement).closest('.template-builder-surface') as HTMLElement | null)
+      ?? (event.currentTarget as HTMLElement);
+    const rect = surface.getBoundingClientRect();
+    const width = this.clamp(section.layout?.colSpan ?? 6, 2, 12);
+    const columnWidth = rect.width / 12;
+    const x = this.clamp(event.clientX - rect.left, 0, rect.width);
+    const y = Math.max(0, event.clientY - rect.top + surface.scrollTop);
+    return {
+      col: this.clamp(Math.floor(x / columnWidth) + 1, 1, Math.max(1, 12 - width + 1)),
+      row: this.clamp(Math.floor(y / 40) + 1, 1, 40)
+    };
+  }
+
+  private addSectionFieldsToActiveSectionTemplate(sectionId: string, placement: Partial<FormFieldLayout> = {}): void {
+    const source = this.sectionLibrary.find(section => section.id === sectionId);
+    if (!source || !this.activeSectionTemplate) {
+      return;
+    }
+
+    const suffix = this.createShortId();
+    const fieldsWithLayout = this.normalizeFields(source.fields).map(field => ({
+      field,
+      layout: this.normalizeFieldLayout(field)
+    }));
+    if (!fieldsWithLayout.length) {
+      return;
+    }
+
+    const minCol = Math.min(...fieldsWithLayout.map(item => item.layout.col ?? 1));
+    const minRow = Math.min(...fieldsWithLayout.map(item => item.layout.row ?? 1));
+    const maxCol = Math.max(...fieldsWithLayout.map(item => (item.layout.col ?? 1) + item.layout.colSpan - 1));
+    const groupWidth = this.clamp(maxCol - minCol + 1, 2, 12);
+    const baseCol = this.clamp(placement.col ?? 1, 1, Math.max(1, 12 - groupWidth + 1));
+    const baseRow = this.clamp(placement.row ?? 1, 1, 40);
+
+    const newFields = fieldsWithLayout.map(({ field, layout }) => ({
+      ...this.clone(field),
+      id: `${field.id}-${suffix}`,
+      layout: {
+        col: baseCol + (layout.col ?? 1) - minCol,
+        row: baseRow + (layout.row ?? 1) - minRow,
+        colSpan: layout.colSpan,
+        rowSpan: layout.rowSpan
+      }
+    }));
+
+    this.activeSectionTemplate.fields = [...this.activeSectionTemplate.fields, ...newFields];
+    this.selectedTemplateFieldIds = newFields.map(field => field.id);
+    this.selectedTemplateFieldId = this.selectedTemplateFieldIds.at(-1) ?? null;
+    if (newFields.length > 1 && !this.selectionTemplateName.trim()) {
+      this.selectionTemplateName = source.title;
+    }
+    newFields.forEach(field => {
+      this.fieldOptionDrafts[field.id] = field.options?.map(option => option.label).join('\n') ?? '';
+    });
+    this.upsertActiveSectionTemplate();
+    this.statusMessage = 'Sablon elemei hozzáadva a vászonhoz.';
   }
 
   removeField(section: FormSectionDefinition, fieldId: string): void {
@@ -969,20 +1300,20 @@ export class FormEditorComponent implements OnInit {
     if (this.fieldDragState || this.fieldResizeState || this.resizeState || this.dragState) {
       return;
     }
-    if (this.panelMode !== 'template' || !this.selectedTemplateFieldId) {
+    if (this.panelMode !== 'template' || !this.selectedTemplateFieldIds.length) {
       return;
     }
 
     const target = event.target as HTMLElement | null;
     if (!target) {
-      this.selectedTemplateFieldId = null;
+      this.clearTemplateFieldSelection();
       return;
     }
-    if (target.closest('.template-field-element, .field-settings-panel')) {
+    if (target.closest('.template-field-element, .field-settings-panel, .selection-template-overlay')) {
       return;
     }
 
-    this.selectedTemplateFieldId = null;
+    this.clearTemplateFieldSelection();
   }
 
   @HostListener('document:pointermove', ['$event'])
@@ -1331,6 +1662,29 @@ export class FormEditorComponent implements OnInit {
     this.fieldValues[field.id] = field.type === 'checkbox' ? false : '';
   }
 
+  private addSectionFromLibrary(sectionId: string, placement: Partial<FormSectionLayout> = {}): void {
+    const source = this.sectionLibrary.find(section => section.id === sectionId);
+    if (!source || !this.activeTemplate || !this.activePage || !this.builderEditing) {
+      return;
+    }
+
+    const section = this.cloneSectionForInsert(source);
+    const colSpan = this.clamp(section.layout.colSpan, 2, this.gridColumns);
+    const rowSpan = this.clamp(section.layout.rowSpan, 1, this.gridRows);
+    section.layout = {
+      col: this.clamp(placement.col ?? 1, 1, Math.max(1, this.gridColumns - colSpan + 1)),
+      row: this.clamp(placement.row ?? this.getNextRow(), 1, 16),
+      colSpan,
+      rowSpan
+    };
+
+    this.ensureGridContains(section.layout.row + section.layout.rowSpan - 1, section.layout.col + section.layout.colSpan - 1);
+    this.activePage.sections = [...this.activePage.sections, section];
+    section.fields.forEach(field => this.initializeFieldValue(field));
+    this.customFieldSectionId = section.id;
+    this.syncTemplateSections();
+  }
+
   private cloneSectionForInsert(section: FormSectionDefinition): FormSectionDefinition {
     const suffix = this.createShortId();
     const cloned = this.clone(section);
@@ -1350,6 +1704,24 @@ export class FormEditorComponent implements OnInit {
       return 1;
     }
     return Math.max(...sections.map(section => section.layout.row + section.layout.rowSpan), 1);
+  }
+
+  private getFormDropLayout(event: DragEvent, section: FormSectionDefinition): Partial<FormSectionLayout> {
+    const canvas = this.formCanvas?.nativeElement ?? (event.currentTarget as HTMLElement);
+    const rect = canvas.getBoundingClientRect();
+    const layout = section.layout ?? { col: 1, row: 1, colSpan: 4, rowSpan: 1 };
+    const colSpan = this.clamp(layout.colSpan, 2, this.gridColumns);
+    const rowSpan = this.clamp(layout.rowSpan, 1, this.gridRows);
+    const columnWidth = rect.width / this.gridColumns;
+    const x = this.clamp(event.clientX - rect.left, 0, rect.width);
+    const y = Math.max(0, event.clientY - rect.top + canvas.scrollTop);
+
+    return {
+      col: this.clamp(Math.floor(x / columnWidth) + 1, 1, Math.max(1, this.gridColumns - colSpan + 1)),
+      row: this.clamp(Math.floor(y / 132) + 1, 1, Math.max(1, 16 - rowSpan + 1)),
+      colSpan,
+      rowSpan
+    };
   }
 
   private ensureGridContains(row: number, column: number): void {
@@ -1386,6 +1758,9 @@ export class FormEditorComponent implements OnInit {
   }
 
   private getDefaultFieldLayout(type: FormFieldType): FormFieldLayout {
+    if (type === 'header') {
+      return { colSpan: 12, rowSpan: 1 };
+    }
     if (type === 'textarea') {
       return { colSpan: 12, rowSpan: 2 };
     }
@@ -1399,12 +1774,23 @@ export class FormEditorComponent implements OnInit {
   }
 
   private getMaxFieldRowSpan(type: FormFieldType): number {
+    if (type === 'header') {
+      return 3;
+    }
     return type === 'textarea' ? 4 : 1;
   }
 
   private getDefaultFieldLabel(type: FormFieldType): string {
     const item = this.fieldPalette.find(paletteItem => paletteItem.type === type);
     return item?.label ?? 'Mező';
+  }
+
+  private hasDragData(event: DragEvent, type: string): boolean {
+    return Array.from(event.dataTransfer?.types ?? []).includes(type);
+  }
+
+  private getDragData(event: DragEvent, type: string): string {
+    return event.dataTransfer?.getData(type) ?? '';
   }
 
   private slugify(value: string): string {

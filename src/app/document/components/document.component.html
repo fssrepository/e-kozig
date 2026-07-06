@@ -598,21 +598,24 @@
                   [style.grid-column]="getOnyaFieldGridColumn(field)"
                   [style.grid-row]="getOnyaFieldGridRow(field)"
                 >
-                  <label class="onya-field-label">
+                  <label class="onya-field-label" *ngIf="field.type !== 'header'">
                     {{ field.label }}
                     <span *ngIf="field.required">*</span>
                   </label>
 
-                  <mat-checkbox
-                    *ngIf="field.type === 'checkbox'; else onyaNotCheckbox"
-                    [(ngModel)]="onyaFieldValues[field.id]"
-                    [name]="'onya-' + field.id"
-                    [disabled]="!onyaDataEditing"
-                  >
-                    {{ field.label }}
-                  </mat-checkbox>
+                  <div class="onya-field-header" *ngIf="field.type === 'header'; else onyaFieldBody">{{ field.label }}</div>
 
-                  <ng-template #onyaNotCheckbox>
+                  <ng-template #onyaFieldBody>
+                    <mat-checkbox
+                      *ngIf="field.type === 'checkbox'; else onyaNotCheckbox"
+                      [(ngModel)]="onyaFieldValues[field.id]"
+                      [name]="'onya-' + field.id"
+                      [disabled]="!onyaDataEditing"
+                    >
+                      {{ field.label }}
+                    </mat-checkbox>
+
+                    <ng-template #onyaNotCheckbox>
                     <mat-form-field appearance="outline" class="onya-input" *ngIf="field.type !== 'select' && field.type !== 'textarea'">
                       <input
                         matInput
@@ -640,6 +643,7 @@
                         </mat-option>
                       </mat-select>
                     </mat-form-field>
+                    </ng-template>
                   </ng-template>
                 </div>
               </div>

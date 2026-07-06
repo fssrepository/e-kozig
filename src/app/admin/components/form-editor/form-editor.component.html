@@ -156,50 +156,71 @@
           </div>
 
           <div class="panel-section">
-            <h2>Sablon blokk hozzáadása</h2>
-            <mat-form-field appearance="outline" class="full-field">
-              <mat-label>Sablon</mat-label>
-              <mat-select [(ngModel)]="selectedLibrarySectionId" [disabled]="!builderEditing">
-                <mat-option *ngFor="let section of sectionLibrary; trackBy: trackById" [value]="section.id">
-                  {{ section.title }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-            <button mat-stroked-button type="button" class="wide-button" (click)="addSelectedSection()" [disabled]="!builderEditing">
-              <mat-icon>add_box</mat-icon>
-              <span>Blokk hozzáadása</span>
-            </button>
-
-            <div class="quick-blocks">
+            <h2>Elemek</h2>
+            <div class="form-element-palette">
               <button
                 type="button"
-                *ngFor="let section of sectionLibrary; trackBy: trackById"
-                (click)="addSection(section.id)"
-                [disabled]="!builderEditing"
+                *ngFor="let item of formElementPalette"
+                draggable="true"
+                [attr.aria-disabled]="!builderEditing"
+                (dragstart)="onFormElementDragStart($event, item.type)"
+                (click)="addPage()"
               >
-                <span>{{ section.title }}</span>
-                <small>{{ section.navCode || 'CUSTOM' }}</small>
+                <mat-icon>{{ item.icon }}</mat-icon>
+                <span>{{ item.label }}</span>
+                <small>{{ item.description }}</small>
               </button>
+            </div>
+          </div>
+
+          <div class="panel-section sablon-panel-section">
+            <h2>Sablonok</h2>
+            <mat-form-field appearance="outline" class="full-field compact-filter">
+              <mat-label>Keresés</mat-label>
+              <input matInput [(ngModel)]="sectionFilter">
+            </mat-form-field>
+            <div class="sablon-library-list">
+              <div
+                class="sablon-library-item"
+                *ngFor="let section of filteredSectionLibrary; trackBy: trackById"
+                draggable="true"
+                [attr.aria-disabled]="!builderEditing"
+                (dragstart)="onSectionPaletteDragStart($event, section.id)"
+                (click)="addSection(section.id)"
+                role="button"
+                tabindex="0"
+              >
+                <span class="sablon-card-head">
+                  <strong>{{ section.title }}</strong>
+                  <small>{{ section.navCode || 'CUSTOM' }}</small>
+                </span>
+                <span class="sablon-card-preview">
+                  <span class="sablon-preview-grid">
+                    <span
+                      class="sablon-preview-shape"
+                      [style.width.%]="getSablonPreviewWidth(section)"
+                      [style.height.px]="getSablonPreviewHeight(section)"
+                    ></span>
+                  </span>
+                  <span class="sablon-size">{{ getSablonSizeLabel(section) }}</span>
+                </span>
+                <button
+                  type="button"
+                  class="sablon-delete-button"
+                  (click)="deleteSectionTemplate(section.id, $event)"
+                  matTooltip="Sablon törlése"
+                  aria-label="Sablon törlése"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
             </div>
           </div>
         </ng-container>
 
         <ng-container *ngIf="panelMode === 'template' && activeSectionTemplate as block">
           <div class="panel-section">
-            <h2>Új sablon</h2>
-            <mat-form-field appearance="outline" class="full-field">
-              <mat-label>Sablonnév</mat-label>
-              <input matInput [(ngModel)]="block.title">
-            </mat-form-field>
-            <mat-form-field appearance="outline" class="full-field">
-              <mat-label>Kód</mat-label>
-              <input matInput [(ngModel)]="block.navCode">
-            </mat-form-field>
-            <mat-checkbox [(ngModel)]="block.mandatory">Kötelező blokk</mat-checkbox>
-          </div>
-
-          <div class="panel-section">
-            <h2>Mező típusok</h2>
+            <h2>Elemek</h2>
             <div class="field-palette">
               <button
                 type="button"
@@ -214,34 +235,47 @@
             </div>
           </div>
 
-          <div class="panel-section">
-            <h2>Gyors mező</h2>
-            <mat-form-field appearance="outline" class="full-field">
-              <mat-label>Címke</mat-label>
-              <input matInput [(ngModel)]="microFieldLabel">
+          <div class="panel-section sablon-panel-section">
+            <h2>Sablonok</h2>
+            <mat-form-field appearance="outline" class="full-field compact-filter">
+              <mat-label>Keresés</mat-label>
+              <input matInput [(ngModel)]="sectionFilter">
             </mat-form-field>
-            <mat-form-field appearance="outline" class="full-field">
-              <mat-label>Típus</mat-label>
-              <mat-select [(ngModel)]="microFieldType">
-                <mat-option value="text">Szöveg</mat-option>
-                <mat-option value="textarea">Hosszú szöveg</mat-option>
-                <mat-option value="select">Választólista</mat-option>
-                <mat-option value="checkbox">Checkbox</mat-option>
-                <mat-option value="date">Dátum</mat-option>
-                <mat-option value="number">Szám</mat-option>
-                <mat-option value="email">E-mail</mat-option>
-                <mat-option value="tel">Telefon</mat-option>
-              </mat-select>
-            </mat-form-field>
-            <mat-checkbox [(ngModel)]="microFieldRequired">Kötelező mező</mat-checkbox>
-            <mat-form-field appearance="outline" class="full-field" *ngIf="microFieldType === 'select'">
-              <mat-label>Lista értékek</mat-label>
-              <textarea matInput rows="3" [(ngModel)]="microFieldOptions"></textarea>
-            </mat-form-field>
-            <button mat-stroked-button type="button" class="wide-button" (click)="addFieldToActiveSectionTemplate()">
-              <mat-icon>playlist_add</mat-icon>
-              <span>Mező hozzáadása</span>
-            </button>
+            <div class="sablon-library-list">
+              <div
+                class="sablon-library-item"
+                *ngFor="let section of filteredSectionLibrary; trackBy: trackById"
+                draggable="true"
+                (dragstart)="onSectionPaletteDragStart($event, section.id)"
+                (click)="selectSectionTemplate(section.id)"
+                role="button"
+                tabindex="0"
+              >
+                <span class="sablon-card-head">
+                  <strong>{{ section.title }}</strong>
+                  <small>{{ section.navCode || 'CUSTOM' }}</small>
+                </span>
+                <span class="sablon-card-preview">
+                  <span class="sablon-preview-grid">
+                    <span
+                      class="sablon-preview-shape"
+                      [style.width.%]="getSablonPreviewWidth(section)"
+                      [style.height.px]="getSablonPreviewHeight(section)"
+                    ></span>
+                  </span>
+                  <span class="sablon-size">{{ getSablonSizeLabel(section) }}</span>
+                </span>
+                <button
+                  type="button"
+                  class="sablon-delete-button"
+                  (click)="deleteSectionTemplate(section.id, $event)"
+                  matTooltip="Sablon törlése"
+                  aria-label="Sablon törlése"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
           </div>
         </ng-container>
       </aside>
@@ -259,7 +293,12 @@
             </div>
           </div>
 
-          <nav class="page-carousel" aria-label="Űrlap oldalak">
+          <nav
+            class="page-carousel"
+            aria-label="Űrlap oldalak"
+            (dragover)="onPageCarouselDragOver($event)"
+            (drop)="onPageCarouselDrop($event)"
+          >
             <button
               type="button"
               *ngFor="let page of template.pages; let i = index; trackBy: trackById"
@@ -278,6 +317,8 @@
             [class.builder-editing]="builderEditing"
             [style.--grid-columns]="gridColumns"
             [ngStyle]="gridStyle"
+            (dragover)="onFormCanvasDragOver($event)"
+            (drop)="onFormCanvasDrop($event)"
           >
             <section
               class="form-section"
@@ -305,29 +346,33 @@
                   [style.grid-column]="getFieldGridColumn(field)"
                   [style.grid-row]="getFieldGridRow(field)"
                 >
-                  <div class="field-label-row">
+                  <div class="field-label-row" *ngIf="field.type !== 'header'">
                     <span class="field-label-input">{{ field.label }}</span>
                     <span class="preview-required">{{ field.required ? 'Kötelező' : 'Opcionális' }}</span>
                   </div>
 
-                  <mat-checkbox *ngIf="field.type === 'checkbox'; else nonCheckboxField" [(ngModel)]="fieldValues[field.id]" [name]="field.id" [disabled]="true">
-                    {{ field.label }}
-                  </mat-checkbox>
+                  <div class="rendered-header" *ngIf="field.type === 'header'; else formFieldBody">{{ field.label }}</div>
 
-                  <ng-template #nonCheckboxField>
-                    <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type !== 'select' && field.type !== 'textarea'">
-                      <input matInput [type]="getInputType(field)" [placeholder]="field.placeholder || field.label" [(ngModel)]="fieldValues[field.id]" [name]="field.id" readonly>
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type === 'textarea'">
-                      <textarea matInput rows="3" [placeholder]="field.placeholder || field.label" [(ngModel)]="fieldValues[field.id]" [name]="field.id" readonly></textarea>
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type === 'select'">
-                      <mat-select [(ngModel)]="fieldValues[field.id]" [name]="field.id" [placeholder]="field.label" disabled>
-                        <mat-option *ngFor="let option of field.options ?? []" [value]="option.value">
-                          {{ option.label }}
-                        </mat-option>
-                      </mat-select>
-                    </mat-form-field>
+                  <ng-template #formFieldBody>
+                    <mat-checkbox *ngIf="field.type === 'checkbox'; else nonCheckboxField" [(ngModel)]="fieldValues[field.id]" [name]="field.id" [disabled]="true">
+                      {{ field.label }}
+                    </mat-checkbox>
+
+                    <ng-template #nonCheckboxField>
+                      <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type !== 'select' && field.type !== 'textarea'">
+                        <input matInput [type]="getInputType(field)" [placeholder]="field.placeholder || field.label" [(ngModel)]="fieldValues[field.id]" [name]="field.id" readonly>
+                      </mat-form-field>
+                      <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type === 'textarea'">
+                        <textarea matInput rows="3" [placeholder]="field.placeholder || field.label" [(ngModel)]="fieldValues[field.id]" [name]="field.id" readonly></textarea>
+                      </mat-form-field>
+                      <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type === 'select'">
+                        <mat-select [(ngModel)]="fieldValues[field.id]" [name]="field.id" [placeholder]="field.label" disabled>
+                          <mat-option *ngFor="let option of field.options ?? []" [value]="option.value">
+                            {{ option.label }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </ng-template>
                   </ng-template>
                 </div>
               </div>
@@ -347,7 +392,6 @@
             </div>
             <div class="document-state">
               <span>Sablon editor</span>
-              <span>{{ block.mandatory ? 'Kötelező blokk' : 'Opcionális blokk' }}</span>
             </div>
           </div>
 
@@ -364,7 +408,8 @@
 
             <article
               class="template-field-element"
-              [class.selected]="field.id === selectedTemplateFieldId"
+              [class.selected]="isTemplateFieldSelected(field)"
+              [class.template-field-element--header]="field.type === 'header'"
               [class.template-field-element--multiline]="field.type === 'textarea'"
               [class.template-field-element--checkbox]="field.type === 'checkbox'"
               [class.template-field-element--select]="field.type === 'select'"
@@ -417,6 +462,21 @@
               <span class="field-resize-handle field-handle-sw" (pointerdown)="startTemplateFieldResize($event, field, 'sw')"></span>
               <span class="field-resize-handle field-handle-se" (pointerdown)="startTemplateFieldResize($event, field, 'se')"></span>
             </article>
+
+            <div class="selection-template-overlay" *ngIf="hasMultiTemplateSelection" (click)="$event.stopPropagation()">
+              <span>{{ selectedTemplateFieldIds.length }} elem kijelölve</span>
+              <mat-form-field appearance="outline" class="selection-name-field">
+                <mat-label>Sablonnév</mat-label>
+                <input matInput [(ngModel)]="selectionTemplateName">
+              </mat-form-field>
+              <button mat-raised-button color="primary" type="button" (click)="saveSelectedFieldsAsSablon($event)" [disabled]="saving">
+                <mat-icon>save</mat-icon>
+                <span>Mentés</span>
+              </button>
+              <button mat-icon-button type="button" (click)="clearTemplateFieldSelection($event)" aria-label="Kijelölés törlése">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
           </div>
         </div>
       </main>
@@ -446,6 +506,7 @@
       <mat-form-field appearance="outline" class="full-field">
         <mat-label>Típus</mat-label>
         <mat-select [(ngModel)]="field.type" (selectionChange)="updateTemplateFieldType(field)">
+          <mat-option value="header">Címsor</mat-option>
           <mat-option value="text">Szöveg</mat-option>
           <mat-option value="textarea">Hosszú szöveg</mat-option>
           <mat-option value="select">Választólista</mat-option>
@@ -457,7 +518,7 @@
         </mat-select>
       </mat-form-field>
 
-      <mat-checkbox [(ngModel)]="field.required">Kötelező mező</mat-checkbox>
+      <mat-checkbox *ngIf="field.type !== 'header'" [(ngModel)]="field.required">Kötelező mező</mat-checkbox>
 
       <mat-form-field appearance="outline" class="full-field" *ngIf="field.type === 'select'">
         <mat-label>Lista értékek</mat-label>
@@ -476,7 +537,7 @@
           </button>
         </div>
 
-        <div class="field-settings-stepper" *ngIf="field.type === 'textarea'">
+        <div class="field-settings-stepper" *ngIf="field.type === 'textarea' || field.type === 'header'">
           <span>Magasság</span>
           <button mat-icon-button type="button" (click)="resizeTemplateField(field, 0, -1)" aria-label="Alacsonyabb">
             <mat-icon>remove</mat-icon>
@@ -542,7 +603,7 @@
         <div class="section-header">
           <mat-icon aria-hidden="true">description</mat-icon>
           <span class="preview-section-title">{{ section.title }}</span>
-          <span class="section-position">{{ section.mandatory ? 'Kötelező blokk' : 'Opcionális blokk' }}</span>
+          <span class="section-position">{{ section.navCode || 'Sablon' }}</span>
         </div>
         <div class="section-fields">
           <div
@@ -551,27 +612,32 @@
             [style.grid-column]="getFieldGridColumn(field)"
             [style.grid-row]="getFieldGridRow(field)"
           >
-            <div class="field-label-row">
+            <div class="field-label-row" *ngIf="field.type !== 'header'">
               <span class="field-label-input">{{ field.label }}</span>
               <span class="preview-required">{{ field.required ? 'Kötelező' : 'Opcionális' }}</span>
             </div>
-            <mat-checkbox *ngIf="field.type === 'checkbox'; else previewNotCheckbox" [(ngModel)]="previewFieldValues[field.id]" [name]="'preview-' + field.id" disabled>
-              {{ field.label }}
-            </mat-checkbox>
-            <ng-template #previewNotCheckbox>
-              <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type !== 'select' && field.type !== 'textarea'">
-                <input matInput [type]="getInputType(field)" [(ngModel)]="previewFieldValues[field.id]" [name]="'preview-' + field.id" readonly>
-              </mat-form-field>
-              <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type === 'textarea'">
-                <textarea matInput rows="3" [(ngModel)]="previewFieldValues[field.id]" [name]="'preview-' + field.id" readonly></textarea>
-              </mat-form-field>
-              <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type === 'select'">
-                <mat-select [(ngModel)]="previewFieldValues[field.id]" [name]="'preview-' + field.id" disabled>
-                  <mat-option *ngFor="let option of field.options ?? []" [value]="option.value">
-                    {{ option.label }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
+
+            <div class="rendered-header" *ngIf="field.type === 'header'; else previewFieldBody">{{ field.label }}</div>
+
+            <ng-template #previewFieldBody>
+              <mat-checkbox *ngIf="field.type === 'checkbox'; else previewNotCheckbox" [(ngModel)]="previewFieldValues[field.id]" [name]="'preview-' + field.id" disabled>
+                {{ field.label }}
+              </mat-checkbox>
+              <ng-template #previewNotCheckbox>
+                <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type !== 'select' && field.type !== 'textarea'">
+                  <input matInput [type]="getInputType(field)" [(ngModel)]="previewFieldValues[field.id]" [name]="'preview-' + field.id" readonly>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type === 'textarea'">
+                  <textarea matInput rows="3" [(ngModel)]="previewFieldValues[field.id]" [name]="'preview-' + field.id" readonly></textarea>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type === 'select'">
+                  <mat-select [(ngModel)]="previewFieldValues[field.id]" [name]="'preview-' + field.id" disabled>
+                    <mat-option *ngFor="let option of field.options ?? []" [value]="option.value">
+                      {{ option.label }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </ng-template>
             </ng-template>
           </div>
         </div>
