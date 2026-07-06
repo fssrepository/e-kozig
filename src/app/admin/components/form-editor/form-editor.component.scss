@@ -1088,16 +1088,33 @@
 }
 
 ::ng-deep .form-field-section .mat-mdc-checkbox {
+  width: 100%;
+  height: 100%;
   max-width: 100%;
-  padding-left: var(--editor-action-space);
-  padding-right: var(--editor-action-space);
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
 }
 
-::ng-deep .form-field-section .mat-mdc-checkbox .mdc-form-field,
+::ng-deep .form-canvas.builder-editing .form-field-section .mat-mdc-checkbox {
+  padding-left: var(--editor-action-space);
+  padding-right: var(--editor-action-space);
+}
+
+::ng-deep .form-field-section .mat-mdc-checkbox .mdc-form-field {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+}
+
 ::ng-deep .form-field-section .mat-mdc-checkbox .mdc-label {
   min-width: 0;
   max-width: 100%;
+  flex: 1 1 auto;
 }
 
 ::ng-deep .form-field-section .mat-mdc-checkbox .mdc-label {
