@@ -108,6 +108,7 @@ export class FormEditorComponent implements OnInit {
   private readonly fieldDragType = 'application/x-e-kozig-field-type';
   private readonly sectionDragType = 'application/x-e-kozig-section-id';
   private readonly formElementDragType = 'application/x-e-kozig-form-element';
+  private readonly pageDragType = 'application/x-e-kozig-page-index';
 
   @ViewChild('formCanvas') formCanvas?: ElementRef<HTMLElement>;
 
@@ -158,6 +159,8 @@ export class FormEditorComponent implements OnInit {
   selectionTemplateName = '';
   newWizardDialogOpen = false;
   newWizardName = '';
+  pageSettingsOpen = false;
+  selectedPageSettingsIndex: number | null = null;
   fieldSettingsOpen = false;
   previewTemplate: FormTemplate | null = null;
   previewPageIndex = 0;
@@ -181,6 +184,13 @@ export class FormEditorComponent implements OnInit {
 
   get activePage(): FormTemplatePage | null {
     return this.activeTemplate?.pages[this.activePageIndex] ?? null;
+  }
+
+  get selectedPageForSettings(): FormTemplatePage | null {
+    if (this.selectedPageSettingsIndex === null) {
+      return null;
+    }
+    return this.activeTemplate?.pages[this.selectedPageSettingsIndex] ?? null;
   }
 
   get activeSections(): FormSectionDefinition[] {
@@ -419,6 +429,22 @@ export class FormEditorComponent implements OnInit {
     this.customFieldSectionId = this.activeSections[0]?.id ?? '';
   }
 
+  openPageSettings(index: number, event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    if (!this.activeTemplate || index < 0 || index >= this.activeTemplate.pages.length) {
+      return;
+    }
+
+    this.selectedPageSettingsIndex = index;
+    this.pageSettingsOpen = true;
+  }
+
+  closePageSettings(): void {
+    this.pageSettingsOpen = false;
+    this.selectedPageSettingsIndex = null;
+  }
+
   addPage(): void {
     if (!this.activeTemplate || !this.builderEditing) {
       return;
@@ -463,6 +489,57 @@ export class FormEditorComponent implements OnInit {
     }
     this.customFieldSectionId = this.activeSections[0]?.id ?? '';
     this.syncTemplateSections();
+  }
+
+  removeSelectedPage(): void {
+    if (this.selectedPageSettingsIndex === null) {
+      return;
+    }
+    const index = this.selectedPageSettingsIndex;
+    this.closePageSettings();
+    this.removePage(index);
+  }
+
+  onPageTabDragStart(event: DragEvent, index: number): void {
+    if (!this.builderEditing) {
+      event.preventDefault();
+      return;
+    }
+
+    event.stopPropagation();
+    event.dataTransfer?.setData(this.pageDragType, String(index));
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+    }
+  }
+
+  onPageTabDragOver(event: DragEvent): void {
+    if (!this.builderEditing || !this.hasDragData(event, this.pageDragType)) {
+      return;
+    }
+
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+  }
+
+  onPageTabDrop(event: DragEvent, targetIndex: number): void {
+    if (!this.activeTemplate || !this.builderEditing) {
+      return;
+    }
+
+    const sourceIndex = Number(this.getDragData(event, this.pageDragType));
+    if (!Number.isInteger(sourceIndex) || sourceIndex < 0 || sourceIndex >= this.activeTemplate.pages.length) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    const target = event.currentTarget as HTMLElement;
+    const rect = target.getBoundingClientRect();
+    const insertAfter = event.clientX > rect.left + rect.width / 2;
+    this.movePage(sourceIndex, targetIndex + (insertAfter ? 1 : 0));
   }
 
   async createWizard(name = 'Új űrlap'): Promise<void> {
@@ -1888,6 +1965,25 @@ export class FormEditorComponent implements OnInit {
       colSpan,
       rowSpan
     };
+  }
+
+  private movePage(sourceIndex: number, requestedTargetIndex: number): void {
+    if (!this.activeTemplate || sourceIndex === requestedTargetIndex) {
+      return;
+    }
+
+    const pages = [...this.activeTemplate.pages];
+    const activePageId = this.activePage?.id;
+    const [page] = pages.splice(sourceIndex, 1);
+    let targetIndex = requestedTargetIndex;
+    if (sourceIndex < targetIndex) {
+      targetIndex -= 1;
+    }
+    pages.splice(this.clamp(targetIndex, 0, pages.length), 0, page);
+    this.activeTemplate.pages = pages;
+    const nextActiveIndex = pages.findIndex(item => item.id === activePageId);
+    this.activePageIndex = nextActiveIndex >= 0 ? nextActiveIndex : 0;
+    this.syncTemplateSections();
   }
 
   private ensureGridContains(row: number, column: number): void {

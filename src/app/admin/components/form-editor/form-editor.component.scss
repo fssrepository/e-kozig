@@ -54,9 +54,9 @@
 }
 
 .selector-group {
-  min-width: min(405px, 100%);
+  min-width: min(590px, 100%);
   display: grid;
-  grid-template-columns: auto minmax(190px, 1fr) 40px 36px 36px;
+  grid-template-columns: minmax(190px, 1fr) 40px 36px auto;
   align-items: center;
   gap: 0.35rem;
   padding: 0.25rem 0.35rem;
@@ -91,6 +91,32 @@
   color: #fff;
 }
 
+.selector-group button[mat-icon-button],
+.viewport-switch button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.selector-group button[mat-icon-button] mat-icon,
+.viewport-switch button mat-icon {
+  margin: 0;
+}
+
+.selector-divider {
+  width: 1px;
+  height: 28px;
+  background: #cbd8e6;
+}
+
+.selector-secondary-actions {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
 .toolbar-actions {
   flex: 0 0 auto;
   flex-wrap: wrap;
@@ -107,14 +133,12 @@
   background: #f6f9fc;
 }
 
-.viewport-switch button,
-.toolbar-actions button[mat-icon-button] {
+.viewport-switch button {
   width: 36px;
   height: 36px;
 }
 
-.viewport-switch button.active,
-.toolbar-actions button.mode-active {
+.viewport-switch button.active {
   background: #0067b1;
   color: #fff;
 }
@@ -420,7 +444,8 @@
 
 .sablon-library-list {
   max-height: min(360px, 42dvh);
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   padding-right: 0.2rem;
 }
 
@@ -428,11 +453,40 @@
   margin-bottom: 0.4rem;
 }
 
+::ng-deep .form-editor-page .compact-filter .mat-mdc-text-field-wrapper {
+  height: 42px;
+}
+
+::ng-deep .form-editor-page .compact-filter .mat-mdc-form-field-flex {
+  height: 42px;
+  align-items: center;
+}
+
+::ng-deep .form-editor-page .compact-filter .mat-mdc-form-field-infix {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+::ng-deep .form-editor-page .compact-filter .mat-mdc-floating-label {
+  top: 50%;
+}
+
+::ng-deep .form-editor-page .compact-filter input.mat-mdc-input-element {
+  line-height: 22px;
+}
+
 .sablon-library-item {
   position: relative;
   display: grid;
   gap: 0.35rem;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
   padding: 0.5rem 2.35rem 0.5rem 0.5rem;
+  overflow: hidden;
 }
 
 .sablon-card-head {
@@ -459,12 +513,15 @@
 
 .sablon-card-preview {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
-  gap: 0.45rem;
+  min-width: 0;
 }
 
 .sablon-preview-grid {
+  position: relative;
+  min-width: 0;
+  width: 100%;
   height: 48px;
   border: 1px solid #d7e0ea;
   border-radius: 3px;
@@ -489,9 +546,25 @@
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.62);
 }
 
+.sablon-size {
+  position: absolute;
+  right: 0.3rem;
+  bottom: 0.25rem;
+  max-width: calc(100% - 0.6rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 1px solid #c5d3e2;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #5c6f82;
+  padding: 0.08rem 0.38rem;
+  box-shadow: 0 1px 3px rgba(15, 47, 74, 0.1);
+}
+
 .sablon-delete-button {
   position: absolute;
-  top: 0.35rem;
+  top: 0.55rem;
   right: 0.35rem;
   width: 26px;
   height: 26px;
@@ -557,12 +630,16 @@
   min-height: 54px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 0.75rem;
   padding: 0.55rem 0.8rem;
   border-bottom: 3px solid #0067b1;
   background: #fff;
   box-sizing: border-box;
+}
+
+.document-bar--title-element {
+  border-bottom-width: 2px;
 }
 
 .document-title {
@@ -1263,6 +1340,7 @@
 }
 
 .field-settings-popup,
+.page-settings-popup,
 .new-wizard-popup {
   position: fixed;
   inset: 0;
@@ -1514,9 +1592,34 @@
   }
 
   .selector-group {
-    grid-template-columns: auto minmax(0, 1fr) 40px 36px;
+    grid-template-columns: 40px minmax(0, 1fr) 40px;
+    grid-template-areas:
+      "new select stencil"
+      "secondary secondary secondary";
     width: 100%;
     min-width: 0;
+  }
+
+  .selector-group .toolbar-select {
+    grid-area: select;
+  }
+
+  .selector-group .selector-new {
+    grid-area: new;
+  }
+
+  .selector-group .selector-stencil {
+    grid-area: stencil;
+    justify-self: end;
+  }
+
+  .selector-group .selector-secondary-actions {
+    grid-area: secondary;
+    justify-self: center;
+  }
+
+  .selector-group .selector-secondary-actions .selector-divider {
+    display: inline-block;
   }
 
   .editor-shell {

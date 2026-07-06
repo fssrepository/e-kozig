@@ -7,7 +7,6 @@
     <header class="editor-toolbar">
       <div class="compact-selectors">
         <div class="selector-group" [class.active]="panelMode === 'form' || panelMode === 'template'">
-          <label>Űrlap</label>
           <mat-form-field appearance="outline" class="toolbar-select">
             <mat-select [ngModel]="selectedTemplateId" (selectionChange)="selectTemplate($event.value)" aria-label="Űrlap kiválasztása">
               <mat-option *ngFor="let item of templates; trackBy: trackById" [value]="item.id">
@@ -15,14 +14,12 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
-          <button mat-mini-fab type="button" color="primary" (click)="openNewWizardDialog()" matTooltip="Új űrlap" aria-label="Új űrlap">
+          <button mat-mini-fab class="selector-new" type="button" color="primary" (click)="openNewWizardDialog()" matTooltip="Új űrlap" aria-label="Új űrlap">
             <mat-icon>add</mat-icon>
-          </button>
-          <button mat-icon-button type="button" (click)="showFormPanel(); openOnyaPreview()" matTooltip="ONYA előnézet" aria-label="ONYA előnézet">
-            <mat-icon>visibility</mat-icon>
           </button>
           <button
             mat-icon-button
+            class="selector-stencil"
             type="button"
             [class.active]="builderEditing || panelMode === 'template'"
             (click)="handleStencilAction()"
@@ -31,17 +28,20 @@
           >
             <mat-icon>{{ builderEditing || panelMode === 'template' ? 'save' : 'format_shapes' }}</mat-icon>
           </button>
-        </div>
-      </div>
-
-      <div class="toolbar-actions">
-        <div class="viewport-switch" role="group" aria-label="Nézet">
-          <button mat-icon-button type="button" [class.active]="viewport === 'desktop'" (click)="setViewport('desktop')" matTooltip="Asztali nézet" aria-label="Asztali nézet">
-            <mat-icon>desktop_windows</mat-icon>
-          </button>
-          <button mat-icon-button type="button" [class.active]="viewport === 'mobile'" (click)="setViewport('mobile')" matTooltip="Mobil nézet" aria-label="Mobil nézet">
-            <mat-icon>phone_iphone</mat-icon>
-          </button>
+          <span class="selector-secondary-actions">
+            <button mat-icon-button class="selector-preview" type="button" (click)="showFormPanel(); openOnyaPreview()" matTooltip="ONYA előnézet" aria-label="ONYA előnézet">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <span class="selector-divider"></span>
+            <span class="viewport-switch" role="group" aria-label="Nézet">
+              <button mat-icon-button type="button" [class.active]="viewport === 'desktop'" (click)="setViewport('desktop')" matTooltip="Asztali nézet" aria-label="Asztali nézet">
+                <mat-icon>desktop_windows</mat-icon>
+              </button>
+              <button mat-icon-button type="button" [class.active]="viewport === 'mobile'" (click)="setViewport('mobile')" matTooltip="Mobil nézet" aria-label="Mobil nézet">
+                <mat-icon>phone_iphone</mat-icon>
+              </button>
+            </span>
+          </span>
         </div>
       </div>
     </header>
@@ -93,7 +93,6 @@
                 draggable="true"
                 [attr.aria-disabled]="!builderEditing"
                 (dragstart)="onSectionPaletteDragStart($event, section.id)"
-                (click)="selectSectionTemplate(section.id)"
                 role="button"
                 tabindex="0"
               >
@@ -108,8 +107,8 @@
                       [style.width.%]="getSablonPreviewWidth(section)"
                       [style.height.px]="getSablonPreviewHeight(section)"
                     ></span>
+                    <span class="sablon-size">{{ getSablonSizeLabel(section) }}</span>
                   </span>
-                  <span class="sablon-size">{{ getSablonSizeLabel(section) }}</span>
                 </span>
                 <button
                   type="button"
@@ -154,7 +153,6 @@
                 *ngFor="let section of filteredSectionLibrary; trackBy: trackById"
                 draggable="true"
                 (dragstart)="onSectionPaletteDragStart($event, section.id)"
-                (click)="selectSectionTemplate(section.id)"
                 role="button"
                 tabindex="0"
               >
@@ -169,8 +167,8 @@
                       [style.width.%]="getSablonPreviewWidth(section)"
                       [style.height.px]="getSablonPreviewHeight(section)"
                     ></span>
+                    <span class="sablon-size">{{ getSablonSizeLabel(section) }}</span>
                   </span>
-                  <span class="sablon-size">{{ getSablonSizeLabel(section) }}</span>
                 </span>
                 <button
                   type="button"
@@ -189,14 +187,10 @@
 
       <main class="workspace" [class.mobile-preview]="viewport === 'mobile'">
         <div class="preview-frame" *ngIf="panelMode === 'form'">
-          <div class="document-bar">
+          <div class="document-bar document-bar--title-element">
             <div>
               <span class="document-title">{{ template.name }}</span>
               <span class="document-code">{{ template.navCode }}</span>
-            </div>
-            <div class="document-state">
-              <span>{{ builderEditing ? 'Szerkesztés' : 'Csak olvasás' }}</span>
-              <span>{{ template.mandatory ? 'Kötelező űrlap' : 'Opcionális űrlap' }}</span>
             </div>
           </div>
 
@@ -211,16 +205,23 @@
               *ngFor="let page of template.pages; let i = index; trackBy: trackById"
               [class.active]="i === activePageIndex"
               (click)="setActivePage(i)"
+              (dragover)="onPageTabDragOver($event)"
+              (drop)="onPageTabDrop($event, i)"
             >
-              <span class="page-tab-grip" aria-hidden="true">
+              <span
+                class="page-tab-grip"
+                draggable="true"
+                (dragstart)="onPageTabDragStart($event, i)"
+                (click)="$event.stopPropagation()"
+                aria-hidden="true"
+              >
                 <mat-icon>drag_indicator</mat-icon>
               </span>
               <span>{{ i + 1 }}</span>
               <strong>{{ page.title }}</strong>
               <span
                 class="page-tab-more"
-                *ngIf="builderEditing && template.pages.length > 1"
-                (click)="removePage(i, $event)"
+                (click)="openPageSettings(i, $event)"
                 matTooltip="Oldal műveletek"
                 aria-label="Oldal műveletek"
                 role="button"
@@ -431,6 +432,45 @@
       </button>
     </div>
   </form>
+</section>
+
+<section class="page-settings-popup" *ngIf="pageSettingsOpen && selectedPageForSettings as page">
+  <div class="field-settings-backdrop" (click)="closePageSettings()"></div>
+  <div class="field-settings-panel" (click)="$event.stopPropagation()">
+    <div class="field-settings-header">
+      <div>
+        <span>Oldal / tab</span>
+        <strong>{{ page.title }}</strong>
+      </div>
+      <button mat-icon-button type="button" (click)="closePageSettings()" aria-label="Bezárás">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="field-settings-body">
+      <mat-form-field appearance="outline" class="full-field">
+        <mat-label>Tab neve</mat-label>
+        <input matInput [(ngModel)]="page.title">
+      </mat-form-field>
+    </div>
+
+    <div class="field-settings-actions">
+      <button
+        mat-stroked-button
+        type="button"
+        color="warn"
+        (click)="removeSelectedPage()"
+        [disabled]="(activeTemplate?.pages?.length || 0) <= 1"
+      >
+        <mat-icon>delete</mat-icon>
+        <span>Törlés</span>
+      </button>
+      <button mat-raised-button color="primary" type="button" (click)="closePageSettings()">
+        <mat-icon>done</mat-icon>
+        <span>Kész</span>
+      </button>
+    </div>
+  </div>
 </section>
 
 <section class="field-settings-popup" *ngIf="fieldSettingsOpen && selectedTemplateField as field">
