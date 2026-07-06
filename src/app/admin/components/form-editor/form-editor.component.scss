@@ -65,9 +65,9 @@
 }
 
 .selector-group.active {
-  border-color: #78aedc;
-  background: #dceefb;
-  box-shadow: 0 1px 2px rgba(0, 103, 177, 0.12);
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
 }
 
 .selector-group label {
@@ -79,6 +79,32 @@
 
 .toolbar-select {
   width: 100%;
+  height: 44px;
+}
+
+::ng-deep .form-editor-page .toolbar-select .mat-mdc-text-field-wrapper {
+  height: 44px;
+  padding: 0 0.75rem;
+}
+
+::ng-deep .form-editor-page .toolbar-select .mat-mdc-form-field-flex {
+  height: 44px;
+  align-items: center;
+}
+
+::ng-deep .form-editor-page .toolbar-select .mat-mdc-form-field-infix {
+  min-height: 0;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+::ng-deep .form-editor-page .toolbar-select .mat-mdc-select-trigger {
+  height: 44px;
+  display: flex;
+  align-items: center;
 }
 
 .selector-group button[mat-mini-fab] {
@@ -116,6 +142,14 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+}
+
+.selector-group.active .selector-secondary-actions {
+  padding: 0.2rem;
+  border: 1px solid #78aedc;
+  border-radius: 4px;
+  background: #dceefb;
+  box-shadow: 0 1px 2px rgba(0, 103, 177, 0.12);
 }
 
 .toolbar-actions {
@@ -1610,14 +1644,27 @@
     height: auto;
     min-height: 100dvh;
     overflow: visible;
-    padding-top: 4.25rem;
+    padding-top: 1rem;
   }
 
-  .editor-toolbar,
+  .editor-toolbar {
+    min-height: 94px;
+    justify-content: center;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
+
   .compact-selectors,
   .toolbar-actions {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .compact-selectors {
+    justify-content: center;
+    width: 100%;
   }
 
   .selector-group {
@@ -1627,11 +1674,16 @@
       "secondary";
     width: 100%;
     min-width: 0;
+    gap: 0.45rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
   }
 
   .selector-group .toolbar-select {
     grid-area: select;
-    width: min(100%, calc(100vw - 7.5rem));
+    width: min(250px, calc(100vw - 9rem));
     justify-self: center;
   }
 
