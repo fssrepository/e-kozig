@@ -228,7 +228,7 @@
 .editor-shell {
   height: calc(100% - 76px);
   min-height: 0;
-  margin-top: 0.6rem;
+  margin-top: 0.35rem;
   padding: 0.75rem;
   display: grid;
   grid-template-columns: 292px minmax(0, 1fr);
@@ -1157,7 +1157,7 @@
   pointer-events: auto;
 }
 
-::ng-deep .builder-editing .form-field-element .rendered-field .mat-mdc-text-field-wrapper {
+::ng-deep .builder-editing .form-field-section .form-field-element .rendered-field .mat-mdc-text-field-wrapper {
   padding-left: var(--editor-action-space);
   padding-right: var(--editor-action-space);
 }
@@ -1249,7 +1249,7 @@
   resize: none;
 }
 
-.builder-editing .form-field-element--header .rendered-header {
+.builder-editing .form-field-section .form-field-element--header .rendered-header {
   padding-left: var(--editor-action-space);
   padding-right: var(--editor-action-space);
 }

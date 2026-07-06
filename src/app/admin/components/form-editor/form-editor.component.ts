@@ -49,6 +49,7 @@ interface DragState {
   startRow: number;
   columnWidth: number;
   rowHeight: number;
+  moved: boolean;
 }
 
 interface FieldResizeState {
@@ -197,6 +198,7 @@ export class FormEditorComponent implements OnInit {
   private dragState: DragState | null = null;
   private fieldResizeState: FieldResizeState | null = null;
   private fieldDragState: FieldDragState | null = null;
+  private suppressNextTabActivation = false;
 
   async ngOnInit(): Promise<void> {
     this.syncViewportFromScreen();
@@ -513,6 +515,10 @@ export class FormEditorComponent implements OnInit {
   activatePageTabSection(section: FormSectionDefinition, event?: Event): void {
     event?.preventDefault();
     event?.stopPropagation();
+    if (this.suppressNextTabActivation) {
+      this.suppressNextTabActivation = false;
+      return;
+    }
     const targetPageIndex = this.getPageIndexForTabSection(section);
     if (targetPageIndex < 0) {
       return;
@@ -586,7 +592,7 @@ export class FormEditorComponent implements OnInit {
     this.syncTemplateSections();
   }
 
-  addPage(): void {
+  addPage(placement: Partial<FormSectionLayout> = {}): void {
     if (!this.activeTemplate || !this.builderEditing) {
       return;
     }
@@ -598,6 +604,9 @@ export class FormEditorComponent implements OnInit {
     };
     this.activeTemplate.pages = [...this.activeTemplate.pages, page];
     this.refreshPageChromeSections();
+    if (placement.col || placement.row || placement.colSpan || placement.rowSpan) {
+      this.applyPageTabPlacement(page.id, placement);
+    }
     this.setActivePage(this.activeTemplate.pages.length - 1);
     this.syncTemplateSections();
   }
@@ -831,7 +840,7 @@ export class FormEditorComponent implements OnInit {
     const formElement = this.getDragData(event, this.formElementDragType);
     if (formElement === 'page') {
       event.preventDefault();
-      this.addPage();
+      this.addPage(this.getPageDropLayout(event));
       return;
     }
 
@@ -1817,7 +1826,8 @@ export class FormEditorComponent implements OnInit {
       startCol: section.layout.col,
       startRow: section.layout.row,
       columnWidth: canvasWidth / this.gridColumns,
-      rowHeight: 66
+      rowHeight: 66,
+      moved: false
     };
   }
 
@@ -1948,6 +1958,9 @@ export class FormEditorComponent implements OnInit {
       }
       const colDelta = Math.round((event.clientX - this.dragState.startX) / this.dragState.columnWidth);
       const rowDelta = Math.round((event.clientY - this.dragState.startY) / this.dragState.rowHeight);
+      if (colDelta !== 0 || rowDelta !== 0) {
+        this.dragState.moved = true;
+      }
       section.layout.col = this.clamp(
         this.dragState.startCol + colDelta,
         1,
@@ -2009,6 +2022,7 @@ export class FormEditorComponent implements OnInit {
   @HostListener('document:pointerup')
   @HostListener('document:pointercancel')
   stopPointerAction(): void {
+    const completedDrag = this.dragState;
     if (this.fieldDragState) {
       this.settleTemplateField(this.fieldDragState.fieldId);
       this.upsertActiveSectionTemplate();
@@ -2021,6 +2035,15 @@ export class FormEditorComponent implements OnInit {
     this.fieldResizeState = null;
     this.resizeState = null;
     this.dragState = null;
+    if (completedDrag?.moved) {
+      const draggedSection = this.activeSections.find(section => section.id === completedDrag.sectionId);
+      if (draggedSection && this.isPageTabsSection(draggedSection)) {
+        this.suppressNextTabActivation = true;
+        window.setTimeout(() => {
+          this.suppressNextTabActivation = false;
+        }, 0);
+      }
+    }
   }
 
   getGridColumn(section: FormSectionDefinition): string {
@@ -2329,6 +2352,16 @@ export class FormEditorComponent implements OnInit {
     return this.clamp(maxFieldRow + 1, 2, this.gridRows);
   }
 
+  private getGroupedSectionColSpan(fields: FormFieldDefinition[]): number {
+    const maxFieldCol = fields
+      .map(field => {
+        const layout = this.normalizeFieldLayout(field);
+        return (layout.col ?? 1) + layout.colSpan - 1;
+      })
+      .reduce((max, col) => Math.max(max, col), 1);
+    return this.clamp(maxFieldCol, 2, this.gridColumns);
+  }
+
   private propagateChromeLayout(source: FormSectionDefinition): void {
     if (!this.activeTemplate || (!this.isFormTitleSection(source) && !this.isPageTabsSection(source))) {
       return;
@@ -2339,6 +2372,30 @@ export class FormEditorComponent implements OnInit {
       .filter(section => section.id !== source.id && this.isMatchingChromeSection(source, section))
       .forEach(section => {
         section.layout = { ...source.layout };
+      });
+  }
+
+  private applyPageTabPlacement(pageId: string, placement: Partial<FormSectionLayout>): void {
+    if (!this.activeTemplate) {
+      return;
+    }
+
+    const pageIndex = this.activeTemplate.pages.findIndex(page => page.id === pageId);
+    const fallback = this.getDefaultTabLayout(pageIndex);
+    const colSpan = this.clamp(placement.colSpan ?? fallback.colSpan, 2, this.gridColumns);
+    const rowSpan = this.clamp(placement.rowSpan ?? fallback.rowSpan, 1, this.gridRows);
+    const layout: FormSectionLayout = {
+      col: this.clamp(placement.col ?? fallback.col, 1, Math.max(1, this.gridColumns - colSpan + 1)),
+      row: this.clamp(placement.row ?? fallback.row, 1, Math.max(1, this.gridRows - rowSpan + 1)),
+      colSpan,
+      rowSpan
+    };
+
+    this.activeTemplate.pages
+      .flatMap(page => page.sections)
+      .filter(section => this.isPageTabsSection(section) && section.navCode === pageId)
+      .forEach(section => {
+        section.layout = { ...layout };
       });
   }
 
@@ -2485,6 +2542,30 @@ export class FormEditorComponent implements OnInit {
         };
       }
       this.markFieldCells(occupied, normalized.layout);
+      return normalized;
+    });
+  }
+
+  private normalizeGroupedFields(fields: FormFieldDefinition[]): FormFieldDefinition[] {
+    const occupied = new Set<string>();
+    return this.normalizeFields(fields).map(field => {
+      const normalized = this.clone(field);
+      const layout = this.normalizeFieldLayout(normalized);
+      const requiredLayout: Required<FormFieldLayout> = {
+        col: layout.col ?? 1,
+        row: layout.row ?? 1,
+        colSpan: layout.colSpan,
+        rowSpan: layout.rowSpan
+      };
+      const nextLayout = this.fieldCellsOccupied(occupied, requiredLayout)
+        ? {
+            ...requiredLayout,
+            ...this.findAvailableFieldSlot(occupied, requiredLayout.colSpan, requiredLayout.rowSpan)
+          }
+        : requiredLayout;
+
+      normalized.layout = nextLayout;
+      this.markFieldCells(occupied, nextLayout);
       return normalized;
     });
   }
@@ -2643,8 +2724,8 @@ export class FormEditorComponent implements OnInit {
     }
 
     const sourceSection = this.cloneSectionForInsert(source);
-    sourceSection.fields = this.normalizeFields(sourceSection.fields);
-    const colSpan = this.clamp(sourceSection.layout.colSpan, 2, this.gridColumns);
+    sourceSection.fields = this.normalizeGroupedFields(sourceSection.fields);
+    const colSpan = this.clamp(Math.max(sourceSection.layout.colSpan, this.getGroupedSectionColSpan(sourceSection.fields)), 2, this.gridColumns);
     const rowSpan = this.clamp(Math.max(sourceSection.layout.rowSpan, this.getGroupedSectionRowSpan(sourceSection.fields)), 1, this.gridRows);
     sourceSection.layout = {
       col: this.clamp(placement.col ?? 1, 1, Math.max(1, this.gridColumns - colSpan + 1)),
@@ -2757,6 +2838,23 @@ export class FormEditorComponent implements OnInit {
     const layout = section.layout ?? { col: 1, row: 1, colSpan: 4, rowSpan: 1 };
     const colSpan = this.clamp(layout.colSpan, 2, this.gridColumns);
     const rowSpan = this.clamp(layout.rowSpan, 1, this.gridRows);
+    const columnWidth = rect.width / this.gridColumns;
+    const x = this.clamp(event.clientX - rect.left, 0, rect.width);
+    const y = Math.max(0, event.clientY - rect.top + canvas.scrollTop);
+
+    return {
+      col: this.clamp(Math.floor(x / columnWidth) + 1, 1, Math.max(1, this.gridColumns - colSpan + 1)),
+      row: this.clamp(Math.floor(y / 66) + 1, 1, Math.max(1, 24 - rowSpan + 1)),
+      colSpan,
+      rowSpan
+    };
+  }
+
+  private getPageDropLayout(event: DragEvent): Partial<FormSectionLayout> {
+    const canvas = this.formCanvas?.nativeElement ?? (event.currentTarget as HTMLElement);
+    const rect = canvas.getBoundingClientRect();
+    const colSpan = 2;
+    const rowSpan = 1;
     const columnWidth = rect.width / this.gridColumns;
     const x = this.clamp(event.clientX - rect.left, 0, rect.width);
     const y = Math.max(0, event.clientY - rect.top + canvas.scrollTop);
