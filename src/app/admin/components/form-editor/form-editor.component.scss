@@ -17,6 +17,7 @@
   box-sizing: border-box;
   background: transparent;
   overflow: visible;
+  scrollbar-gutter: stable;
 }
 
 .editor-loading {
@@ -249,6 +250,7 @@
   min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
+  scrollbar-gutter: stable;
   padding: 0.7rem;
   box-sizing: border-box;
 }
@@ -870,6 +872,7 @@
   flex: 1;
   min-height: 0;
   overflow: auto;
+  scrollbar-gutter: stable;
   display: grid;
   gap: 8px;
   padding: 0.8rem;
