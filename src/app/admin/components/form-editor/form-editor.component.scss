@@ -768,6 +768,18 @@
   font-size: 13px;
 }
 
+.page-carousel--canvas {
+  grid-column: 1 / -1;
+  min-width: 0;
+  padding: 0;
+  border-bottom: 0;
+  background: transparent;
+}
+
+.page-carousel--canvas button {
+  min-width: min(128px, 100%);
+}
+
 .page-tab-grip {
   width: 22px;
   height: 24px;
@@ -831,7 +843,7 @@
   background-image:
     linear-gradient(to right, rgba(0, 103, 177, 0.16) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(0, 103, 177, 0.16) 1px, transparent 1px);
-  background-size: calc((100% - 1.6rem) / var(--grid-columns, 12)) 132px;
+  background-size: calc((100% - 1.6rem) / var(--grid-columns, 12)) 66px;
 }
 
 .form-canvas.is-mobile {
@@ -866,6 +878,45 @@
   background: #fff;
 }
 
+.form-title-section .container-header {
+  flex: 1;
+  min-height: 100%;
+  border-bottom: 0;
+  background: #fff;
+}
+
+.form-title-section .section-position,
+.form-title-section .section-required-text {
+  display: none;
+}
+
+.form-tabs-section .section-fields {
+  align-content: start;
+  padding: 0.45rem;
+}
+
+.title-element-copy {
+  min-width: 0;
+  display: grid;
+  gap: 0.1rem;
+}
+
+.title-element-copy strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #1f2933;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.title-element-copy small {
+  color: #5c6f82;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .section-header {
   min-height: 40px;
   display: grid;
@@ -883,6 +934,15 @@
   min-height: 38px;
   padding: 0.25rem 0.35rem;
   background: #eef4f9;
+}
+
+.builder-editing .form-container-element:not(.form-title-section):not(.form-tabs-section) .container-header {
+  grid-template-columns: 28px minmax(0, 1fr) 30px;
+}
+
+.builder-editing .form-container-element:not(.form-title-section):not(.form-tabs-section) .section-position,
+.builder-editing .form-container-element:not(.form-title-section):not(.form-tabs-section) .section-required-text {
+  display: none;
 }
 
 .container-grip,
@@ -988,6 +1048,7 @@
 }
 
 .field-editor {
+  position: relative;
   min-width: 0;
   min-height: 0;
   border: 1px solid #edf2f7;
@@ -1002,22 +1063,29 @@
 }
 
 .form-field-toolbar {
-  min-height: 26px;
-  display: grid;
-  grid-template-columns: 24px minmax(0, 1fr) 24px;
+  position: absolute;
+  top: 0.28rem;
+  left: 0.28rem;
+  right: 0.28rem;
+  z-index: 3;
+  min-height: 24px;
+  display: flex;
   align-items: center;
-  gap: 0.35rem;
-  margin-bottom: 0.25rem;
+  justify-content: space-between;
   color: #0f2f4a;
   font-size: 12px;
   font-weight: 800;
+  pointer-events: none;
 }
 
-.form-field-toolbar > span:nth-child(2) {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.form-field-toolbar .form-field-grip,
+.form-field-toolbar .form-field-more {
+  pointer-events: auto;
+}
+
+::ng-deep .builder-editing .form-field-element .rendered-field .mat-mdc-text-field-wrapper {
+  padding-left: 2.25rem;
+  padding-right: 2.25rem;
 }
 
 .field-editor:last-child {

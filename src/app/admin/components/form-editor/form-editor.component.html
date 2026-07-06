@@ -186,51 +186,6 @@
 
       <main class="workspace" [class.mobile-preview]="viewport === 'mobile'">
         <div class="preview-frame" *ngIf="panelMode === 'form'">
-          <div class="document-bar document-bar--title-element">
-            <div>
-              <span class="document-title">{{ template.name }}</span>
-              <span class="document-code">{{ template.navCode }}</span>
-            </div>
-          </div>
-
-          <nav
-            class="page-carousel"
-            aria-label="Űrlap oldalak"
-            (dragover)="onPageCarouselDragOver($event)"
-            (drop)="onPageCarouselDrop($event)"
-          >
-            <button
-              type="button"
-              *ngFor="let page of template.pages; let i = index; trackBy: trackById"
-              [class.active]="i === activePageIndex"
-              (click)="setActivePage(i)"
-              (dragover)="onPageTabDragOver($event)"
-              (drop)="onPageTabDrop($event, i)"
-            >
-              <span
-                class="page-tab-grip"
-                draggable="true"
-                (dragstart)="onPageTabDragStart($event, i)"
-                (click)="$event.stopPropagation()"
-                aria-hidden="true"
-              >
-                <mat-icon>drag_indicator</mat-icon>
-              </span>
-              <span>{{ i + 1 }}</span>
-              <strong>{{ page.title }}</strong>
-              <span
-                class="page-tab-more"
-                (click)="openPageSettings(i, $event)"
-                matTooltip="Oldal műveletek"
-                aria-label="Oldal műveletek"
-                role="button"
-                tabindex="0"
-              >
-                <mat-icon>more_horiz</mat-icon>
-              </span>
-            </button>
-          </nav>
-
           <div
             #formCanvas
             class="form-canvas"
@@ -243,6 +198,8 @@
           >
             <section
               class="form-section form-container-element"
+              [class.form-title-section]="isFormTitleSection(section)"
+              [class.form-tabs-section]="isPageTabsSection(section)"
               *ngFor="let section of activeSections; trackBy: trackById"
               [style.grid-column]="getGridColumn(section)"
               [style.grid-row]="getGridRow(section)"
@@ -251,9 +208,15 @@
                 <span class="container-grip" (pointerdown)="startDrag($event, section)" matTooltip="Konténer mozgatása" aria-hidden="true">
                   <mat-icon>drag_indicator</mat-icon>
                 </span>
-                <span class="section-title-input">{{ section.title }}</span>
-                <span class="section-position">{{ section.navCode || 'CONTAINER' }}</span>
-                <span class="section-required-text">{{ section.mandatory ? 'Kötelező' : 'Opcionális' }}</span>
+                <span class="section-title-input" *ngIf="!isFormTitleSection(section); else formTitleElement">{{ section.title }}</span>
+                <ng-template #formTitleElement>
+                  <span class="title-element-copy">
+                    <strong>{{ section.title }}</strong>
+                    <small>{{ section.navCode || template.navCode }}</small>
+                  </span>
+                </ng-template>
+                <span class="section-position" *ngIf="!isFormTitleSection(section)">{{ section.navCode || 'CONTAINER' }}</span>
+                <span class="section-required-text" *ngIf="!isFormTitleSection(section)">{{ section.mandatory ? 'Kötelező' : 'Opcionális' }}</span>
                 <button
                   mat-icon-button
                   type="button"
@@ -267,7 +230,47 @@
                 </button>
               </div>
 
-              <div class="section-fields" (dragover)="onContainerDragOver($event)" (drop)="onContainerDrop($event, section)">
+              <div class="section-fields" *ngIf="!isFormTitleSection(section)" (dragover)="onContainerDragOver($event, section)" (drop)="onContainerDrop($event, section)">
+                <nav
+                  class="page-carousel page-carousel--canvas"
+                  *ngIf="isPageTabsSection(section); else regularContainerFields"
+                  aria-label="Űrlap oldalak"
+                  (dragover)="onPageCarouselDragOver($event)"
+                  (drop)="onPageCarouselDrop($event)"
+                >
+                  <button
+                    type="button"
+                    *ngFor="let page of template.pages; let i = index; trackBy: trackById"
+                    [class.active]="i === activePageIndex"
+                    (click)="setActivePage(i)"
+                    (dragover)="onPageTabDragOver($event)"
+                    (drop)="onPageTabDrop($event, i)"
+                  >
+                    <span
+                      class="page-tab-grip"
+                      draggable="true"
+                      (dragstart)="onPageTabDragStart($event, i)"
+                      (click)="$event.stopPropagation()"
+                      aria-hidden="true"
+                    >
+                      <mat-icon>drag_indicator</mat-icon>
+                    </span>
+                    <span>{{ i + 1 }}</span>
+                    <strong>{{ page.title }}</strong>
+                    <span
+                      class="page-tab-more"
+                      (click)="openPageSettings(i, $event)"
+                      matTooltip="Oldal műveletek"
+                      aria-label="Oldal műveletek"
+                      role="button"
+                      tabindex="0"
+                    >
+                      <mat-icon>more_horiz</mat-icon>
+                    </span>
+                  </button>
+                </nav>
+
+                <ng-template #regularContainerFields>
                 <div class="container-empty" *ngIf="builderEditing && !section.fields.length">
                   Húzz ide elemeket vagy sablont
                 </div>
@@ -287,7 +290,6 @@
                     >
                       <mat-icon>drag_indicator</mat-icon>
                     </span>
-                    <span>{{ field.label }}</span>
                     <button
                       type="button"
                       class="form-field-more"
@@ -328,6 +330,7 @@
                     </ng-template>
                   </ng-template>
                 </div>
+                </ng-template>
               </div>
 
               <span *ngIf="builderEditing" class="resize-handle handle-east" (pointerdown)="startResize($event, section, 'e')"></span>
