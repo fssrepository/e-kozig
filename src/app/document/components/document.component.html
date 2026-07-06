@@ -549,7 +549,103 @@
       </div>
 
       <div class="doc-content-panel" *ngIf="showDocContentPanel">
-        <p>Nyomtatvány szerkeszto panel (csak olvasas vagy szerkesztes mód) - fél percenként automatikus szerver oldali mentés (draft)</p>
+        <div class="onya-form-surface" *ngIf="onyaTemplate as formTemplate">
+          <div class="onya-surface-toolbar">
+            <div>
+              <div class="onya-surface-title">{{ formTemplate.name }}</div>
+              <div class="onya-surface-meta">{{ formTemplate.navCode }} · {{ onyaDataEditing ? 'Szerkesztés' : 'Csak olvasás' }}</div>
+            </div>
+            <div class="onya-surface-actions">
+              <button mat-icon-button type="button" (click)="toggleOnyaDataEditing()" aria-label="Adatok szerkesztése">
+                <mat-icon>{{ onyaDataEditing ? 'edit_note' : 'edit' }}</mat-icon>
+              </button>
+              <button mat-stroked-button type="button" (click)="saveOnyaFormData()" [disabled]="!onyaDataEditing">
+                <mat-icon>save</mat-icon>
+                <span>Mentés</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="onya-user-strip">
+            <span>Bejelentkezett felhasználó</span>
+            <strong>{{ onyaUser.fullName }}</strong>
+            <span>{{ onyaUser.taxId }}</span>
+          </div>
+
+          <div class="onya-page-carousel" *ngIf="onyaPages.length > 1">
+            <button
+              type="button"
+              *ngFor="let page of onyaPages; let i = index"
+              [class.active]="i === onyaPageIndex"
+              (click)="setOnyaPage(i)"
+            >
+              <span>{{ i + 1 }}</span>
+              <strong>{{ page.title }}</strong>
+            </button>
+          </div>
+
+          <div class="onya-sections">
+            <section class="onya-section" *ngFor="let section of onyaActiveSections">
+              <div class="onya-section-title">
+                <span>{{ section.title }}</span>
+                <small>{{ section.mandatory ? 'Kötelező' : 'Opcionális' }}</small>
+              </div>
+
+              <div class="onya-section-fields">
+                <div
+                  class="onya-field"
+                  *ngFor="let field of section.fields"
+                  [style.grid-column]="getOnyaFieldGridColumn(field)"
+                  [style.grid-row]="getOnyaFieldGridRow(field)"
+                >
+                  <label class="onya-field-label">
+                    {{ field.label }}
+                    <span *ngIf="field.required">*</span>
+                  </label>
+
+                  <mat-checkbox
+                    *ngIf="field.type === 'checkbox'; else onyaNotCheckbox"
+                    [(ngModel)]="onyaFieldValues[field.id]"
+                    [name]="'onya-' + field.id"
+                    [disabled]="!onyaDataEditing"
+                  >
+                    {{ field.label }}
+                  </mat-checkbox>
+
+                  <ng-template #onyaNotCheckbox>
+                    <mat-form-field appearance="outline" class="onya-input" *ngIf="field.type !== 'select' && field.type !== 'textarea'">
+                      <input
+                        matInput
+                        [type]="getOnyaInputType(field)"
+                        [(ngModel)]="onyaFieldValues[field.id]"
+                        [name]="'onya-' + field.id"
+                        [readonly]="!onyaDataEditing"
+                      >
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="onya-input" *ngIf="field.type === 'textarea'">
+                      <textarea
+                        matInput
+                        rows="3"
+                        [(ngModel)]="onyaFieldValues[field.id]"
+                        [name]="'onya-' + field.id"
+                        [readonly]="!onyaDataEditing"
+                      ></textarea>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="onya-input" *ngIf="field.type === 'select'">
+                      <mat-select [(ngModel)]="onyaFieldValues[field.id]" [name]="'onya-' + field.id" [disabled]="!onyaDataEditing">
+                        <mat-option *ngFor="let option of field.options ?? []" [value]="option.value">
+                          {{ option.label }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </ng-template>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
       </div>
     </div>
   </div>

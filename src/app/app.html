@@ -72,6 +72,11 @@
           <mat-icon>settings</mat-icon>
           <span>Beállítások</span>
         </button>
+        <div *ngIf="isAdmin" class="mobile-menu-section-label">Admin</div>
+        <a *ngIf="isAdmin" class="menu-item" routerLink="/admin/forms" routerLinkActive="active" (click)="closeMobileMenu()">
+          <mat-icon>dynamic_form</mat-icon>
+          <span>Űrlap szerkesztő</span>
+        </a>
       </div>
     </div>
 
@@ -269,6 +274,11 @@
           <mat-icon aria-hidden="false" aria-label="Beállítások">settings</mat-icon>
           <span>Beállítások</span>
         </button>
+        <div *ngIf="isAdmin" class="sidebar-section-label">Admin</div>
+        <a *ngIf="isAdmin" mat-list-item routerLink="/admin/forms" routerLinkActive="selected">
+          <mat-icon aria-hidden="false" aria-label="Űrlap szerkesztő">dynamic_form</mat-icon>
+          <span>Űrlap szerkesztő</span>
+        </a>
       </mat-nav-list>
     </nav>
     <section class="content-area">

@@ -85,6 +85,7 @@ export class App {
   protected readonly title = signal('e-kozig');
   protected menuBadges = { home: 0, documents: 0, invoices: 0 };
   protected menuBadgeTotal = 0;
+  protected readonly isAdmin = true;
   protected showMobileMenu = false;
   protected showUserMenu = false;
   protected userBadgeCount = 1;

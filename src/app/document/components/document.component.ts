@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, AfterViewInit, HostListener, inject, ChangeDetectorRef, ElementRef, OnDestroy, ChangeDetectionStrategy, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -13,10 +13,21 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSelectModule } from '@angular/material/select';
 import { Observable, startWith, map } from 'rxjs';
 import { DocumentItem, DocumentItemDetail } from '../models/document-item.interface';
 import { DocumentService } from '../services/document.service';
 import { AlertService } from '../../shared/alert.service';
+import {
+  DEFAULT_USER_PROFILE,
+  FormDocument,
+  FormFieldDefinition,
+  FormSectionDefinition,
+  FormTemplate,
+  FormTemplatePage
+} from '../../admin/models/form-editor.model';
+import { FormEditorStoreService } from '../../admin/services/form-editor-store.service';
 
 interface NyomtatvanyEntry {
   code: string;
@@ -65,6 +76,7 @@ interface DraftItem {
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatAutocompleteModule,
@@ -76,7 +88,9 @@ interface DraftItem {
     MatProgressSpinnerModule,
     MatExpansionModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatCheckboxModule,
+    MatSelectModule
   ],
   styleUrls: ['../../../_styles/_document.scss'],
   templateUrl: './document.component.html',
@@ -85,6 +99,7 @@ interface DraftItem {
 export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
   private documentService = inject(DocumentService);
   private alertService = inject(AlertService);
+  private formStore = inject(FormEditorStoreService);
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
   private filtersScrollLeft = 0;
@@ -172,6 +187,12 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
   showDocDetailSearch = false;
   showDocContentPanel = false;
   documentPanelTitle = 'Űrlap típus';
+  onyaTemplates: FormTemplate[] = [];
+  onyaTemplate: FormTemplate | null = null;
+  onyaPageIndex = 0;
+  onyaDataEditing = false;
+  onyaFieldValues: Record<string, string | boolean | number | null> = {};
+  readonly onyaUser = DEFAULT_USER_PROFILE;
 
   docMenus: DocMenuNode[] = [];
   baseDocMenus: DocMenuNode[] = [];
@@ -310,6 +331,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     );
 
     this.loadNyomtatvanyok();
+    void this.loadOnyaTemplates();
 
     this.docSearchCtrl.valueChanges.pipe(
       startWith('')
@@ -505,6 +527,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.currentDocSubmenu = null;
     this.currentDocSubSubmenu = null;
     this.updateActiveEntryGroups();
+    this.syncOnyaTemplateToSelection();
     this.activePopup = 'form';
   }
 
@@ -520,6 +543,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showDocContentPanel = true;
     this.showDocDetailSearch = false;
     this.updateActiveEntryGroups();
+    this.syncOnyaTemplateToSelection();
     this.activePopup = 'form';
   }
 
@@ -1253,6 +1277,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.documentPanelTitle = label;
     this.showDocContentPanel = true;
     this.showDocSearchPanel = false;
+    this.syncOnyaTemplateToSelection(entry.code);
   }
 
   selectFirstDocSearchResult(): void {
@@ -1266,6 +1291,167 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.documentPanelTitle = label;
     this.showDocContentPanel = true;
     this.showDocDetailSearch = false;
+    this.syncOnyaTemplateToSelection(entry.code);
+  }
+
+  get onyaPages(): FormTemplatePage[] {
+    if (!this.onyaTemplate) {
+      return [];
+    }
+    return this.onyaTemplate.pages?.length
+      ? this.onyaTemplate.pages
+      : [{ id: 'page-main', title: 'Oldal 1', mandatory: true, sections: this.onyaTemplate.sections ?? [] }];
+  }
+
+  get onyaActiveSections(): FormSectionDefinition[] {
+    return this.onyaPages[this.onyaPageIndex]?.sections ?? [];
+  }
+
+  setOnyaPage(index: number): void {
+    if (index < 0 || index >= this.onyaPages.length) {
+      return;
+    }
+    this.onyaPageIndex = index;
+  }
+
+  toggleOnyaDataEditing(): void {
+    this.onyaDataEditing = !this.onyaDataEditing;
+  }
+
+  getOnyaInputType(field: FormFieldDefinition): string {
+    if (field.type === 'email' || field.type === 'tel' || field.type === 'number' || field.type === 'date') {
+      return field.type;
+    }
+    return 'text';
+  }
+
+  getOnyaFieldGridColumn(field: FormFieldDefinition): string {
+    const layout = this.getOnyaFieldLayout(field);
+    return layout.col ? `${layout.col} / span ${layout.colSpan}` : `span ${layout.colSpan}`;
+  }
+
+  getOnyaFieldGridRow(field: FormFieldDefinition): string {
+    const layout = this.getOnyaFieldLayout(field);
+    return layout.row ? `${layout.row} / span ${layout.rowSpan}` : `span ${layout.rowSpan}`;
+  }
+
+  async saveOnyaFormData(): Promise<void> {
+    if (!this.onyaTemplate) {
+      return;
+    }
+
+    const document: FormDocument = {
+      id: this.createLocalId('onya-form'),
+      templateId: this.onyaTemplate.id,
+      templateName: this.onyaTemplate.name,
+      title: `${this.onyaUser.fullName} - ${this.onyaTemplate.navCode}`,
+      userId: this.onyaUser.id,
+      savedAt: new Date().toISOString(),
+      data: this.clone(this.onyaFieldValues)
+    };
+
+    await this.formStore.saveDocument(document);
+    this.onyaDataEditing = false;
+    this.alertService.open('A kitöltött űrlap mentve.');
+  }
+
+  private async loadOnyaTemplates(): Promise<void> {
+    try {
+      this.onyaTemplates = (await this.formStore.getTemplates()).map(template => this.normalizeOnyaTemplate(template));
+      this.syncOnyaTemplateToSelection();
+    } catch (error) {
+      this.onyaTemplates = [];
+      this.onyaTemplate = null;
+      console.error(error);
+    }
+  }
+
+  private syncOnyaTemplateToSelection(code?: string): void {
+    if (!this.onyaTemplates.length) {
+      return;
+    }
+
+    const selectedCode = (code || this.documentPanelTitle.split(' - ')[0] || '').trim().toLowerCase();
+    const match = this.onyaTemplates.find(template =>
+      template.navCode.toLowerCase() === selectedCode ||
+      template.name.toLowerCase().includes(selectedCode)
+    );
+    this.onyaTemplate = this.clone(match ?? this.onyaTemplates[0]);
+    this.onyaPageIndex = 0;
+    this.onyaDataEditing = false;
+    this.initializeOnyaFieldValues();
+  }
+
+  private normalizeOnyaTemplate(template: FormTemplate): FormTemplate {
+    const normalized = this.clone(template);
+    normalized.grid = normalized.grid ?? { columns: 12, rows: 6 };
+    normalized.mandatory = normalized.mandatory ?? false;
+    if (!normalized.pages?.length) {
+      normalized.pages = [
+        {
+          id: 'page-main',
+          title: 'Oldal 1',
+          mandatory: true,
+          sections: normalized.sections ?? []
+        }
+      ];
+    }
+    normalized.sections = normalized.pages.flatMap(page => page.sections);
+    return normalized;
+  }
+
+  private initializeOnyaFieldValues(): void {
+    this.onyaFieldValues = {};
+    this.onyaPages
+      .flatMap(page => page.sections)
+      .flatMap(section => section.fields)
+      .forEach(field => {
+        if (field.autofillKey) {
+          this.onyaFieldValues[field.id] = this.onyaUser[field.autofillKey];
+          return;
+        }
+        this.onyaFieldValues[field.id] = field.type === 'checkbox' ? false : '';
+      });
+  }
+
+  private createLocalId(prefix: string): string {
+    const random = typeof crypto !== 'undefined' && 'randomUUID' in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.round(Math.random() * 100000)}`;
+    return `${prefix}-${random}`;
+  }
+
+  private getOnyaFieldLayout(field: FormFieldDefinition): { col?: number; row?: number; colSpan: number; rowSpan: number } {
+    const fallback = this.getOnyaDefaultFieldLayout(field.type);
+    const colSpan = this.clampNumber(field.layout?.colSpan ?? fallback.colSpan, 2, 12);
+    const maxRowSpan = field.type === 'textarea' ? 4 : 1;
+    return {
+      col: field.layout?.col ? this.clampNumber(field.layout.col, 1, Math.max(1, 12 - colSpan + 1)) : undefined,
+      row: field.layout?.row ? this.clampNumber(field.layout.row, 1, 40) : undefined,
+      colSpan,
+      rowSpan: this.clampNumber(field.layout?.rowSpan ?? fallback.rowSpan, 1, maxRowSpan)
+    };
+  }
+
+  private getOnyaDefaultFieldLayout(type: FormFieldDefinition['type']): { colSpan: number; rowSpan: number } {
+    if (type === 'textarea') {
+      return { colSpan: 12, rowSpan: 2 };
+    }
+    if (type === 'checkbox') {
+      return { colSpan: 4, rowSpan: 1 };
+    }
+    if (type === 'date' || type === 'number' || type === 'tel') {
+      return { colSpan: 4, rowSpan: 1 };
+    }
+    return { colSpan: 6, rowSpan: 1 };
+  }
+
+  private clampNumber(value: number, min: number, max: number): number {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  private clone<T>(value: T): T {
+    return JSON.parse(JSON.stringify(value));
   }
 
   private parseDateTime(s: string): Date {
@@ -1501,6 +1687,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.documentPanelTitle = this.stripMenuSuffix(item);
     this.showDocContentPanel = true;
     this.showDocDetailSearch = false;
+    this.syncOnyaTemplateToSelection();
   }
 
   selectDraftItem(item: DraftItem): void {
@@ -1509,6 +1696,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.documentPanelTitle = label;
     this.showDocContentPanel = true;
     this.showDocDetailSearch = false;
+    this.syncOnyaTemplateToSelection(item.formType);
   }
 
   onDraftDeleteClick(item: DraftItem, event: Event): void {
