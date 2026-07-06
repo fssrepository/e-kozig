@@ -521,10 +521,14 @@
   text-align: left;
 }
 
-.form-element-palette button[aria-disabled='true'],
-.sablon-library-item[aria-disabled='true'] {
+.form-element-palette button[aria-disabled='true'] {
   cursor: default;
   opacity: 0.58;
+}
+
+.sablon-library-item[aria-disabled='true'] {
+  cursor: default;
+  opacity: 1;
 }
 
 .form-element-palette button {
@@ -614,11 +618,13 @@
 .sablon-library-item {
   position: relative;
   display: grid;
+  align-items: center;
   gap: 0.35rem;
   min-width: 0;
+  min-height: 46px;
   width: 100%;
   box-sizing: border-box;
-  padding: 0.5rem 2.35rem 0.5rem 0.5rem;
+  padding: 0.45rem 2.45rem 0.45rem 0.6rem;
   overflow: hidden;
 }
 
@@ -626,6 +632,7 @@
   min-width: 0;
   display: grid;
   gap: 0.05rem;
+  align-self: center;
 }
 
 .sablon-card-head strong {
@@ -635,6 +642,7 @@
   white-space: nowrap;
   color: #0f2f4a;
   font-size: 13px;
+  line-height: 1.25;
 }
 
 .sablon-card-head small,
@@ -642,6 +650,7 @@
   color: #5c6f82;
   font-size: 11px;
   font-weight: 700;
+  line-height: 1.2;
 }
 
 .sablon-card-preview {
@@ -697,14 +706,15 @@
 
 .sablon-delete-button {
   position: absolute;
-  top: 0.55rem;
+  top: 50%;
   right: 0.35rem;
+  transform: translateY(-50%);
   width: 26px;
   height: 26px;
-  border: 1px solid #d7e0ea;
+  border: 1px solid #e6a3a3;
   border-radius: 50%;
-  background: #fff;
-  color: #6b7d90;
+  background: #fff5f5;
+  color: #c62828;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -715,6 +725,7 @@
 
 .sablon-delete-button:hover {
   border-color: #d32f2f;
+  background: #ffe7e7;
   color: #d32f2f;
 }
 
