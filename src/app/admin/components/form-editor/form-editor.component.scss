@@ -2108,6 +2108,56 @@
 }
 
 @media (min-width: 881px) {
+  .builder-panel,
+  .form-canvas,
+  .sablon-library-list,
+  .template-builder-surface,
+  .field-settings-body,
+  .onya-preview-body {
+    scrollbar-width: thin;
+    scrollbar-color: #9eb8cf #eef4f9;
+  }
+
+  .builder-panel::-webkit-scrollbar,
+  .form-canvas::-webkit-scrollbar,
+  .sablon-library-list::-webkit-scrollbar,
+  .template-builder-surface::-webkit-scrollbar,
+  .field-settings-body::-webkit-scrollbar,
+  .onya-preview-body::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .builder-panel::-webkit-scrollbar-track,
+  .form-canvas::-webkit-scrollbar-track,
+  .sablon-library-list::-webkit-scrollbar-track,
+  .template-builder-surface::-webkit-scrollbar-track,
+  .field-settings-body::-webkit-scrollbar-track,
+  .onya-preview-body::-webkit-scrollbar-track {
+    background: #eef4f9;
+    border-radius: 999px;
+  }
+
+  .builder-panel::-webkit-scrollbar-thumb,
+  .form-canvas::-webkit-scrollbar-thumb,
+  .sablon-library-list::-webkit-scrollbar-thumb,
+  .template-builder-surface::-webkit-scrollbar-thumb,
+  .field-settings-body::-webkit-scrollbar-thumb,
+  .onya-preview-body::-webkit-scrollbar-thumb {
+    background: #9eb8cf;
+    border: 2px solid #eef4f9;
+    border-radius: 999px;
+  }
+
+  .builder-panel::-webkit-scrollbar-thumb:hover,
+  .form-canvas::-webkit-scrollbar-thumb:hover,
+  .sablon-library-list::-webkit-scrollbar-thumb:hover,
+  .template-builder-surface::-webkit-scrollbar-thumb:hover,
+  .field-settings-body::-webkit-scrollbar-thumb:hover,
+  .onya-preview-body::-webkit-scrollbar-thumb:hover {
+    background: #7f9bb4;
+  }
+
   .editor-toolbar {
     position: relative;
     top: -1.35rem;
