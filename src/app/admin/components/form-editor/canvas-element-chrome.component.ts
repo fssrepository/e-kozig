@@ -14,6 +14,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
         type="button"
         class="canvas-element-action canvas-element-grip"
         (pointerdown)="handleDrag($event)"
+        (click)="ignoreActionClick($event)"
         matTooltip="Elem mozgatása"
         aria-label="Elem mozgatása"
       >
@@ -149,5 +150,10 @@ export class CanvasElementChromeComponent {
 
   handleMenu(event: MouseEvent): void {
     this.menuClick.emit(event);
+  }
+
+  ignoreActionClick(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
   }
 }

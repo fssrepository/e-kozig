@@ -457,12 +457,33 @@ export class FormEditorComponent implements OnInit {
     this.closeNewWizardDialog();
   }
 
-  setActivePage(index: number): void {
+  setActivePage(index: number, options: { clearSelection?: boolean } = {}): void {
     if (!this.activeTemplate || index < 0 || index >= this.activeTemplate.pages.length) {
       return;
     }
     this.activePageIndex = index;
+    if (options.clearSelection ?? true) {
+      this.clearFormCanvasSelection();
+    }
     this.customFieldSectionId = this.activeSections[0]?.id ?? '';
+  }
+
+  activatePageTabSection(section: FormSectionDefinition, event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    const targetPageIndex = this.getPageIndexForTabSection(section);
+    if (targetPageIndex < 0) {
+      return;
+    }
+
+    this.setActivePage(targetPageIndex, { clearSelection: !this.builderEditing });
+    if (!this.builderEditing) {
+      return;
+    }
+
+    const targetPage = this.activeTemplate?.pages[targetPageIndex];
+    const activeTabSection = this.activeSections.find(item => this.isPageTabsSection(item) && item.navCode === targetPage?.id);
+    this.selectedFormSectionId = activeTabSection?.id ?? section.id;
   }
 
   openPageSettings(index: number, event?: Event): void {
@@ -499,6 +520,7 @@ export class FormEditorComponent implements OnInit {
       section.layout.rowSpan = this.clamp(Number(section.layout.rowSpan) || 2, 1, this.gridRows);
       section.layout.col = this.clamp(Number(section.layout.col) || 1, 1, Math.max(1, this.gridColumns - section.layout.colSpan + 1));
       section.layout.row = this.clamp(Number(section.layout.row) || 1, 1, Math.max(1, this.gridRows - section.layout.rowSpan + 1));
+      this.propagateChromeLayout(section);
     }
     this.sectionSettingsOpen = false;
     this.selectedSectionSettingsId = null;
@@ -1868,6 +1890,7 @@ export class FormEditorComponent implements OnInit {
         1,
         Math.max(1, this.gridRows - section.layout.rowSpan + 1)
       );
+      this.propagateChromeLayout(section);
       this.syncTemplateSections();
       return;
     }
@@ -1911,6 +1934,7 @@ export class FormEditorComponent implements OnInit {
     }
 
     section.layout = { col, row, colSpan, rowSpan };
+    this.propagateChromeLayout(section);
     this.syncTemplateSections();
   }
 
@@ -1994,6 +2018,14 @@ export class FormEditorComponent implements OnInit {
       return;
     }
     this.selectedFormSectionId = null;
+  }
+
+  private clearFormCanvasSelection(): void {
+    this.selectedFormSectionId = null;
+    this.selectedSectionSettingsId = null;
+    this.sectionSettingsOpen = false;
+    this.selectedFormFieldContext = null;
+    this.formFieldSettingsOpen = false;
   }
 
   getInputType(field: FormFieldDefinition): string {
@@ -2098,6 +2130,27 @@ export class FormEditorComponent implements OnInit {
       return;
     }
     this.activeTemplate.pages.forEach(page => this.ensurePageChromeSections(this.activeTemplate as FormTemplate, page));
+  }
+
+  private propagateChromeLayout(source: FormSectionDefinition): void {
+    if (!this.activeTemplate || (!this.isFormTitleSection(source) && !this.isPageTabsSection(source))) {
+      return;
+    }
+
+    this.activeTemplate.pages
+      .flatMap(page => page.sections)
+      .filter(section => section.id !== source.id && this.isMatchingChromeSection(source, section))
+      .forEach(section => {
+        section.layout = { ...source.layout };
+      });
+  }
+
+  private isMatchingChromeSection(source: FormSectionDefinition, target: FormSectionDefinition): boolean {
+    if (this.isFormTitleSection(source)) {
+      return this.isFormTitleSection(target);
+    }
+
+    return this.isPageTabsSection(source) && this.isPageTabsSection(target) && source.navCode === target.navCode;
   }
 
   private getDefaultTabLayout(index: number, columns = this.gridColumns): FormSectionLayout {

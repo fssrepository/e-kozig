@@ -201,6 +201,7 @@
               [class.form-title-section]="isFormTitleSection(section)"
               [class.form-tabs-section]="isPageTabsSection(section)"
               [class.form-field-section]="isFormFieldSection(section)"
+              [class.form-section--tall]="section.layout.rowSpan > 1"
               [class.selected]="isFormSectionSelected(section)"
               *ngFor="let section of activeSections; trackBy: trackById"
               [style.grid-column]="getGridColumn(section)"
@@ -222,7 +223,7 @@
                 class="page-carousel--canvas"
                 type="button"
                 [class.active]="isActivePageTabSection(section)"
-                (click)="setActivePage(getPageIndexForTabSection(section))"
+                (click)="activatePageTabSection(section, $event)"
               >
                 <app-canvas-element-chrome
                   [label]="tabPage.title"
@@ -256,40 +257,42 @@
                     ></app-canvas-element-chrome>
                   </div>
 
-                  <div
-                    class="rendered-header"
-                    [class.rendered-header--single]="field.headerVariant === 'single'"
-                    [class.rendered-header--no-line]="field.headerLine === false"
-                    [style.background]="field.headerBackground || null"
-                    *ngIf="field.type === 'header'; else formFieldBody"
-                  >
-                    <span>{{ field.label }}</span>
-                    <small *ngIf="field.headerVariant !== 'single' && (field.subtitle || field.placeholder)">
-                      {{ field.subtitle || field.placeholder }}
-                    </small>
-                  </div>
+                  <ng-container *ngIf="!builderEditing || !isFormFieldSection(section)">
+                    <div
+                      class="rendered-header"
+                      [class.rendered-header--single]="field.headerVariant === 'single'"
+                      [class.rendered-header--no-line]="field.headerLine === false"
+                      [style.background]="field.headerBackground || null"
+                      *ngIf="field.type === 'header'; else formFieldBody"
+                    >
+                      <span>{{ field.label }}</span>
+                      <small *ngIf="field.headerVariant !== 'single' && (field.subtitle || field.placeholder)">
+                        {{ field.subtitle || field.placeholder }}
+                      </small>
+                    </div>
 
-                  <ng-template #formFieldBody>
-                    <mat-checkbox *ngIf="field.type === 'checkbox'; else nonCheckboxField" [(ngModel)]="fieldValues[field.id]" [name]="field.id" [disabled]="true">
-                      {{ field.label }}
-                    </mat-checkbox>
+                    <ng-template #formFieldBody>
+                      <mat-checkbox *ngIf="field.type === 'checkbox'; else nonCheckboxField" [(ngModel)]="fieldValues[field.id]" [name]="field.id" [disabled]="true">
+                        {{ field.label }}
+                      </mat-checkbox>
 
-                    <ng-template #nonCheckboxField>
-                      <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type !== 'select' && field.type !== 'textarea'">
-                        <input matInput [type]="getInputType(field)" [placeholder]="field.placeholder || field.label" [(ngModel)]="fieldValues[field.id]" [name]="field.id" readonly>
-                      </mat-form-field>
-                      <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type === 'textarea'">
-                        <textarea matInput rows="3" [placeholder]="field.placeholder || field.label" [(ngModel)]="fieldValues[field.id]" [name]="field.id" readonly></textarea>
-                      </mat-form-field>
-                      <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type === 'select'">
-                        <mat-select [(ngModel)]="fieldValues[field.id]" [name]="field.id" [placeholder]="field.label" disabled>
-                          <mat-option *ngFor="let option of field.options ?? []" [value]="option.value">
-                            {{ option.label }}
-                          </mat-option>
-                        </mat-select>
-                      </mat-form-field>
+                      <ng-template #nonCheckboxField>
+                        <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type !== 'select' && field.type !== 'textarea'">
+                          <input matInput [type]="getInputType(field)" [placeholder]="field.placeholder || field.label" [(ngModel)]="fieldValues[field.id]" [name]="field.id" readonly>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type === 'textarea'">
+                          <textarea matInput rows="3" [placeholder]="field.placeholder || field.label" [(ngModel)]="fieldValues[field.id]" [name]="field.id" readonly></textarea>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type === 'select'">
+                          <mat-select [(ngModel)]="fieldValues[field.id]" [name]="field.id" [placeholder]="field.label" disabled>
+                            <mat-option *ngFor="let option of field.options ?? []" [value]="option.value">
+                              {{ option.label }}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </ng-template>
                     </ng-template>
-                  </ng-template>
+                  </ng-container>
                 </div>
                 </ng-container>
               </div>
