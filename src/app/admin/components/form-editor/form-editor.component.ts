@@ -160,6 +160,7 @@ export class FormEditorComponent implements OnInit {
   microFieldOptions = 'Igen\nNem';
   selectedTemplateFieldId: string | null = null;
   selectedTemplateFieldIds: string[] = [];
+  selectedFormSectionId: string | null = null;
   sectionFilter = '';
   selectionTemplateName = '';
   newWizardDialogOpen = false;
@@ -921,6 +922,9 @@ export class FormEditorComponent implements OnInit {
     const section = this.activePage.sections.find(item => item.id === sectionId);
     this.activePage.sections = this.activePage.sections.filter(item => item.id !== sectionId);
     section?.fields.forEach(field => delete this.fieldValues[field.id]);
+    if (this.selectedFormSectionId === sectionId) {
+      this.selectedFormSectionId = null;
+    }
     this.customFieldSectionId = this.activeSections[0]?.id ?? '';
     this.syncTemplateSections();
   }
@@ -1792,15 +1796,25 @@ export class FormEditorComponent implements OnInit {
     if (this.fieldDragState || this.fieldResizeState || this.resizeState || this.dragState) {
       return;
     }
+    const target = event.target as HTMLElement | null;
+    if (!target) {
+      this.selectedFormSectionId = null;
+      this.clearTemplateFieldSelection();
+      return;
+    }
+
+    if (
+      this.builderEditing
+      && this.selectedFormSectionId
+      && !target.closest('.form-section, .field-settings-panel, .new-wizard-panel')
+    ) {
+      this.selectedFormSectionId = null;
+    }
+
     if (this.panelMode !== 'template' || !this.selectedTemplateFieldIds.length) {
       return;
     }
 
-    const target = event.target as HTMLElement | null;
-    if (!target) {
-      this.clearTemplateFieldSelection();
-      return;
-    }
     if (target.closest('.template-field-element, .field-settings-panel, .selection-template-overlay')) {
       return;
     }
@@ -1978,6 +1992,25 @@ export class FormEditorComponent implements OnInit {
 
   isFormFieldSection(section: FormSectionDefinition): boolean {
     return !this.isFormTitleSection(section) && !this.isPageTabsSection(section) && section.fields.length === 1;
+  }
+
+  isFormSectionSelected(section: FormSectionDefinition): boolean {
+    return this.selectedFormSectionId === section.id;
+  }
+
+  selectFormSection(section: FormSectionDefinition, event?: Event): void {
+    if (!this.builderEditing) {
+      return;
+    }
+    event?.stopPropagation();
+    this.selectedFormSectionId = section.id;
+  }
+
+  clearFormSectionSelection(): void {
+    if (!this.builderEditing) {
+      return;
+    }
+    this.selectedFormSectionId = null;
   }
 
   getInputType(field: FormFieldDefinition): string {
