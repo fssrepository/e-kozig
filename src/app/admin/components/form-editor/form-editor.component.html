@@ -201,9 +201,11 @@
               [class.form-title-section]="isFormTitleSection(section)"
               [class.form-tabs-section]="isPageTabsSection(section)"
               [class.form-field-section]="isFormFieldSection(section)"
+              [class.selected]="isFormSectionSelected(section)"
               *ngFor="let section of activeSections; trackBy: trackById"
               [style.grid-column]="getGridColumn(section)"
               [style.grid-row]="getGridRow(section)"
+              (pointerdown)="selectFormSection(section, $event)"
             >
               <div class="section-header container-header" *ngIf="!isFormFieldSection(section) && !isPageTabsSection(section)">
                 <span *ngIf="builderEditing" class="container-grip" (pointerdown)="startDrag($event, section)" matTooltip="Elem mozgatása" aria-hidden="true">
@@ -342,14 +344,14 @@
                 </ng-template>
               </div>
 
-              <span *ngIf="builderEditing" class="resize-handle handle-north" (pointerdown)="startResize($event, section, 'n')"></span>
-              <span *ngIf="builderEditing" class="resize-handle handle-east" (pointerdown)="startResize($event, section, 'e')"></span>
-              <span *ngIf="builderEditing" class="resize-handle handle-south" (pointerdown)="startResize($event, section, 's')"></span>
-              <span *ngIf="builderEditing" class="resize-handle handle-west" (pointerdown)="startResize($event, section, 'w')"></span>
-              <span *ngIf="builderEditing" class="resize-handle handle-corner handle-nw" (pointerdown)="startResize($event, section, 'nw')"></span>
-              <span *ngIf="builderEditing" class="resize-handle handle-corner handle-ne" (pointerdown)="startResize($event, section, 'ne')"></span>
-              <span *ngIf="builderEditing" class="resize-handle handle-corner handle-sw" (pointerdown)="startResize($event, section, 'sw')"></span>
-              <span *ngIf="builderEditing" class="resize-handle handle-corner handle-se" (pointerdown)="startResize($event, section, 'se')"></span>
+              <span *ngIf="builderEditing && isFormSectionSelected(section)" class="resize-handle handle-north" (pointerdown)="startResize($event, section, 'n')"></span>
+              <span *ngIf="builderEditing && isFormSectionSelected(section)" class="resize-handle handle-east" (pointerdown)="startResize($event, section, 'e')"></span>
+              <span *ngIf="builderEditing && isFormSectionSelected(section)" class="resize-handle handle-south" (pointerdown)="startResize($event, section, 's')"></span>
+              <span *ngIf="builderEditing && isFormSectionSelected(section)" class="resize-handle handle-west" (pointerdown)="startResize($event, section, 'w')"></span>
+              <span *ngIf="builderEditing && isFormSectionSelected(section)" class="resize-handle handle-corner handle-nw" (pointerdown)="startResize($event, section, 'nw')"></span>
+              <span *ngIf="builderEditing && isFormSectionSelected(section)" class="resize-handle handle-corner handle-ne" (pointerdown)="startResize($event, section, 'ne')"></span>
+              <span *ngIf="builderEditing && isFormSectionSelected(section)" class="resize-handle handle-corner handle-sw" (pointerdown)="startResize($event, section, 'sw')"></span>
+              <span *ngIf="builderEditing && isFormSectionSelected(section)" class="resize-handle handle-corner handle-se" (pointerdown)="startResize($event, section, 'se')"></span>
             </section>
           </div>
         </div>
