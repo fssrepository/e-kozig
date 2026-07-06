@@ -276,9 +276,12 @@
   appearance: none;
   width: 100%;
   min-height: 34px;
-  padding: 0;
-  border: 0;
-  background: transparent;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid #d5e3ef;
+  border-bottom-color: #c6d8e8;
+  border-radius: 6px 6px 0 0;
+  background: #e8f1f8;
+  box-shadow: 0 2px 5px rgba(15, 47, 74, 0.12);
   color: #0f2f4a;
   display: flex;
   align-items: center;
@@ -2045,10 +2048,12 @@
 
 @media (max-width: 880px) {
   .form-editor-page {
-    height: auto;
+    height: 100dvh;
     min-height: 100dvh;
-    overflow: visible;
+    overflow-y: auto;
+    overflow-x: hidden;
     padding-top: 1rem;
+    -webkit-overflow-scrolling: touch;
   }
 
   .editor-toolbar {
