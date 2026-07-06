@@ -252,6 +252,7 @@
                   [label]="section.title"
                   [subLabel]="isFormTitleSection(section) ? (section.navCode || template.navCode) : ''"
                   [editing]="builderEditing"
+                  [hideActions]="shouldHideFormSectionChrome(section)"
                   (dragPointerDown)="startDrag($event, section)"
                   (menuClick)="openSectionSettings(section, $event)"
                 ></app-canvas-element-chrome>
@@ -268,6 +269,7 @@
                   [label]="tabPage.title"
                   [badge]="getPageIndexForTabSection(section) + 1"
                   [editing]="builderEditing"
+                  [hideActions]="shouldHideFormSectionChrome(section)"
                   (dragPointerDown)="startDrag($event, section)"
                   (menuClick)="openPageSettings(getPageIndexForTabSection(section), $event)"
                 ></app-canvas-element-chrome>
@@ -291,6 +293,7 @@
                     <app-canvas-element-chrome
                       [label]="field.label"
                       [editing]="builderEditing"
+                      [hideActions]="shouldHideFormSectionChrome(section)"
                       (dragPointerDown)="startDrag($event, section)"
                       (menuClick)="openFormFieldSettings(section, field, $event)"
                     ></app-canvas-element-chrome>
@@ -336,15 +339,34 @@
                 </ng-container>
               </div>
 
-              <span *ngIf="builderEditing && isFormSectionSelected(section)" class="resize-handle handle-north" (pointerdown)="startResize($event, section, 'n')"></span>
-              <span *ngIf="builderEditing && isFormSectionSelected(section)" class="resize-handle handle-east" (pointerdown)="startResize($event, section, 'e')"></span>
-              <span *ngIf="builderEditing && isFormSectionSelected(section)" class="resize-handle handle-south" (pointerdown)="startResize($event, section, 's')"></span>
-              <span *ngIf="builderEditing && isFormSectionSelected(section)" class="resize-handle handle-west" (pointerdown)="startResize($event, section, 'w')"></span>
-              <span *ngIf="builderEditing && isFormSectionSelected(section)" class="resize-handle handle-corner handle-nw" (pointerdown)="startResize($event, section, 'nw')"></span>
-              <span *ngIf="builderEditing && isFormSectionSelected(section)" class="resize-handle handle-corner handle-ne" (pointerdown)="startResize($event, section, 'ne')"></span>
-              <span *ngIf="builderEditing && isFormSectionSelected(section)" class="resize-handle handle-corner handle-sw" (pointerdown)="startResize($event, section, 'sw')"></span>
-              <span *ngIf="builderEditing && isFormSectionSelected(section)" class="resize-handle handle-corner handle-se" (pointerdown)="startResize($event, section, 'se')"></span>
+              <span *ngIf="builderEditing && canResizeFormSection(section)" class="resize-handle handle-north" (pointerdown)="startResize($event, section, 'n')"></span>
+              <span *ngIf="builderEditing && canResizeFormSection(section)" class="resize-handle handle-east" (pointerdown)="startResize($event, section, 'e')"></span>
+              <span *ngIf="builderEditing && canResizeFormSection(section)" class="resize-handle handle-south" (pointerdown)="startResize($event, section, 's')"></span>
+              <span *ngIf="builderEditing && canResizeFormSection(section)" class="resize-handle handle-west" (pointerdown)="startResize($event, section, 'w')"></span>
+              <span *ngIf="builderEditing && canResizeFormSection(section)" class="resize-handle handle-corner handle-nw" (pointerdown)="startResize($event, section, 'nw')"></span>
+              <span *ngIf="builderEditing && canResizeFormSection(section)" class="resize-handle handle-corner handle-ne" (pointerdown)="startResize($event, section, 'ne')"></span>
+              <span *ngIf="builderEditing && canResizeFormSection(section)" class="resize-handle handle-corner handle-sw" (pointerdown)="startResize($event, section, 'sw')"></span>
+              <span *ngIf="builderEditing && canResizeFormSection(section)" class="resize-handle handle-corner handle-se" (pointerdown)="startResize($event, section, 'se')"></span>
             </section>
+
+            <div
+              class="form-selection-outline"
+              *ngIf="builderEditing && hasMultiFormSelection"
+              [style.grid-column]="getFormSelectionGridColumn()"
+              [style.grid-row]="getFormSelectionGridRow()"
+              (pointerdown)="$event.stopPropagation()"
+              (click)="$event.stopPropagation()"
+            >
+              <button
+                type="button"
+                class="form-selection-menu-button"
+                (click)="openFormSelectionSettings($event)"
+                matTooltip="Kijelölés műveletei"
+                aria-label="Kijelölés műveletei"
+              >
+                <mat-icon>more_horiz</mat-icon>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -510,6 +532,39 @@
       <button mat-raised-button color="primary" type="button" (click)="closePageSettings()">
         <mat-icon>done</mat-icon>
         <span>Kész</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="field-settings-popup" *ngIf="formSelectionSettingsOpen && hasMultiFormSelection">
+  <div class="field-settings-backdrop" (click)="closeFormSelectionSettings()"></div>
+  <div class="field-settings-panel" (click)="$event.stopPropagation()">
+    <div class="field-settings-header">
+      <div>
+        <span>Kijelölés</span>
+        <strong>{{ selectedFormSectionIds.length }} elem</strong>
+      </div>
+      <button mat-icon-button type="button" (click)="closeFormSelectionSettings()" aria-label="Bezárás">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="field-settings-body">
+      <mat-form-field appearance="outline" class="full-field">
+        <mat-label>Sablonnév</mat-label>
+        <input matInput [(ngModel)]="formSelectionTemplateName">
+      </mat-form-field>
+    </div>
+
+    <div class="field-settings-actions">
+      <button mat-stroked-button type="button" (click)="clearFormSectionSelection()">
+        <mat-icon>close</mat-icon>
+        <span>Kijelölés törlése</span>
+      </button>
+      <button mat-raised-button color="primary" type="button" (click)="wrapSelectedFormSectionsAsSablon()" [disabled]="saving || wrappableFormSections.length < 2">
+        <mat-icon>inventory_2</mat-icon>
+        <span>Wrap</span>
       </button>
     </div>
   </div>

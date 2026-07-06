@@ -935,6 +935,60 @@
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
+.form-container-element.selected:not(.form-field-section):not(.form-tabs-section) {
+  outline: 1px solid #0067b1;
+  outline-offset: -1px;
+}
+
+.form-field-section.selected .form-field-element,
+.form-tabs-section.selected .page-carousel--canvas {
+  border-color: #0067b1;
+  box-shadow:
+    0 1px 2px rgba(15, 47, 74, 0.06),
+    0 0 0 1px rgba(0, 103, 177, 0.16);
+}
+
+.form-selection-outline {
+  position: relative;
+  z-index: 20;
+  min-width: 0;
+  min-height: 0;
+  align-self: stretch;
+  justify-self: stretch;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.form-selection-menu-button {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #c5d3e2;
+  border-radius: 50%;
+  background: #fff;
+  color: #5c6f82;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: 0 1px 4px rgba(15, 47, 74, 0.2);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.form-selection-menu-button:hover {
+  border-color: #9fb7cf;
+  background: #eef3f8;
+}
+
+.form-selection-menu-button mat-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+}
+
 .form-container-element {
   border-color: #9fb7cf;
   background: #fff;

@@ -10,7 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   template: `
     <span class="canvas-element-chrome" [class.two-line]="!!subLabel" [class.has-badge]="badge !== null && badge !== undefined" [class.editing]="editing">
       <button
-        *ngIf="editing"
+        *ngIf="editing && !hideActions"
         type="button"
         class="canvas-element-action canvas-element-grip"
         (pointerdown)="handleDrag($event)"
@@ -29,7 +29,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
       </span>
 
       <button
-        *ngIf="editing"
+        *ngIf="editing && !hideActions"
         type="button"
         class="canvas-element-action canvas-element-menu"
         (click)="handleMenu($event)"
@@ -144,6 +144,7 @@ export class CanvasElementChromeComponent {
   @Input() subLabel = '';
   @Input() badge: string | number | null = null;
   @Input() editing = false;
+  @Input() hideActions = false;
 
   @Output() dragPointerDown = new EventEmitter<PointerEvent>();
   @Output() menuClick = new EventEmitter<MouseEvent>();

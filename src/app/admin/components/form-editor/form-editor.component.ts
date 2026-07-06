@@ -177,8 +177,11 @@ export class FormEditorComponent implements OnInit {
   selectedTemplateFieldId: string | null = null;
   selectedTemplateFieldIds: string[] = [];
   selectedFormSectionId: string | null = null;
+  selectedFormSectionIds: string[] = [];
   sectionFilter = '';
   selectionTemplateName = '';
+  formSelectionTemplateName = '';
+  formSelectionSettingsOpen = false;
   newWizardDialogOpen = false;
   newWizardName = '';
   pageSettingsOpen = false;
@@ -254,6 +257,19 @@ export class FormEditorComponent implements OnInit {
 
   get activeSections(): FormSectionDefinition[] {
     return this.activePage?.sections ?? [];
+  }
+
+  get selectedFormSections(): FormSectionDefinition[] {
+    const selected = new Set(this.selectedFormSectionIds);
+    return this.activeSections.filter(section => selected.has(section.id));
+  }
+
+  get wrappableFormSections(): FormSectionDefinition[] {
+    return this.selectedFormSections.filter(section => this.canWrapFormSection(section));
+  }
+
+  get hasMultiFormSelection(): boolean {
+    return this.selectedFormSectionIds.length > 1;
   }
 
   get activeSectionTemplateFields(): FormFieldDefinition[] {
@@ -519,6 +535,10 @@ export class FormEditorComponent implements OnInit {
   activatePageTabSection(section: FormSectionDefinition, event?: Event): void {
     event?.preventDefault();
     event?.stopPropagation();
+    const mouseEvent = event as MouseEvent | undefined;
+    if (this.builderEditing && (mouseEvent?.ctrlKey || mouseEvent?.metaKey)) {
+      return;
+    }
     if (this.suppressNextTabActivation) {
       this.suppressNextTabActivation = false;
       return;
@@ -536,6 +556,7 @@ export class FormEditorComponent implements OnInit {
     const targetPage = this.activeTemplate?.pages[targetPageIndex];
     const activeTabSection = this.activeSections.find(item => this.isPageTabsSection(item) && item.navCode === targetPage?.id);
     this.selectedFormSectionId = activeTabSection?.id ?? section.id;
+    this.selectedFormSectionIds = [this.selectedFormSectionId];
   }
 
   openPageSettings(index: number, event?: Event): void {
@@ -966,6 +987,11 @@ export class FormEditorComponent implements OnInit {
     if (this.selectedFormSectionId === sectionId) {
       this.selectedFormSectionId = null;
     }
+    this.selectedFormSectionIds = this.selectedFormSectionIds.filter(id => id !== sectionId);
+    if (!this.selectedFormSectionIds.length) {
+      this.formSelectionSettingsOpen = false;
+      this.formSelectionTemplateName = '';
+    }
     this.customFieldSectionId = this.activeSections[0]?.id ?? '';
     this.syncTemplateSections();
   }
@@ -1008,6 +1034,7 @@ export class FormEditorComponent implements OnInit {
     ];
     unwrappedSections.flatMap(item => item.fields).forEach(field => this.initializeFieldValue(field));
     this.selectedFormSectionId = unwrappedSections[0]?.id ?? null;
+    this.selectedFormSectionIds = this.selectedFormSectionId ? [this.selectedFormSectionId] : [];
     this.sectionSettingsOpen = false;
     this.selectedSectionSettingsId = null;
     this.syncTemplateSections();
@@ -1388,7 +1415,7 @@ export class FormEditorComponent implements OnInit {
     this.saving = true;
     try {
       await this.store.saveSectionTemplate(section);
-      this.upsertSectionLibrary(section);
+      this.upsertSectionLibrary(section, { pinToTop: true });
       this.selectedLibrarySectionId = section.id;
       this.clearTemplateFieldSelection();
       this.statusMessage = 'Kijelölt mezőkből sablon mentve.';
@@ -1820,6 +1847,7 @@ export class FormEditorComponent implements OnInit {
     event.preventDefault();
     event.stopPropagation();
     this.selectedFormSectionId = section.id;
+    this.selectedFormSectionIds = [section.id];
     const canvas = this.formCanvas?.nativeElement;
     const canvasWidth = canvas?.getBoundingClientRect().width ?? 960;
     this.resizeState = null;
@@ -1867,17 +1895,17 @@ export class FormEditorComponent implements OnInit {
     }
     const target = event.target as HTMLElement | null;
     if (!target) {
-      this.selectedFormSectionId = null;
+      this.clearFormCanvasSelection();
       this.clearTemplateFieldSelection();
       return;
     }
 
     if (
       this.builderEditing
-      && this.selectedFormSectionId
-      && !target.closest('.form-section, .field-settings-panel, .new-wizard-panel')
+      && this.selectedFormSectionIds.length
+      && !target.closest('.form-section, .field-settings-panel, .new-wizard-panel, .form-selection-outline, .form-selection-menu-button')
     ) {
-      this.selectedFormSectionId = null;
+      this.clearFormCanvasSelection();
     }
 
     if (this.panelMode !== 'template' || !this.selectedTemplateFieldIds.length) {
@@ -2101,7 +2129,15 @@ export class FormEditorComponent implements OnInit {
   }
 
   isFormSectionSelected(section: FormSectionDefinition): boolean {
-    return this.selectedFormSectionId === section.id;
+    return this.selectedFormSectionIds.includes(section.id);
+  }
+
+  canResizeFormSection(section: FormSectionDefinition): boolean {
+    return this.selectedFormSectionIds.length === 1 && this.selectedFormSectionId === section.id;
+  }
+
+  shouldHideFormSectionChrome(section: FormSectionDefinition): boolean {
+    return this.hasMultiFormSelection && this.isFormSectionSelected(section);
   }
 
   selectFormSection(section: FormSectionDefinition, event?: Event): void {
@@ -2109,7 +2145,25 @@ export class FormEditorComponent implements OnInit {
       return;
     }
     event?.stopPropagation();
+    const mouseEvent = event as MouseEvent | undefined;
+    if (mouseEvent?.ctrlKey || mouseEvent?.metaKey) {
+      event?.preventDefault();
+      this.sectionSettingsOpen = false;
+      this.formFieldSettingsOpen = false;
+      this.formSelectionSettingsOpen = false;
+      this.selectedFormSectionIds = this.selectedFormSectionIds.includes(section.id)
+        ? this.selectedFormSectionIds.filter(id => id !== section.id)
+        : [...this.selectedFormSectionIds, section.id];
+      this.selectedFormSectionId = this.selectedFormSectionIds.at(-1) ?? null;
+      if (this.hasMultiFormSelection && !this.formSelectionTemplateName.trim()) {
+        this.formSelectionTemplateName = `${this.activeTemplate?.name || 'Űrlap'} sablon`;
+      }
+      return;
+    }
+
     this.selectedFormSectionId = section.id;
+    this.selectedFormSectionIds = [section.id];
+    this.formSelectionSettingsOpen = false;
   }
 
   clearFormSectionSelection(): void {
@@ -2117,14 +2171,158 @@ export class FormEditorComponent implements OnInit {
       return;
     }
     this.selectedFormSectionId = null;
+    this.selectedFormSectionIds = [];
+    this.formSelectionTemplateName = '';
+    this.formSelectionSettingsOpen = false;
+  }
+
+  getFormSelectionGridColumn(): string {
+    const bounds = this.getFormSelectionBounds();
+    return bounds ? `${bounds.minCol} / span ${bounds.colSpan}` : '1 / span 1';
+  }
+
+  getFormSelectionGridRow(): string {
+    const bounds = this.getFormSelectionBounds();
+    return bounds ? `${bounds.minRow} / span ${bounds.rowSpan}` : '1 / span 1';
+  }
+
+  openFormSelectionSettings(event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    if (!this.hasMultiFormSelection) {
+      return;
+    }
+    if (!this.formSelectionTemplateName.trim()) {
+      this.formSelectionTemplateName = `${this.activeTemplate?.name || 'Űrlap'} sablon`;
+    }
+    this.sectionSettingsOpen = false;
+    this.formFieldSettingsOpen = false;
+    this.formSelectionSettingsOpen = true;
+  }
+
+  closeFormSelectionSettings(): void {
+    this.formSelectionSettingsOpen = false;
+  }
+
+  async wrapSelectedFormSectionsAsSablon(): Promise<void> {
+    if (!this.activePage || !this.builderEditing) {
+      return;
+    }
+
+    const sections = this.wrappableFormSections;
+    if (sections.length < 2) {
+      this.statusMessage = 'Legalább két űrlapelem kijelölése szükséges.';
+      return;
+    }
+
+    const bounds = this.getSectionBounds(sections);
+    const title = this.formSelectionTemplateName.trim() || 'Új sablon';
+    const suffix = this.createShortId();
+    const copiedValues: Array<{ sourceId: string; targetId: string }> = [];
+    const fields = sections.flatMap(section => {
+      const sectionOffsetCol = section.layout.col - bounds.minCol;
+      const sectionOffsetRow = section.layout.row - bounds.minRow;
+      return section.fields.map(field => {
+        const fieldLayout = this.normalizeFieldLayout(field);
+        const clonedField = this.clone(field);
+        const targetId = `${field.id}-${suffix}`;
+        copiedValues.push({ sourceId: field.id, targetId });
+        return {
+          ...clonedField,
+          id: targetId,
+          layout: {
+            col: this.clamp(sectionOffsetCol + (fieldLayout.col ?? 1), 1, 12),
+            row: this.clamp(sectionOffsetRow + (fieldLayout.row ?? 1), 1, 40),
+            colSpan: this.clamp(
+              this.isGroupedFormSection(section) ? fieldLayout.colSpan : section.layout.colSpan,
+              2,
+              12
+            ),
+            rowSpan: this.clamp(
+              this.isGroupedFormSection(section) ? fieldLayout.rowSpan : section.layout.rowSpan,
+              1,
+              this.getMaxFieldRowSpan(field.type)
+            )
+          }
+        };
+      });
+    });
+
+    const groupedSection = this.normalizeSectionTemplate({
+      id: `${this.slugify(title)}-${suffix}`,
+      title,
+      navCode: this.groupedSectionNavCode,
+      description: 'Kijelölt elemekből létrehozott sablon',
+      mandatory: false,
+      grouped: true,
+      layout: {
+        col: bounds.minCol,
+        row: bounds.minRow,
+        colSpan: bounds.colSpan,
+        rowSpan: bounds.rowSpan
+      },
+      fields: this.normalizeGroupedFields(fields)
+    });
+    groupedSection.layout.rowSpan = this.clamp(
+      Math.max(groupedSection.layout.rowSpan, this.getGroupedSectionRowSpan(groupedSection.fields)),
+      1,
+      this.gridRows
+    );
+
+    const savedSection = this.normalizeSectionTemplate({
+      ...this.clone(groupedSection),
+      id: `${this.slugify(title)}-template-${suffix}`,
+      navCode: this.slugify(title).toUpperCase().slice(0, 16) || 'CUSTOM',
+      layout: {
+        ...groupedSection.layout,
+        col: 1,
+        row: 1
+      }
+    });
+
+    this.saving = true;
+    try {
+      await this.store.saveSectionTemplate(savedSection);
+      this.upsertSectionLibrary(savedSection, { pinToTop: true });
+      this.selectedLibrarySectionId = savedSection.id;
+
+      const selectedIds = new Set(sections.map(section => section.id));
+      const firstIndex = this.activePage.sections.findIndex(section => selectedIds.has(section.id));
+      const remainingSections = this.activePage.sections.filter(section => !selectedIds.has(section.id));
+      const insertIndex = firstIndex < 0 ? remainingSections.length : firstIndex;
+      this.activePage.sections = [
+        ...remainingSections.slice(0, insertIndex),
+        groupedSection,
+        ...remainingSections.slice(insertIndex)
+      ];
+      copiedValues.forEach(({ sourceId, targetId }) => {
+        this.fieldValues[targetId] = this.fieldValues[sourceId] ?? '';
+        delete this.fieldValues[sourceId];
+      });
+      groupedSection.fields.forEach(field => this.initializeFieldValue(field));
+      this.selectedFormSectionId = groupedSection.id;
+      this.selectedFormSectionIds = [groupedSection.id];
+      this.formSelectionSettingsOpen = false;
+      this.formSelectionTemplateName = '';
+      this.syncTemplateSections();
+      this.statusMessage = 'Kijelölt elemek sablonként becsomagolva.';
+    } catch (error) {
+      this.statusMessage = 'A kijelölt elemek sablonként mentése sikertelen.';
+      console.error(error);
+    } finally {
+      this.saving = false;
+    }
   }
 
   private clearFormCanvasSelection(): void {
     this.selectedFormSectionId = null;
+    this.selectedFormSectionIds = [];
     this.selectedSectionSettingsId = null;
     this.sectionSettingsOpen = false;
     this.selectedFormFieldContext = null;
     this.formFieldSettingsOpen = false;
+    this.formSelectionTemplateName = '';
+    this.formSelectionSettingsOpen = false;
   }
 
   getInputType(field: FormFieldDefinition): string {
@@ -2346,6 +2544,33 @@ export class FormEditorComponent implements OnInit {
     }
   }
 
+  private getFormSelectionBounds(): (FormSectionLayout & { minCol: number; minRow: number }) | null {
+    const sections = this.selectedFormSections;
+    if (!sections.length) {
+      return null;
+    }
+    return this.getSectionBounds(sections);
+  }
+
+  private getSectionBounds(sections: FormSectionDefinition[]): FormSectionLayout & { minCol: number; minRow: number } {
+    const minCol = Math.min(...sections.map(section => section.layout.col));
+    const minRow = Math.min(...sections.map(section => section.layout.row));
+    const maxCol = Math.max(...sections.map(section => section.layout.col + section.layout.colSpan - 1));
+    const maxRow = Math.max(...sections.map(section => section.layout.row + section.layout.rowSpan - 1));
+    return {
+      minCol,
+      minRow,
+      col: minCol,
+      row: minRow,
+      colSpan: this.clamp(maxCol - minCol + 1, 2, this.gridColumns),
+      rowSpan: this.clamp(maxRow - minRow + 1, 1, this.gridRows)
+    };
+  }
+
+  private canWrapFormSection(section: FormSectionDefinition): boolean {
+    return !this.isFormTitleSection(section) && !this.isPageTabsSection(section) && section.fields.length > 0;
+  }
+
   private getGroupedSectionRowSpan(fields: FormFieldDefinition[]): number {
     const maxFieldRow = fields
       .map(field => {
@@ -2529,11 +2754,13 @@ export class FormEditorComponent implements OnInit {
     return normalized;
   }
 
-  private upsertSectionLibrary(section: FormSectionDefinition): void {
-    this.sectionLibrary = [
-      section,
-      ...this.sectionLibrary.filter(item => item.id !== section.id)
-    ].sort((a, b) => a.title.localeCompare(b.title, 'hu'));
+  private upsertSectionLibrary(section: FormSectionDefinition, options: { pinToTop?: boolean } = {}): void {
+    const rest = this.sectionLibrary
+      .filter(item => item.id !== section.id)
+      .sort((a, b) => a.title.localeCompare(b.title, 'hu'));
+    this.sectionLibrary = options.pinToTop
+      ? [section, ...rest]
+      : [section, ...rest].sort((a, b) => a.title.localeCompare(b.title, 'hu'));
   }
 
   private normalizeFields(fields: FormFieldDefinition[]): FormFieldDefinition[] {
@@ -2752,6 +2979,7 @@ export class FormEditorComponent implements OnInit {
     this.activePage.sections = [...this.activePage.sections, sourceSection];
     this.customFieldSectionId = sourceSection.id;
     this.selectedFormSectionId = sourceSection.id;
+    this.selectedFormSectionIds = [sourceSection.id];
     this.syncTemplateSections();
     this.statusMessage = 'Sablon csoportként hozzáadva.';
   }
