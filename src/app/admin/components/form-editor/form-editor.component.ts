@@ -112,6 +112,7 @@ export class FormEditorComponent implements OnInit {
   private readonly store = inject(FormEditorStoreService);
   private readonly formTitleSectionPrefix = 'form-title-';
   private readonly formTabsSectionPrefix = 'form-tabs-';
+  private readonly groupedSectionNavCode = 'SABLON';
   private readonly fieldDragType = 'application/x-e-kozig-field-type';
   private readonly sectionDragType = 'application/x-e-kozig-section-id';
   private readonly formElementDragType = 'application/x-e-kozig-form-element';
@@ -931,6 +932,32 @@ export class FormEditorComponent implements OnInit {
     }
     this.duplicateSection(section);
     this.closeSectionSettings();
+  }
+
+  unwrapSelectedSection(): void {
+    const section = this.selectedSectionForSettings;
+    if (!section || !this.activePage || !this.isGroupedFormSection(section)) {
+      return;
+    }
+
+    const unwrappedSections = this.createElementSectionsFromSection({
+      ...this.clone(section),
+      grouped: false,
+      navCode: section.navCode === this.groupedSectionNavCode ? 'ELEM' : section.navCode,
+      fields: this.normalizeFields(section.fields)
+    });
+    const sectionIndex = this.activePage.sections.findIndex(item => item.id === section.id);
+    this.activePage.sections = [
+      ...this.activePage.sections.slice(0, sectionIndex),
+      ...unwrappedSections,
+      ...this.activePage.sections.slice(sectionIndex + 1)
+    ];
+    unwrappedSections.flatMap(item => item.fields).forEach(field => this.initializeFieldValue(field));
+    this.selectedFormSectionId = unwrappedSections[0]?.id ?? null;
+    this.sectionSettingsOpen = false;
+    this.selectedSectionSettingsId = null;
+    this.syncTemplateSections();
+    this.statusMessage = 'Sablon felbontva külön mozgatható elemekre.';
   }
 
   addCustomField(): void {
@@ -2002,6 +2029,10 @@ export class FormEditorComponent implements OnInit {
     return !this.isFormTitleSection(section) && !this.isPageTabsSection(section) && section.fields.length === 1;
   }
 
+  isGroupedFormSection(section: FormSectionDefinition): boolean {
+    return !this.isFormTitleSection(section) && !this.isPageTabsSection(section) && !!section.grouped && section.fields.length > 1;
+  }
+
   isFormSectionSelected(section: FormSectionDefinition): boolean {
     return this.selectedFormSectionId === section.id;
   }
@@ -2150,7 +2181,7 @@ export class FormEditorComponent implements OnInit {
         this.normalizeCanvasElementSize(section);
         const desiredLayout = {
           ...section.layout,
-          row: minContentRow
+          row: this.isGroupedFormSection(section) ? Math.max(section.layout.row, minContentRow) : minContentRow
         };
         section.layout = this.sectionLayoutFits(desiredLayout, occupied)
           ? desiredLayout
@@ -2166,6 +2197,18 @@ export class FormEditorComponent implements OnInit {
   }
 
   private normalizeCanvasElementSize(section: FormSectionDefinition): void {
+    if (this.isGroupedFormSection(section)) {
+      const rowSpan = Math.max(section.layout.rowSpan, this.getGroupedSectionRowSpan(section.fields));
+      section.layout = this.normalizeSectionCanvasLayout(
+        {
+          ...section.layout,
+          rowSpan
+        },
+        { col: 1, row: 1, colSpan: section.layout.colSpan, rowSpan }
+      );
+      return;
+    }
+
     if (!this.isFormFieldSection(section)) {
       section.layout = this.normalizeSectionCanvasLayout(section.layout, section.layout);
       return;
@@ -2236,6 +2279,16 @@ export class FormEditorComponent implements OnInit {
     }
   }
 
+  private getGroupedSectionRowSpan(fields: FormFieldDefinition[]): number {
+    const maxFieldRow = fields
+      .map(field => {
+        const layout = this.normalizeFieldLayout(field);
+        return (layout.row ?? 1) + layout.rowSpan - 1;
+      })
+      .reduce((max, row) => Math.max(max, row), 1);
+    return this.clamp(maxFieldRow + 1, 2, this.gridRows);
+  }
+
   private propagateChromeLayout(source: FormSectionDefinition): void {
     if (!this.activeTemplate || (!this.isFormTitleSection(source) && !this.isPageTabsSection(source))) {
       return;
@@ -2274,6 +2327,14 @@ export class FormEditorComponent implements OnInit {
         section.layout = this.normalizeSectionCanvasLayout(section.layout, { col: 1, row: 1, colSpan: 6, rowSpan: 1 });
         section.fields = [];
         return [section];
+      }
+
+      if (this.isGroupedFormSection(section)) {
+        return [{
+          ...section,
+          layout: this.normalizeSectionCanvasLayout(section.layout, { col: 1, row: 1, colSpan: 6, rowSpan: this.getGroupedSectionRowSpan(section.fields) }),
+          fields: this.normalizeFields(section.fields ?? [])
+        }];
       }
 
       const normalizedSection = {
@@ -2542,26 +2603,25 @@ export class FormEditorComponent implements OnInit {
     }
 
     const sourceSection = this.cloneSectionForInsert(source);
+    sourceSection.fields = this.normalizeFields(sourceSection.fields);
     const colSpan = this.clamp(sourceSection.layout.colSpan, 2, this.gridColumns);
-    const rowSpan = this.clamp(sourceSection.layout.rowSpan, 1, this.gridRows);
+    const rowSpan = this.clamp(Math.max(sourceSection.layout.rowSpan, this.getGroupedSectionRowSpan(sourceSection.fields)), 1, this.gridRows);
     sourceSection.layout = {
       col: this.clamp(placement.col ?? 1, 1, Math.max(1, this.gridColumns - colSpan + 1)),
       row: this.clamp(placement.row ?? this.getNextRow(), 1, this.gridRows),
       colSpan,
       rowSpan
     };
+    sourceSection.navCode = this.groupedSectionNavCode;
+    sourceSection.grouped = true;
 
-    const sections = this.createElementSectionsFromSection({
-      ...sourceSection,
-      fields: this.normalizeFields(sourceSection.fields)
-    });
-    sections.forEach(section => {
-      this.ensureGridContains(section.layout.row + section.layout.rowSpan - 1, section.layout.col + section.layout.colSpan - 1);
-      section.fields.forEach(field => this.initializeFieldValue(field));
-    });
-    this.activePage.sections = [...this.activePage.sections, ...sections];
-    this.customFieldSectionId = sections.at(-1)?.id ?? '';
+    this.ensureGridContains(sourceSection.layout.row + sourceSection.layout.rowSpan - 1, sourceSection.layout.col + sourceSection.layout.colSpan - 1);
+    sourceSection.fields.forEach(field => this.initializeFieldValue(field));
+    this.activePage.sections = [...this.activePage.sections, sourceSection];
+    this.customFieldSectionId = sourceSection.id;
+    this.selectedFormSectionId = sourceSection.id;
     this.syncTemplateSections();
+    this.statusMessage = 'Sablon csoportként hozzáadva.';
   }
 
   private cloneSectionForInsert(section: FormSectionDefinition): FormSectionDefinition {

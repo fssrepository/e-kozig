@@ -768,6 +768,10 @@
   height: 100%;
 }
 
+.form-canvas:not(.builder-editing) .page-carousel--canvas {
+  padding-inline: 0.45rem;
+}
+
 .form-canvas {
   position: relative;
   flex: 1;
@@ -788,17 +792,37 @@
 }
 
 .form-canvas.is-mobile {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-content: start;
 }
 
 .form-canvas.is-mobile .form-section {
   min-height: auto;
+  width: 100%;
+  grid-column: 1 / -1 !important;
+  grid-row: auto !important;
+  align-self: stretch;
+}
+
+.form-canvas.is-mobile .form-tabs-section {
+  grid-column: auto / span 6 !important;
+  min-width: 0;
+}
+
+.form-canvas.is-mobile .form-field-section:not(.form-section--tall):not(:has(.form-field-element--header)):not(:has(.form-field-element--multiline)),
+.form-canvas.is-mobile .form-tabs-section:not(.form-section--tall) {
+  align-self: stretch;
 }
 
 .form-canvas.is-mobile .section-fields {
   display: flex;
   flex-direction: column;
+}
+
+.form-canvas.is-mobile .page-carousel--canvas {
+  width: 100%;
+  padding-inline: 0.45rem;
 }
 
 .form-section {
@@ -817,6 +841,25 @@
 .form-container-element {
   border-color: #9fb7cf;
   background: #fff;
+}
+
+.form-group-section {
+  border-color: #7caed6;
+  background: #f7fbff;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.06),
+    inset 0 0 0 1px rgba(0, 103, 177, 0.08);
+}
+
+.form-group-section > .container-header {
+  background: #eaf3fb;
+  border-bottom-color: #b8d0e6;
+}
+
+.form-group-section > .section-fields {
+  background:
+    linear-gradient(135deg, rgba(0, 103, 177, 0.05), transparent 55%),
+    #f7fbff;
 }
 
 .form-field-section {

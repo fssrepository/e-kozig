@@ -70,6 +70,7 @@ export interface FormSectionDefinition {
   navCode?: string;
   description?: string;
   mandatory?: boolean;
+  grouped?: boolean;
   layout: FormSectionLayout;
   fields: FormFieldDefinition[];
 }

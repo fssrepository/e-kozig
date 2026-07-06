@@ -201,6 +201,7 @@
               [class.form-title-section]="isFormTitleSection(section)"
               [class.form-tabs-section]="isPageTabsSection(section)"
               [class.form-field-section]="isFormFieldSection(section)"
+              [class.form-group-section]="isGroupedFormSection(section)"
               [class.form-section--tall]="section.layout.rowSpan > 1"
               [class.selected]="isFormSectionSelected(section)"
               *ngFor="let section of activeSections; trackBy: trackById"
@@ -248,7 +249,7 @@
                   [style.grid-column]="getFieldGridColumn(field)"
                   [style.grid-row]="getFieldGridRow(field)"
                 >
-                  <div class="form-field-toolbar" *ngIf="builderEditing">
+                  <div class="form-field-toolbar" *ngIf="builderEditing && !isGroupedFormSection(section)">
                     <app-canvas-element-chrome
                       [label]="field.label"
                       [editing]="builderEditing"
@@ -515,6 +516,10 @@
     </div>
 
     <div class="field-settings-actions">
+      <button mat-stroked-button type="button" *ngIf="isGroupedFormSection(section)" (click)="unwrapSelectedSection()">
+        <mat-icon>call_split</mat-icon>
+        <span>Felbontás</span>
+      </button>
       <button mat-stroked-button type="button" (click)="duplicateSelectedSection()">
         <mat-icon>content_copy</mat-icon>
         <span>Másolás</span>
