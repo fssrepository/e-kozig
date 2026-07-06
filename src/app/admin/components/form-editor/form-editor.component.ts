@@ -2767,8 +2767,12 @@ export class FormEditorComponent implements OnInit {
         if (saved) {
           this.statusMessage = '';
         }
+        this.cdr.detectChanges();
       })
-      .catch(error => console.error(error));
+      .catch(error => {
+        console.error(error);
+        this.cdr.detectChanges();
+      });
   }
 
   private startStencilSaveAnimation(): void {
@@ -2777,6 +2781,7 @@ export class FormEditorComponent implements OnInit {
     const runId = ++this.stencilFeedbackRunId;
     this.stencilSavePending = true;
     this.stencilSaveSuccess = false;
+    this.cdr.detectChanges();
 
     this.stencilSavePendingTimer = window.setTimeout(() => {
       if (runId !== this.stencilFeedbackRunId) {
@@ -2784,11 +2789,13 @@ export class FormEditorComponent implements OnInit {
       }
       this.stencilSavePending = false;
       this.stencilSaveSuccess = true;
+      this.cdr.detectChanges();
       this.stencilSaveSuccessTimer = window.setTimeout(() => {
         if (runId !== this.stencilFeedbackRunId) {
           return;
         }
         this.stencilSaveSuccess = false;
+        this.cdr.detectChanges();
       }, this.stencilSaveSuccessMs);
     }, this.stencilSaveSpinnerMs);
   }
@@ -2799,6 +2806,7 @@ export class FormEditorComponent implements OnInit {
     window.clearTimeout(this.stencilSaveSuccessTimer);
     this.stencilSavePending = false;
     this.stencilSaveSuccess = false;
+    this.cdr.detectChanges();
   }
 
   private syncViewportFromScreen(): void {
