@@ -23,102 +23,129 @@
               class="selector-stencil"
               type="button"
               [class.active]="builderEditing || panelMode === 'template'"
+              [class.saving]="stencilSavePending"
+              [class.saved]="stencilSaveSuccess"
+              [disabled]="stencilSavePending"
               (click)="handleStencilAction()"
-              [matTooltip]="builderEditing || panelMode === 'template' ? 'Mentés' : 'Stencil szerkesztés'"
-              [attr.aria-label]="builderEditing || panelMode === 'template' ? 'Mentés' : 'Stencil szerkesztés'"
+              [matTooltip]="builderEditing || panelMode === 'template' ? 'Megtekintés' : 'Stencil szerkesztés'"
+              [attr.aria-label]="builderEditing || panelMode === 'template' ? 'Megtekintés' : 'Stencil szerkesztés'"
             >
-              <mat-icon>{{ builderEditing || panelMode === 'template' ? 'save' : 'format_shapes' }}</mat-icon>
+              <mat-icon>{{ builderEditing || panelMode === 'template' ? 'visibility' : 'format_shapes' }}</mat-icon>
             </button>
-            <button mat-icon-button class="selector-preview" type="button" (click)="showFormPanel(); openOnyaPreview()" matTooltip="ONYA előnézet" aria-label="ONYA előnézet">
-              <mat-icon>visibility</mat-icon>
+            <button
+              mat-icon-button
+              class="selector-sidebar"
+              type="button"
+              [class.active]="!sideMenuCollapsed"
+              (click)="toggleSideMenu()"
+              [matTooltip]="sideMenuCollapsed ? 'Oldalsáv mutatása' : 'Oldalsáv elrejtése'"
+              [attr.aria-label]="sideMenuCollapsed ? 'Oldalsáv mutatása' : 'Oldalsáv elrejtése'"
+            >
+              <mat-icon>view_sidebar</mat-icon>
             </button>
             <span class="selector-divider"></span>
-            <span class="viewport-switch" role="group" aria-label="Nézet">
-              <button mat-icon-button type="button" [class.active]="viewport === 'desktop'" (click)="setViewport('desktop')" matTooltip="Asztali nézet" aria-label="Asztali nézet">
-                <mat-icon>desktop_windows</mat-icon>
-              </button>
-              <button mat-icon-button type="button" [class.active]="viewport === 'mobile'" (click)="setViewport('mobile')" matTooltip="Mobil nézet" aria-label="Mobil nézet">
-                <mat-icon>phone_iphone</mat-icon>
-              </button>
-            </span>
+            <button
+              mat-icon-button
+              class="viewport-toggle active"
+              type="button"
+              [class.auto-mobile]="autoMobileViewport"
+              [disabled]="autoMobileViewport"
+              (click)="toggleViewport()"
+              [matTooltip]="autoMobileViewport ? 'Mobil nézet automatikusan kiválasztva' : (viewport === 'desktop' ? 'Váltás mobil nézetre' : 'Váltás asztali nézetre')"
+              [attr.aria-label]="autoMobileViewport ? 'Mobil nézet automatikusan kiválasztva' : (viewport === 'desktop' ? 'Váltás mobil nézetre' : 'Váltás asztali nézetre')"
+            >
+              <mat-icon>{{ viewport === 'desktop' ? 'desktop_windows' : 'phone_iphone' }}</mat-icon>
+            </button>
           </span>
         </div>
       </div>
     </header>
 
-    <div class="status-row" *ngIf="statusMessage">
+    <div class="status-row" *ngIf="statusMessage && statusMessage !== 'Űrlapszerkezet mentve.' && statusMessage !== 'Sablon mentve.'">
       {{ statusMessage }}
     </div>
 
-    <section class="editor-shell">
-      <aside class="builder-panel" [class.locked]="panelMode === 'form' && !builderEditing">
+    <section class="editor-shell" [class.side-menu-collapsed]="sideMenuCollapsed">
+      <aside class="builder-panel" [class.locked]="panelMode === 'form' && !builderEditing" *ngIf="!sideMenuCollapsed">
         <ng-container *ngIf="panelMode === 'form'">
           <div class="panel-section">
-            <h2>Elemek</h2>
-            <div class="field-palette form-field-palette">
-              <button
-                type="button"
-                *ngFor="let item of formElementPalette"
-                draggable="true"
-                [attr.aria-disabled]="!builderEditing"
-                (dragstart)="onFormElementDragStart($event, item.type)"
-                (click)="addFormElement(item.type)"
-              >
-                <mat-icon>{{ item.icon }}</mat-icon>
-                <span>{{ item.label }}</span>
-              </button>
-              <button
-                type="button"
-                *ngFor="let item of fieldPalette"
-                draggable="true"
-                [attr.aria-disabled]="!builderEditing"
-                (dragstart)="onPaletteDragStart($event, item.type)"
-                (click)="addFieldToActiveForm(item.type)"
-              >
-                <mat-icon>{{ item.icon }}</mat-icon>
-                <span>{{ item.label }}</span>
-              </button>
+            <button type="button" class="panel-section-toggle" (click)="elementsPanelOpen = !elementsPanelOpen" [attr.aria-expanded]="elementsPanelOpen">
+              <span>Elemek</span>
+              <mat-icon>{{ elementsPanelOpen ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </button>
+            <div class="panel-section-content" *ngIf="elementsPanelOpen">
+              <div class="field-palette form-field-palette">
+                <button
+                  type="button"
+                  *ngFor="let item of formElementPalette"
+                  draggable="true"
+                  [attr.aria-disabled]="!builderEditing"
+                  (dragstart)="onFormElementDragStart($event, item.type)"
+                  (click)="addFormElement(item.type)"
+                >
+                  <mat-icon>{{ item.icon }}</mat-icon>
+                  <span>{{ item.label }}</span>
+                </button>
+                <button
+                  type="button"
+                  *ngFor="let item of fieldPalette"
+                  draggable="true"
+                  [attr.aria-disabled]="!builderEditing"
+                  (dragstart)="onPaletteDragStart($event, item.type)"
+                  (click)="addFieldToActiveForm(item.type)"
+                >
+                  <mat-icon>{{ item.icon }}</mat-icon>
+                  <span>{{ item.label }}</span>
+                </button>
+              </div>
             </div>
           </div>
 
           <div class="panel-section sablon-panel-section">
-            <h2>Sablonok</h2>
-            <mat-form-field appearance="outline" class="full-field compact-filter">
-              <input matInput placeholder="Keresés" aria-label="Sablon keresés" [(ngModel)]="sectionFilter">
-            </mat-form-field>
-            <div class="sablon-library-list">
-              <div
-                class="sablon-library-item"
-                *ngFor="let section of filteredSectionLibrary; trackBy: trackById"
-                draggable="true"
-                [attr.aria-disabled]="!builderEditing"
-                (dragstart)="onSectionPaletteDragStart($event, section.id)"
-                role="button"
-                tabindex="0"
-              >
-                <span class="sablon-card-head">
-                  <strong>{{ section.title }}</strong>
-                  <small>{{ section.navCode || 'CUSTOM' }}</small>
-                </span>
-                <span class="sablon-card-preview">
-                  <span class="sablon-preview-grid">
-                    <span
-                      class="sablon-preview-shape"
-                      [style.width.%]="getSablonPreviewWidth(section)"
-                      [style.height.px]="getSablonPreviewHeight(section)"
-                    ></span>
-                    <span class="sablon-size">{{ getSablonSizeLabel(section) }}</span>
-                  </span>
-                </span>
-                <button
-                  type="button"
-                  class="sablon-delete-button"
-                  (click)="deleteSectionTemplate(section.id, $event)"
-                  matTooltip="Sablon törlése"
-                  aria-label="Sablon törlése"
+            <button type="button" class="panel-section-toggle" (click)="sablonPanelOpen = !sablonPanelOpen" [attr.aria-expanded]="sablonPanelOpen">
+              <span>Sablonok</span>
+              <mat-icon>{{ sablonPanelOpen ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </button>
+            <div class="panel-section-content" *ngIf="sablonPanelOpen">
+              <mat-form-field appearance="outline" class="full-field compact-filter">
+                <input matInput placeholder="Keresés" aria-label="Sablon keresés" [(ngModel)]="sectionFilter">
+              </mat-form-field>
+              <div class="sablon-library-list">
+                <div
+                  class="sablon-library-item"
+                  *ngFor="let section of filteredSectionLibrary; trackBy: trackById"
+                  draggable="true"
+                  [attr.aria-disabled]="!builderEditing"
+                  (dragstart)="onSectionPaletteDragStart($event, section.id)"
+                  (click)="addSection(section.id)"
+                  (keydown.enter)="addSection(section.id)"
+                  role="button"
+                  tabindex="0"
                 >
-                  <mat-icon>delete</mat-icon>
-                </button>
+                  <span class="sablon-card-head">
+                    <strong>{{ section.title }}</strong>
+                    <small>{{ section.navCode || 'CUSTOM' }}</small>
+                  </span>
+                  <span class="sablon-card-preview">
+                    <span class="sablon-preview-grid">
+                      <span
+                        class="sablon-preview-shape"
+                        [style.width.%]="getSablonPreviewWidth(section)"
+                        [style.height.px]="getSablonPreviewHeight(section)"
+                      ></span>
+                      <span class="sablon-size">{{ getSablonSizeLabel(section) }}</span>
+                    </span>
+                  </span>
+                  <button
+                    type="button"
+                    class="sablon-delete-button"
+                    (click)="deleteSectionTemplate(section.id, $event)"
+                    matTooltip="Sablon törlése"
+                    aria-label="Sablon törlése"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -126,58 +153,68 @@
 
         <ng-container *ngIf="panelMode === 'template' && activeSectionTemplate as block">
           <div class="panel-section">
-            <h2>Elemek</h2>
-            <div class="field-palette">
-              <button
-                type="button"
-                *ngFor="let item of fieldPalette"
-                draggable="true"
-                (dragstart)="onPaletteDragStart($event, item.type)"
-                (click)="addFieldToActiveSectionTemplate(item.type)"
-              >
-                <mat-icon>{{ item.icon }}</mat-icon>
-                <span>{{ item.label }}</span>
-              </button>
+            <button type="button" class="panel-section-toggle" (click)="elementsPanelOpen = !elementsPanelOpen" [attr.aria-expanded]="elementsPanelOpen">
+              <span>Elemek</span>
+              <mat-icon>{{ elementsPanelOpen ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </button>
+            <div class="panel-section-content" *ngIf="elementsPanelOpen">
+              <div class="field-palette">
+                <button
+                  type="button"
+                  *ngFor="let item of fieldPalette"
+                  draggable="true"
+                  (dragstart)="onPaletteDragStart($event, item.type)"
+                  (click)="addFieldToActiveSectionTemplate(item.type)"
+                >
+                  <mat-icon>{{ item.icon }}</mat-icon>
+                  <span>{{ item.label }}</span>
+                </button>
+              </div>
             </div>
           </div>
 
           <div class="panel-section sablon-panel-section">
-            <h2>Sablonok</h2>
-            <mat-form-field appearance="outline" class="full-field compact-filter">
-              <input matInput placeholder="Keresés" aria-label="Sablon keresés" [(ngModel)]="sectionFilter">
-            </mat-form-field>
-            <div class="sablon-library-list">
-              <div
-                class="sablon-library-item"
-                *ngFor="let section of filteredSectionLibrary; trackBy: trackById"
-                draggable="true"
-                (dragstart)="onSectionPaletteDragStart($event, section.id)"
-                role="button"
-                tabindex="0"
-              >
-                <span class="sablon-card-head">
-                  <strong>{{ section.title }}</strong>
-                  <small>{{ section.navCode || 'CUSTOM' }}</small>
-                </span>
-                <span class="sablon-card-preview">
-                  <span class="sablon-preview-grid">
-                    <span
-                      class="sablon-preview-shape"
-                      [style.width.%]="getSablonPreviewWidth(section)"
-                      [style.height.px]="getSablonPreviewHeight(section)"
-                    ></span>
-                    <span class="sablon-size">{{ getSablonSizeLabel(section) }}</span>
-                  </span>
-                </span>
-                <button
-                  type="button"
-                  class="sablon-delete-button"
-                  (click)="deleteSectionTemplate(section.id, $event)"
-                  matTooltip="Sablon törlése"
-                  aria-label="Sablon törlése"
+            <button type="button" class="panel-section-toggle" (click)="sablonPanelOpen = !sablonPanelOpen" [attr.aria-expanded]="sablonPanelOpen">
+              <span>Sablonok</span>
+              <mat-icon>{{ sablonPanelOpen ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </button>
+            <div class="panel-section-content" *ngIf="sablonPanelOpen">
+              <mat-form-field appearance="outline" class="full-field compact-filter">
+                <input matInput placeholder="Keresés" aria-label="Sablon keresés" [(ngModel)]="sectionFilter">
+              </mat-form-field>
+              <div class="sablon-library-list">
+                <div
+                  class="sablon-library-item"
+                  *ngFor="let section of filteredSectionLibrary; trackBy: trackById"
+                  draggable="true"
+                  (dragstart)="onSectionPaletteDragStart($event, section.id)"
+                  role="button"
+                  tabindex="0"
                 >
-                  <mat-icon>delete</mat-icon>
-                </button>
+                  <span class="sablon-card-head">
+                    <strong>{{ section.title }}</strong>
+                    <small>{{ section.navCode || 'CUSTOM' }}</small>
+                  </span>
+                  <span class="sablon-card-preview">
+                    <span class="sablon-preview-grid">
+                      <span
+                        class="sablon-preview-shape"
+                        [style.width.%]="getSablonPreviewWidth(section)"
+                        [style.height.px]="getSablonPreviewHeight(section)"
+                      ></span>
+                      <span class="sablon-size">{{ getSablonSizeLabel(section) }}</span>
+                    </span>
+                  </span>
+                  <button
+                    type="button"
+                    class="sablon-delete-button"
+                    (click)="deleteSectionTemplate(section.id, $event)"
+                    matTooltip="Sablon törlése"
+                    aria-label="Sablon törlése"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
               </div>
             </div>
           </div>

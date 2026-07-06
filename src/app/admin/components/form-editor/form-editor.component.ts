@@ -117,6 +117,10 @@ export class FormEditorComponent implements OnInit {
   private readonly sectionDragType = 'application/x-e-kozig-section-id';
   private readonly formElementDragType = 'application/x-e-kozig-form-element';
   private readonly formFieldDragType = 'application/x-e-kozig-form-field';
+  private readonly autoMobileViewportQuery = '(max-width: 760px)';
+  private stencilSavePendingTimer = 0;
+  private stencilSaveSuccessTimer = 0;
+  private preferredViewport: FormEditorViewport = 'desktop';
 
   @ViewChild('formCanvas') formCanvas?: ElementRef<HTMLElement>;
 
@@ -144,8 +148,12 @@ export class FormEditorComponent implements OnInit {
   selectedSectionId = SECTION_LIBRARY[0]?.id ?? '';
   selectedLibrarySectionId = SECTION_LIBRARY[0]?.id ?? '';
   panelMode: EditorPanelMode = 'form';
+  sideMenuCollapsed = false;
+  elementsPanelOpen = true;
+  sablonPanelOpen = true;
   activePageIndex = 0;
   viewport: FormEditorViewport = 'desktop';
+  autoMobileViewport = false;
   builderEditing = false;
   fieldValues: Record<string, string | boolean | number | null> = {};
   fieldOptionDrafts: Record<string, string> = {};
@@ -180,6 +188,8 @@ export class FormEditorComponent implements OnInit {
   previewFieldValues: Record<string, string | boolean | number | null> = {};
   loading = true;
   saving = false;
+  stencilSavePending = false;
+  stencilSaveSuccess = false;
   statusMessage = '';
 
   private resizeState: ResizeState | null = null;
@@ -188,7 +198,13 @@ export class FormEditorComponent implements OnInit {
   private fieldDragState: FieldDragState | null = null;
 
   async ngOnInit(): Promise<void> {
+    this.syncViewportFromScreen();
     await this.loadEditorData();
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.syncViewportFromScreen();
   }
 
   get hasActiveTemplate(): boolean {
@@ -366,7 +382,19 @@ export class FormEditorComponent implements OnInit {
   }
 
   setViewport(viewport: FormEditorViewport): void {
+    if (this.autoMobileViewport) {
+      this.viewport = 'mobile';
+      return;
+    }
+    this.preferredViewport = viewport;
     this.viewport = viewport;
+  }
+
+  toggleViewport(): void {
+    if (this.autoMobileViewport) {
+      return;
+    }
+    this.setViewport(this.viewport === 'desktop' ? 'mobile' : 'desktop');
   }
 
   openOnyaPreview(template: FormTemplate | null = this.activeTemplate): void {
@@ -411,17 +439,23 @@ export class FormEditorComponent implements OnInit {
 
   async handleStencilAction(): Promise<void> {
     if (this.panelMode === 'template') {
-      await this.saveSectionTemplate();
+      await this.runStencilSaveFeedback(() => this.saveSectionTemplate());
+      this.panelMode = 'form';
+      this.builderEditing = false;
       return;
     }
 
     if (this.builderEditing) {
-      await this.saveTemplate();
+      await this.runStencilSaveFeedback(() => this.saveTemplate());
       return;
     }
 
     this.panelMode = 'form';
     this.builderEditing = true;
+  }
+
+  toggleSideMenu(): void {
+    this.sideMenuCollapsed = !this.sideMenuCollapsed;
   }
 
   async handlePrimaryEditAction(): Promise<void> {
@@ -1755,7 +1789,7 @@ export class FormEditorComponent implements OnInit {
   }
 
   startDrag(event: PointerEvent, section: FormSectionDefinition): void {
-    if (this.viewport === 'mobile' || !this.builderEditing) {
+    if (!this.builderEditing) {
       return;
     }
 
@@ -2622,6 +2656,51 @@ export class FormEditorComponent implements OnInit {
     this.selectedFormSectionId = sourceSection.id;
     this.syncTemplateSections();
     this.statusMessage = 'Sablon csoportként hozzáadva.';
+  }
+
+  private async runStencilSaveFeedback(saveAction: () => Promise<void>): Promise<void> {
+    window.clearTimeout(this.stencilSavePendingTimer);
+    window.clearTimeout(this.stencilSaveSuccessTimer);
+    this.stencilSavePending = true;
+    this.stencilSaveSuccess = false;
+    const startedAt = Date.now();
+
+    await saveAction();
+
+    const saved =
+      this.statusMessage === 'Űrlapszerkezet mentve.'
+      || this.statusMessage === 'Sablon mentve.';
+    if (saved) {
+      this.statusMessage = '';
+      this.stencilSaveSuccess = true;
+    }
+
+    const remaining = Math.max(0, 900 - (Date.now() - startedAt));
+    this.stencilSavePendingTimer = window.setTimeout(() => {
+      this.stencilSavePending = false;
+    }, remaining);
+    this.stencilSaveSuccessTimer = window.setTimeout(() => {
+      this.stencilSaveSuccess = false;
+    }, 1200);
+  }
+
+  private syncViewportFromScreen(): void {
+    if (typeof window === 'undefined' || !window.matchMedia) {
+      return;
+    }
+
+    const forceMobile = window.matchMedia(this.autoMobileViewportQuery).matches;
+    if (forceMobile) {
+      this.autoMobileViewport = true;
+      this.viewport = 'mobile';
+      return;
+    }
+
+    const wasAutoMobile = this.autoMobileViewport;
+    this.autoMobileViewport = false;
+    if (wasAutoMobile) {
+      this.viewport = this.preferredViewport;
+    }
   }
 
   private cloneSectionForInsert(section: FormSectionDefinition): FormSectionDefinition {

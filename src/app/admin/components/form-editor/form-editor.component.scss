@@ -126,7 +126,7 @@
 }
 
 .selector-group button[mat-icon-button],
-.viewport-switch button {
+.viewport-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -134,8 +134,26 @@
 }
 
 .selector-group button[mat-icon-button] mat-icon,
-.viewport-switch button mat-icon {
+.viewport-toggle mat-icon {
   margin: 0;
+}
+
+.selector-stencil {
+  position: relative;
+}
+
+.selector-stencil.saving::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 2px solid rgba(0, 103, 177, 0.2);
+  border-top-color: #0067b1;
+  border-radius: 50%;
+  animation: stencil-save-spin 0.8s linear infinite;
+}
+
+.selector-stencil.saved {
+  animation: stencil-save-flash 1.1s ease-out;
 }
 
 .selector-divider {
@@ -165,24 +183,22 @@
   justify-content: flex-end;
 }
 
-.viewport-switch {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.15rem;
-  padding: 0.15rem;
-  border: 1px solid #cbd8e6;
-  border-radius: 4px;
-  background: #f6f9fc;
-}
-
-.viewport-switch button {
+.viewport-toggle {
   width: 36px;
   height: 36px;
 }
 
-.viewport-switch button.active {
+.viewport-toggle.active {
   background: #0067b1;
   color: #fff;
+}
+
+.viewport-toggle.auto-mobile,
+.viewport-toggle.auto-mobile:disabled {
+  background: #0067b1;
+  color: #fff;
+  opacity: 1;
+  cursor: default;
 }
 
 .toolbar-actions button[mat-stroked-button],
@@ -222,9 +238,14 @@
   box-sizing: border-box;
 }
 
+.editor-shell.side-menu-collapsed {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .builder-panel {
   min-height: 0;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   padding: 0.7rem;
   box-sizing: border-box;
 }
@@ -246,6 +267,66 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.panel-section-toggle {
+  appearance: none;
+  width: 100%;
+  min-height: 34px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #0f2f4a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.panel-section-toggle span {
+  min-width: 0;
+}
+
+.panel-section-toggle mat-icon {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  color: #0f2f4a;
+}
+
+.panel-section-content {
+  min-height: 0;
+  margin-top: 0.5rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+@keyframes stencil-save-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes stencil-save-flash {
+  0%,
+  100% {
+    background: #0067b1;
+    color: #fff;
+  }
+
+  25%,
+  75% {
+    background: #14843c;
+    color: #fff;
+  }
 }
 
 .full-field {
@@ -657,8 +738,8 @@
 }
 
 .mobile-preview .preview-frame {
-  width: min(390px, 100%);
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
 }
 
 .onya-topline {
@@ -801,8 +882,11 @@
   min-height: auto;
   width: 100%;
   grid-column: 1 / -1 !important;
-  grid-row: auto !important;
   align-self: stretch;
+}
+
+.form-canvas.is-mobile:not(.builder-editing) .form-section {
+  grid-row: auto !important;
 }
 
 .form-canvas.is-mobile .form-tabs-section {
@@ -1995,7 +2079,7 @@
     grid-template-areas:
       "select"
       "secondary";
-    width: 100%;
+    width: min(390px, calc(100vw - 2rem));
     min-width: 0;
     gap: 0.45rem;
     padding: 0;
@@ -2006,7 +2090,7 @@
 
   .selector-group .toolbar-select {
     grid-area: select;
-    width: min(250px, calc(100vw - 9rem));
+    width: 100%;
     justify-self: center;
   }
 
@@ -2023,11 +2107,19 @@
   .editor-shell {
     height: auto;
     grid-template-columns: 1fr;
+    justify-items: center;
+    padding-inline: 0;
   }
 
   .builder-panel,
   .preview-frame {
     min-height: 0;
+    width: min(390px, 100%);
+  }
+
+  .builder-panel {
+    max-height: min(56dvh, 540px);
+    -webkit-overflow-scrolling: touch;
   }
 
   .form-canvas {
@@ -2051,5 +2143,15 @@
 
   .form-section {
     min-height: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .selector-group {
+    width: min(390px, calc(100vw - 1rem));
+  }
+
+  .selector-group .toolbar-select {
+    width: min(240px, calc(100vw - 9.5rem));
   }
 }
