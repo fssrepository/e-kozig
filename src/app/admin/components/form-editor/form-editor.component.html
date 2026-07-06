@@ -243,6 +243,7 @@
               [class.form-group-section]="isGroupedFormSection(section)"
               [class.form-section--tall]="section.layout.rowSpan > 1"
               [class.selected]="isFormSectionSelected(section)"
+              [class.dragging]="isFormSectionDragging(section)"
               *ngFor="let section of activeSections; trackBy: trackById"
               [style.grid-column]="getGridColumn(section)"
               [style.grid-row]="getGridRow(section)"
@@ -357,17 +358,21 @@
               [style.grid-row]="getFormSelectionGridRow()"
               (pointerdown)="$event.stopPropagation()"
               (click)="$event.stopPropagation()"
+            ></div>
+
+            <button
+              *ngIf="builderEditing && hasMultiFormSelection"
+              type="button"
+              class="form-selection-menu-button"
+              [style.grid-column]="getFormSelectionGridColumn()"
+              [style.grid-row]="getFormSelectionGridRow()"
+              (pointerdown)="$event.stopPropagation()"
+              (click)="openFormSelectionSettings($event)"
+              matTooltip="Kijelölés műveletei"
+              aria-label="Kijelölés műveletei"
             >
-              <button
-                type="button"
-                class="form-selection-menu-button"
-                (click)="openFormSelectionSettings($event)"
-                matTooltip="Kijelölés műveletei"
-                aria-label="Kijelölés műveletei"
-              >
-                <mat-icon>more_horiz</mat-icon>
-              </button>
-            </div>
+              <mat-icon>more_horiz</mat-icon>
+            </button>
           </div>
         </div>
 

@@ -2132,6 +2132,10 @@ export class FormEditorComponent implements OnInit {
     return this.selectedFormSectionIds.includes(section.id);
   }
 
+  isFormSectionDragging(section: FormSectionDefinition): boolean {
+    return this.dragState?.sectionId === section.id;
+  }
+
   canResizeFormSection(section: FormSectionDefinition): boolean {
     return this.selectedFormSectionIds.length === 1 && this.selectedFormSectionId === section.id;
   }
