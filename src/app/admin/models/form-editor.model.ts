@@ -42,6 +42,10 @@ export interface FormFieldDefinition {
   label: string;
   type: FormFieldType;
   placeholder?: string;
+  subtitle?: string;
+  headerVariant?: 'single' | 'double';
+  headerBackground?: string;
+  headerLine?: boolean;
   required?: boolean;
   autofillKey?: AutofillKey;
   options?: FormFieldOption[];

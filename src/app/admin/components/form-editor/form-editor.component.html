@@ -200,12 +200,13 @@
               class="form-section form-container-element"
               [class.form-title-section]="isFormTitleSection(section)"
               [class.form-tabs-section]="isPageTabsSection(section)"
+              [class.form-field-section]="isFormFieldSection(section)"
               *ngFor="let section of activeSections; trackBy: trackById"
               [style.grid-column]="getGridColumn(section)"
               [style.grid-row]="getGridRow(section)"
             >
-              <div class="section-header container-header">
-                <span class="container-grip" (pointerdown)="startDrag($event, section)" matTooltip="Konténer mozgatása" aria-hidden="true">
+              <div class="section-header container-header" *ngIf="!isFormFieldSection(section) && !isPageTabsSection(section)">
+                <span *ngIf="builderEditing" class="container-grip" (pointerdown)="startDrag($event, section)" matTooltip="Elem mozgatása" aria-hidden="true">
                   <mat-icon>drag_indicator</mat-icon>
                 </span>
                 <span class="section-title-input" *ngIf="!isFormTitleSection(section); else formTitleElement">{{ section.title }}</span>
@@ -223,8 +224,8 @@
                   class="container-more"
                   *ngIf="builderEditing"
                   (click)="openSectionSettings(section, $event)"
-                  matTooltip="Konténer beállításai"
-                  aria-label="Konténer beállításai"
+                  matTooltip="Elem beállításai"
+                  aria-label="Elem beállításai"
                 >
                   <mat-icon>more_horiz</mat-icon>
                 </button>
@@ -286,8 +287,7 @@
                   <div class="form-field-toolbar" *ngIf="builderEditing">
                     <span
                       class="form-field-grip"
-                      draggable="true"
-                      (dragstart)="onFormFieldDragStart($event, section, field)"
+                      (pointerdown)="startDrag($event, section)"
                       matTooltip="Elem mozgatása"
                       aria-hidden="true"
                     >
@@ -304,12 +304,18 @@
                     </button>
                   </div>
 
-                  <div class="field-label-row" *ngIf="field.type !== 'header' && !builderEditing">
-                    <span class="field-label-input">{{ field.label }}</span>
-                    <span class="preview-required">{{ field.required ? 'Kötelező' : 'Opcionális' }}</span>
+                  <div
+                    class="rendered-header"
+                    [class.rendered-header--single]="field.headerVariant === 'single'"
+                    [class.rendered-header--no-line]="field.headerLine === false"
+                    [style.background]="field.headerBackground || null"
+                    *ngIf="field.type === 'header'; else formFieldBody"
+                  >
+                    <span>{{ field.label }}</span>
+                    <small *ngIf="field.headerVariant !== 'single' && (field.subtitle || field.placeholder)">
+                      {{ field.subtitle || field.placeholder }}
+                    </small>
                   </div>
-
-                  <div class="rendered-header" *ngIf="field.type === 'header'; else formFieldBody">{{ field.label }}</div>
 
                   <ng-template #formFieldBody>
                     <mat-checkbox *ngIf="field.type === 'checkbox'; else nonCheckboxField" [(ngModel)]="fieldValues[field.id]" [name]="field.id" [disabled]="true">
@@ -336,9 +342,14 @@
                 </ng-template>
               </div>
 
+              <span *ngIf="builderEditing" class="resize-handle handle-north" (pointerdown)="startResize($event, section, 'n')"></span>
               <span *ngIf="builderEditing" class="resize-handle handle-east" (pointerdown)="startResize($event, section, 'e')"></span>
               <span *ngIf="builderEditing" class="resize-handle handle-south" (pointerdown)="startResize($event, section, 's')"></span>
-              <span *ngIf="builderEditing" class="resize-handle handle-corner" (pointerdown)="startResize($event, section, 'se')"></span>
+              <span *ngIf="builderEditing" class="resize-handle handle-west" (pointerdown)="startResize($event, section, 'w')"></span>
+              <span *ngIf="builderEditing" class="resize-handle handle-corner handle-nw" (pointerdown)="startResize($event, section, 'nw')"></span>
+              <span *ngIf="builderEditing" class="resize-handle handle-corner handle-ne" (pointerdown)="startResize($event, section, 'ne')"></span>
+              <span *ngIf="builderEditing" class="resize-handle handle-corner handle-sw" (pointerdown)="startResize($event, section, 'sw')"></span>
+              <span *ngIf="builderEditing" class="resize-handle handle-corner handle-se" (pointerdown)="startResize($event, section, 'se')"></span>
             </section>
           </div>
         </div>
@@ -515,8 +526,8 @@
   <div class="field-settings-panel" (click)="$event.stopPropagation()">
     <div class="field-settings-header">
       <div>
-        <span>Konténer beállításai</span>
-        <strong>{{ section.title || 'Konténer' }}</strong>
+        <span>Elem beállításai</span>
+        <strong>{{ section.title || 'Elem' }}</strong>
       </div>
       <button mat-icon-button type="button" (click)="closeSectionSettings()" aria-label="Bezárás">
         <mat-icon>close</mat-icon>
@@ -534,7 +545,7 @@
         <input matInput [(ngModel)]="section.navCode">
       </mat-form-field>
 
-      <mat-checkbox [(ngModel)]="section.mandatory">Kötelező konténer</mat-checkbox>
+      <mat-checkbox [(ngModel)]="section.mandatory">Kötelező elem</mat-checkbox>
 
       <div class="field-settings-layout">
         <mat-form-field appearance="outline" class="full-field">
@@ -598,6 +609,28 @@
           <mat-option value="tel">Telefon</mat-option>
         </mat-select>
       </mat-form-field>
+
+      <ng-container *ngIf="field.type === 'header'">
+        <mat-form-field appearance="outline" class="full-field">
+          <mat-label>Második sor</mat-label>
+          <input matInput [(ngModel)]="field.subtitle">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-field">
+          <mat-label>Címsor mód</mat-label>
+          <mat-select [(ngModel)]="field.headerVariant">
+            <mat-option value="double">Két sor</mat-option>
+            <mat-option value="single">Egy sor</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-field">
+          <mat-label>Háttérszín</mat-label>
+          <input matInput type="color" [(ngModel)]="field.headerBackground">
+        </mat-form-field>
+
+        <mat-checkbox [(ngModel)]="field.headerLine">Alsó vonal</mat-checkbox>
+      </ng-container>
 
       <mat-checkbox *ngIf="field.type !== 'header'" [(ngModel)]="field.required">Kötelező mező</mat-checkbox>
 
@@ -677,6 +710,28 @@
           <mat-option value="tel">Telefon</mat-option>
         </mat-select>
       </mat-form-field>
+
+      <ng-container *ngIf="field.type === 'header'">
+        <mat-form-field appearance="outline" class="full-field">
+          <mat-label>Második sor</mat-label>
+          <input matInput [(ngModel)]="field.subtitle">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-field">
+          <mat-label>Címsor mód</mat-label>
+          <mat-select [(ngModel)]="field.headerVariant">
+            <mat-option value="double">Két sor</mat-option>
+            <mat-option value="single">Egy sor</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-field">
+          <mat-label>Háttérszín</mat-label>
+          <input matInput type="color" [(ngModel)]="field.headerBackground">
+        </mat-form-field>
+
+        <mat-checkbox [(ngModel)]="field.headerLine">Alsó vonal</mat-checkbox>
+      </ng-container>
 
       <mat-checkbox *ngIf="field.type !== 'header'" [(ngModel)]="field.required">Kötelező mező</mat-checkbox>
 

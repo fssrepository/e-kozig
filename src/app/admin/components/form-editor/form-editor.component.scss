@@ -878,6 +878,40 @@
   background: #fff;
 }
 
+.form-field-section {
+  display: block;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.form-field-section > .container-header {
+  display: none;
+}
+
+.form-field-section > .section-fields {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: visible;
+  padding: 0;
+  display: block;
+}
+
+.form-field-section .form-field-element {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
 .form-title-section .container-header {
   flex: 1;
   min-height: 100%;
@@ -959,6 +993,11 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 1px 3px rgba(15, 47, 74, 0.14);
+}
+
+.container-more,
+.form-field-more {
+  border-radius: 50%;
 }
 
 .builder-editing .container-grip,
@@ -1065,8 +1104,8 @@
 .form-field-toolbar {
   position: absolute;
   top: 50%;
-  left: 0.28rem;
-  right: 0.28rem;
+  left: 0.55rem;
+  right: 0.55rem;
   transform: translateY(-50%);
   z-index: 3;
   min-height: 24px;
@@ -1081,8 +1120,13 @@
 
 .form-field-element--header .form-field-toolbar,
 .form-field-element--multiline .form-field-toolbar {
-  top: 0.28rem;
+  top: 0.5rem;
   transform: none;
+}
+
+.form-field-section .form-field-toolbar {
+  left: 0.55rem;
+  right: 0.55rem;
 }
 
 .form-field-toolbar .form-field-grip,
@@ -1093,6 +1137,43 @@
 ::ng-deep .builder-editing .form-field-element .rendered-field .mat-mdc-text-field-wrapper {
   padding-left: 2.25rem;
   padding-right: 2.25rem;
+}
+
+::ng-deep .form-field-section .rendered-field {
+  height: 100%;
+  margin: 0;
+}
+
+::ng-deep .form-field-section .rendered-field .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+::ng-deep .form-field-section .rendered-field .mat-mdc-text-field-wrapper {
+  height: 100%;
+}
+
+::ng-deep .form-field-section .rendered-field .mat-mdc-form-field-flex,
+::ng-deep .form-field-section .rendered-field .mat-mdc-form-field-infix {
+  height: 100%;
+}
+
+::ng-deep .form-field-section .rendered-field .mat-mdc-form-field-infix {
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+::ng-deep .form-field-section .form-field-element--multiline .rendered-field .mat-mdc-form-field-infix {
+  align-items: stretch;
+  padding-top: 0.45rem;
+  padding-bottom: 0.45rem;
+}
+
+::ng-deep .form-field-section .form-field-element--multiline textarea {
+  height: 100%;
+  resize: none;
 }
 
 .builder-editing .form-field-element--header .rendered-header {
@@ -1124,12 +1205,41 @@
 
 .rendered-header {
   min-height: 34px;
-  display: flex;
-  align-items: center;
+  height: 100%;
+  display: grid;
+  align-content: center;
+  gap: 0.1rem;
   border-bottom: 2px solid #0067b1;
   color: #0f2f4a;
-  font-size: 17px;
+  padding: 0.35rem 0.45rem;
+  box-sizing: border-box;
+}
+
+.rendered-header span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 18px;
   font-weight: 800;
+}
+
+.rendered-header small {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #5c6f82;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.rendered-header--single {
+  align-content: center;
+}
+
+.rendered-header--no-line {
+  border-bottom-color: transparent;
 }
 
 .template-frame {
@@ -1677,9 +1787,17 @@
   z-index: 3;
 }
 
+.handle-north {
+  top: -3px;
+  left: 0;
+  right: 0;
+  height: 7px;
+  cursor: ns-resize;
+}
+
 .handle-east {
   top: 0;
-  right: 0;
+  right: -3px;
   width: 7px;
   height: 100%;
   cursor: ew-resize;
@@ -1688,18 +1806,46 @@
 .handle-south {
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: -3px;
   height: 7px;
   cursor: ns-resize;
 }
 
+.handle-west {
+  top: 0;
+  left: -3px;
+  width: 7px;
+  height: 100%;
+  cursor: ew-resize;
+}
+
 .handle-corner {
-  right: 0;
-  bottom: 0;
-  width: 16px;
-  height: 16px;
+  width: 8px;
+  height: 8px;
   cursor: nwse-resize;
   background: #0067b1;
+}
+
+.handle-nw {
+  top: -4px;
+  left: -4px;
+}
+
+.handle-ne {
+  top: -4px;
+  right: -4px;
+  cursor: nesw-resize;
+}
+
+.handle-sw {
+  left: -4px;
+  bottom: -4px;
+  cursor: nesw-resize;
+}
+
+.handle-se {
+  right: -4px;
+  bottom: -4px;
 }
 
 .onya-preview-popup {

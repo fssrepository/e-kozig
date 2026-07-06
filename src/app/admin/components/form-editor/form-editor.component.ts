@@ -24,13 +24,15 @@ import {
 import { FormEditorStoreService } from '../../services/form-editor-store.service';
 
 type ResizeDirection = 'n' | 'e' | 's' | 'w' | 'se' | 'nw' | 'ne' | 'sw';
-type FormElementType = 'page' | 'container';
+type FormElementType = 'page';
 
 interface ResizeState {
   sectionId: string;
   direction: ResizeDirection;
   startX: number;
   startY: number;
+  startCol: number;
+  startRow: number;
   startColSpan: number;
   startRowSpan: number;
   columnWidth: number;
@@ -535,9 +537,7 @@ export class FormEditorComponent implements OnInit {
   addFormElement(type: FormElementType): void {
     if (type === 'page') {
       this.addPage();
-      return;
     }
-    this.addContainerToActiveForm();
   }
 
   removeActivePage(): void {
@@ -807,12 +807,6 @@ export class FormEditorComponent implements OnInit {
       return;
     }
 
-    if (formElement === 'container') {
-      event.preventDefault();
-      this.addContainerToActiveForm(this.getFormContainerDropLayout(event));
-      return;
-    }
-
     const fieldType = this.getDragData(event, this.fieldDragType) as FormFieldType;
     if (this.fieldPalette.some(item => item.type === fieldType)) {
       event.preventDefault();
@@ -836,7 +830,7 @@ export class FormEditorComponent implements OnInit {
   }
 
   onContainerDragOver(event: DragEvent, section: FormSectionDefinition): void {
-    if (this.isFormTitleSection(section) || this.isPageTabsSection(section)) {
+    if (this.isFormTitleSection(section) || this.isPageTabsSection(section) || this.isFormFieldSection(section)) {
       return;
     }
     if (
@@ -858,7 +852,7 @@ export class FormEditorComponent implements OnInit {
   }
 
   onContainerDrop(event: DragEvent, section: FormSectionDefinition): void {
-    if (!this.builderEditing || this.isFormTitleSection(section) || this.isPageTabsSection(section)) {
+    if (!this.builderEditing || this.isFormTitleSection(section) || this.isPageTabsSection(section) || this.isFormFieldSection(section)) {
       return;
     }
 
@@ -949,36 +943,6 @@ export class FormEditorComponent implements OnInit {
     this.closeSectionSettings();
   }
 
-  addContainerToActiveForm(placement: Partial<FormSectionLayout> = {}): void {
-    if (!this.activeTemplate || !this.activePage || !this.builderEditing) {
-      return;
-    }
-
-    const suffix = this.createShortId();
-    const colSpan = this.clamp(placement.colSpan ?? 4, 2, this.gridColumns);
-    const rowSpan = this.clamp(placement.rowSpan ?? 2, 1, this.gridRows);
-    const section: FormSectionDefinition = {
-      id: `kontener-${suffix}`,
-      title: 'Konténer',
-      navCode: 'CONTAINER',
-      description: 'Üres űrlap konténer',
-      mandatory: false,
-      layout: {
-        col: this.clamp(placement.col ?? 1, 1, Math.max(1, this.gridColumns - colSpan + 1)),
-        row: this.clamp(placement.row ?? this.getNextRow(), 1, this.gridRows),
-        colSpan,
-        rowSpan
-      },
-      fields: []
-    };
-
-    this.ensureGridContains(section.layout.row + section.layout.rowSpan - 1, section.layout.col + section.layout.colSpan - 1);
-    this.activePage.sections = [...this.activePage.sections, section];
-    this.customFieldSectionId = section.id;
-    this.syncTemplateSections();
-    this.statusMessage = 'Konténer hozzáadva az űrlaphoz.';
-  }
-
   addCustomField(): void {
     if (!this.activeTemplate || !this.builderEditing) {
       return;
@@ -990,35 +954,17 @@ export class FormEditorComponent implements OnInit {
       return;
     }
 
-    const section = this.activeSections.find(item => item.id === this.customFieldSectionId)
-      ?? this.activeSections[0];
-    if (!section) {
-      this.statusMessage = 'Előbb adjon hozzá egy blokkot.';
-      return;
-    }
-
-    const field: FormFieldDefinition = {
-      id: `${this.slugify(label)}-${this.createShortId()}`,
-      label,
-      type: this.customFieldType,
-      required: false,
-      layout: this.getDefaultFieldLayout(this.customFieldType),
-      options: this.customFieldType === 'select' ? this.parseCustomOptions() : undefined
-    };
-
-    section.fields = [...section.fields, field];
-    this.initializeFieldValue(field);
+    this.addFieldToActiveForm(this.customFieldType, {}, label);
     this.customFieldLabel = '';
     this.statusMessage = 'Mező hozzáadva.';
-    this.syncTemplateSections();
   }
 
-  addFieldToActiveForm(type: FormFieldType, placement: Partial<FormSectionLayout> = {}): void {
+  addFieldToActiveForm(type: FormFieldType, placement: Partial<FormSectionLayout> = {}, labelOverride = ''): void {
     if (!this.activeTemplate || !this.activePage || !this.builderEditing) {
       return;
     }
 
-    const label = this.getDefaultFieldLabel(type);
+    const label = labelOverride.trim() || this.getDefaultFieldLabel(type);
     const suffix = this.createShortId();
     const fieldLayout = this.getDefaultFieldLayout(type);
     const colSpan = this.clamp(placement.colSpan ?? fieldLayout.colSpan, 2, this.gridColumns);
@@ -1052,6 +998,7 @@ export class FormEditorComponent implements OnInit {
       ]
     };
 
+    section.fields.forEach(field => this.applyFieldTypeOptions(field));
     this.ensureGridContains(section.layout.row + section.layout.rowSpan - 1, section.layout.col + section.layout.colSpan - 1);
     this.activePage.sections = [...this.activePage.sections, section];
     section.fields.forEach(field => this.initializeFieldValue(field));
@@ -1090,7 +1037,7 @@ export class FormEditorComponent implements OnInit {
     section.fields = [...section.fields, field];
     this.initializeFieldValue(field);
     this.syncTemplateSections();
-    this.statusMessage = 'Elem hozzáadva a konténerhez.';
+    this.statusMessage = 'Elem hozzáadva.';
   }
 
   addSectionFieldsToContainer(target: FormSectionDefinition, sourceSectionId: string): void {
@@ -1112,7 +1059,7 @@ export class FormEditorComponent implements OnInit {
     target.fields = this.normalizeFields([...target.fields, ...fields]);
     fields.forEach(field => this.initializeFieldValue(field));
     this.syncTemplateSections();
-    this.statusMessage = 'Sablon elemei hozzáadva a konténerhez.';
+    this.statusMessage = 'Sablon elemei hozzáadva.';
   }
 
   moveFormFieldToContainer(payload: string, target: FormSectionDefinition, event?: DragEvent): void {
@@ -1163,6 +1110,7 @@ export class FormEditorComponent implements OnInit {
       options: type === 'select' ? this.parseOptions(this.microFieldOptions) : undefined
     };
 
+    this.applyFieldTypeOptions(field);
     if (!this.activeSectionTemplate) {
       return;
     }
@@ -1440,16 +1388,10 @@ export class FormEditorComponent implements OnInit {
       col: currentLayout.col,
       row: currentLayout.row
     };
-    if (field.type === 'header') {
-      field.required = false;
-      field.options = undefined;
-      delete this.fieldOptionDrafts[field.id];
-    } else if (field.type === 'select') {
+    this.applyFieldTypeOptions(field);
+    if (field.type === 'select') {
       field.options = field.options?.length ? field.options : this.parseOptions(this.microFieldOptions);
       this.fieldOptionDrafts[field.id] = field.options.map(option => option.label).join('\n');
-    } else {
-      field.options = undefined;
-      delete this.fieldOptionDrafts[field.id];
     }
     this.settleTemplateField(field.id);
     this.upsertActiveSectionTemplate();
@@ -1685,16 +1627,10 @@ export class FormEditorComponent implements OnInit {
       col: currentLayout.col,
       row: currentLayout.row
     };
-    if (field.type === 'header') {
-      field.required = false;
-      field.options = undefined;
-      delete this.fieldOptionDrafts[field.id];
-    } else if (field.type === 'select') {
+    this.applyFieldTypeOptions(field);
+    if (field.type === 'select') {
       field.options = field.options?.length ? field.options : this.parseOptions(this.microFieldOptions);
       this.fieldOptionDrafts[field.id] = field.options.map(option => option.label).join('\n');
-    } else {
-      field.options = undefined;
-      delete this.fieldOptionDrafts[field.id];
     }
     this.initializeFieldValue(field);
     this.syncTemplateSections();
@@ -1807,7 +1743,7 @@ export class FormEditorComponent implements OnInit {
     }
 
     const target = event.target as HTMLElement;
-    if (!target.closest('.container-grip')) {
+    if (!target.closest('.container-grip, .form-field-grip')) {
       return;
     }
 
@@ -1842,6 +1778,8 @@ export class FormEditorComponent implements OnInit {
       direction,
       startX: event.clientX,
       startY: event.clientY,
+      startCol: section.layout.col,
+      startRow: section.layout.row,
       startColSpan: section.layout.colSpan,
       startRowSpan: section.layout.rowSpan,
       columnWidth: canvasWidth / this.gridColumns,
@@ -1964,23 +1902,36 @@ export class FormEditorComponent implements OnInit {
       return;
     }
 
-    const colDelta = this.resizeState.direction.includes('e')
-      ? Math.round((event.clientX - this.resizeState.startX) / this.resizeState.columnWidth)
-      : 0;
-    const rowDelta = this.resizeState.direction.includes('s')
-      ? Math.round((event.clientY - this.resizeState.startY) / this.resizeState.rowHeight)
-      : 0;
+    const direction = this.resizeState.direction;
+    const rawColDelta = Math.round((event.clientX - this.resizeState.startX) / this.resizeState.columnWidth);
+    const rawRowDelta = Math.round((event.clientY - this.resizeState.startY) / this.resizeState.rowHeight);
+    let col = this.resizeState.startCol;
+    let row = this.resizeState.startRow;
+    let colSpan = this.resizeState.startColSpan;
+    let rowSpan = this.resizeState.startRowSpan;
 
-    section.layout.colSpan = this.clamp(
-      this.resizeState.startColSpan + colDelta,
-      3,
-      this.gridColumns - section.layout.col + 1
-    );
-    section.layout.rowSpan = this.clamp(
-      this.resizeState.startRowSpan + rowDelta,
-      1,
-      this.gridRows - section.layout.row + 1
-    );
+    if (direction.includes('e')) {
+      colSpan = this.clamp(
+        this.resizeState.startColSpan + rawColDelta,
+        2,
+        Math.max(2, this.gridColumns - this.resizeState.startCol + 1)
+      );
+    }
+    if (direction.includes('w')) {
+      const maxCol = this.resizeState.startCol + this.resizeState.startColSpan - 2;
+      col = this.clamp(this.resizeState.startCol + rawColDelta, 1, Math.max(1, maxCol));
+      colSpan = this.resizeState.startCol + this.resizeState.startColSpan - col;
+    }
+    if (direction.includes('s')) {
+      rowSpan = this.clamp(this.resizeState.startRowSpan + rawRowDelta, 1, Math.max(1, this.gridRows - this.resizeState.startRow + 1));
+    }
+    if (direction.includes('n')) {
+      const maxRow = this.resizeState.startRow + this.resizeState.startRowSpan - 1;
+      row = this.clamp(this.resizeState.startRow + rawRowDelta, 1, Math.max(1, maxRow));
+      rowSpan = this.clamp(this.resizeState.startRow + this.resizeState.startRowSpan - row, 1, Math.max(1, this.gridRows - row + 1));
+    }
+
+    section.layout = { col, row, colSpan, rowSpan };
     this.syncTemplateSections();
   }
 
@@ -2025,6 +1976,10 @@ export class FormEditorComponent implements OnInit {
     return section.id.startsWith(this.formTabsSectionPrefix);
   }
 
+  isFormFieldSection(section: FormSectionDefinition): boolean {
+    return !this.isFormTitleSection(section) && !this.isPageTabsSection(section) && section.fields.length === 1;
+  }
+
   getInputType(field: FormFieldDefinition): string {
     if (field.type === 'email' || field.type === 'tel' || field.type === 'number' || field.type === 'date') {
       return field.type;
@@ -2062,6 +2017,7 @@ export class FormEditorComponent implements OnInit {
     normalized.pages.forEach(page => {
       page.mandatory = page.mandatory ?? false;
       this.ensurePageChromeSections(normalized, page);
+      this.flattenPageFieldSections(page);
       page.sections.forEach(section => {
         section.mandatory = section.mandatory ?? false;
         section.fields = this.normalizeFields(section.fields);
@@ -2120,6 +2076,97 @@ export class FormEditorComponent implements OnInit {
     template.grid.rows = this.clamp(maxRow, 12, 24);
   }
 
+  private flattenPageFieldSections(page: FormTemplatePage): void {
+    page.sections = (page.sections ?? []).flatMap(section => {
+      if (this.isFormTitleSection(section) || this.isPageTabsSection(section)) {
+        section.layout = this.normalizeSectionCanvasLayout(section.layout, { col: 1, row: 1, colSpan: 6, rowSpan: 1 });
+        section.fields = [];
+        return [section];
+      }
+
+      const normalizedSection = {
+        ...section,
+        layout: this.normalizeSectionCanvasLayout(section.layout, { col: 1, row: 1, colSpan: 6, rowSpan: 1 }),
+        fields: this.normalizeFields(section.fields ?? [])
+      };
+      return this.createElementSectionsFromSection(normalizedSection);
+    });
+  }
+
+  private createElementSectionsFromSection(section: FormSectionDefinition): FormSectionDefinition[] {
+    if (!section.fields.length) {
+      return [];
+    }
+
+    if (this.isFlatElementSection(section)) {
+      const field = section.fields[0];
+      const fieldLayout = this.normalizeFieldLayout(field);
+      field.layout = {
+        col: 1,
+        row: 1,
+        colSpan: 12,
+        rowSpan: this.clamp(fieldLayout.rowSpan, 1, this.getMaxFieldRowSpan(field.type))
+      };
+      section.title = field.label || section.title;
+      section.navCode = field.type === 'header' ? 'CIMSOR' : 'ELEM';
+      section.layout = this.normalizeSectionCanvasLayout(section.layout, {
+        col: 1,
+        row: 1,
+        colSpan: fieldLayout.colSpan,
+        rowSpan: fieldLayout.rowSpan
+      });
+      section.layout.rowSpan = this.clamp(Math.max(section.layout.rowSpan, field.layout.rowSpan), 1, this.gridRows);
+      return [section];
+    }
+
+    return section.fields.map((field, index) => this.createElementSectionFromField(section, field, index));
+  }
+
+  private isFlatElementSection(section: FormSectionDefinition): boolean {
+    return section.fields.length === 1 && (section.navCode === 'ELEM' || section.navCode === 'CIMSOR');
+  }
+
+  private createElementSectionFromField(section: FormSectionDefinition, field: FormFieldDefinition, index: number): FormSectionDefinition {
+    const sourceLayout = this.normalizeSectionCanvasLayout(section.layout, { col: 1, row: 1, colSpan: 6, rowSpan: 1 });
+    const fieldLayout = this.normalizeFieldLayout(field);
+    const localCol = fieldLayout.col ?? 1;
+    const localRow = fieldLayout.row ?? 1;
+    const colOffset = Math.floor(((localCol - 1) * sourceLayout.colSpan) / 12);
+    const col = this.clamp(sourceLayout.col + colOffset, 1, this.gridColumns);
+    const scaledColSpan = Math.max(2, Math.round((fieldLayout.colSpan * sourceLayout.colSpan) / 12));
+    const colSpan = this.clamp(scaledColSpan, 2, Math.max(2, this.gridColumns - col + 1));
+    const row = this.clamp(sourceLayout.row + localRow - 1, 1, this.gridRows);
+    const rowSpan = this.clamp(fieldLayout.rowSpan, 1, Math.max(1, this.gridRows - row + 1));
+    const clonedField = this.clone(field);
+    clonedField.layout = {
+      col: 1,
+      row: 1,
+      colSpan: 12,
+      rowSpan
+    };
+
+    return {
+      id: `${section.id}-${field.id}-elem-${index + 1}`,
+      title: clonedField.label || section.title,
+      navCode: clonedField.type === 'header' ? 'CIMSOR' : 'ELEM',
+      description: section.title,
+      mandatory: clonedField.required ?? false,
+      layout: { col, row, colSpan, rowSpan },
+      fields: [clonedField]
+    };
+  }
+
+  private normalizeSectionCanvasLayout(layout: FormSectionLayout | undefined, fallback: FormSectionLayout): FormSectionLayout {
+    const colSpan = this.clamp(layout?.colSpan ?? fallback.colSpan, 2, this.gridColumns);
+    const rowSpan = this.clamp(layout?.rowSpan ?? fallback.rowSpan, 1, this.gridRows);
+    return {
+      col: this.clamp(layout?.col ?? fallback.col, 1, Math.max(1, this.gridColumns - colSpan + 1)),
+      row: this.clamp(layout?.row ?? fallback.row, 1, Math.max(1, this.gridRows - rowSpan + 1)),
+      colSpan,
+      rowSpan
+    };
+  }
+
   private normalizeSectionTemplate(section: FormSectionDefinition): FormSectionDefinition {
     const normalized = this.clone(section);
     normalized.navCode = normalized.navCode || 'CUSTOM';
@@ -2136,6 +2183,7 @@ export class FormEditorComponent implements OnInit {
       const normalized = this.clone(field);
       normalized.required = normalized.required ?? false;
       normalized.options = normalized.type === 'select' ? normalized.options ?? [] : undefined;
+      this.applyFieldTypeOptions(normalized);
       normalized.layout = this.normalizeFieldLayout(normalized);
       if (!field.layout?.col || !field.layout?.row) {
         const slot = this.findAvailableFieldSlot(occupied, normalized.layout.colSpan, normalized.layout.rowSpan);
@@ -2148,6 +2196,27 @@ export class FormEditorComponent implements OnInit {
       this.markFieldCells(occupied, normalized.layout);
       return normalized;
     });
+  }
+
+  private applyFieldTypeOptions(field: FormFieldDefinition): void {
+    if (field.type === 'header') {
+      field.required = false;
+      field.options = undefined;
+      field.headerVariant = field.headerVariant ?? 'double';
+      field.headerBackground = field.headerBackground || '#ffffff';
+      field.headerLine = field.headerLine ?? true;
+      delete this.fieldOptionDrafts[field.id];
+      return;
+    }
+
+    field.headerVariant = undefined;
+    field.headerBackground = undefined;
+    field.headerLine = undefined;
+    field.subtitle = undefined;
+    if (field.type !== 'select') {
+      field.options = undefined;
+      delete this.fieldOptionDrafts[field.id];
+    }
   }
 
   private normalizeFieldLayout(field: FormFieldDefinition): FormFieldLayout {
@@ -2281,20 +2350,26 @@ export class FormEditorComponent implements OnInit {
       return;
     }
 
-    const section = this.cloneSectionForInsert(source);
-    const colSpan = this.clamp(section.layout.colSpan, 2, this.gridColumns);
-    const rowSpan = this.clamp(section.layout.rowSpan, 1, this.gridRows);
-    section.layout = {
+    const sourceSection = this.cloneSectionForInsert(source);
+    const colSpan = this.clamp(sourceSection.layout.colSpan, 2, this.gridColumns);
+    const rowSpan = this.clamp(sourceSection.layout.rowSpan, 1, this.gridRows);
+    sourceSection.layout = {
       col: this.clamp(placement.col ?? 1, 1, Math.max(1, this.gridColumns - colSpan + 1)),
       row: this.clamp(placement.row ?? this.getNextRow(), 1, this.gridRows),
       colSpan,
       rowSpan
     };
 
-    this.ensureGridContains(section.layout.row + section.layout.rowSpan - 1, section.layout.col + section.layout.colSpan - 1);
-    this.activePage.sections = [...this.activePage.sections, section];
-    section.fields.forEach(field => this.initializeFieldValue(field));
-    this.customFieldSectionId = section.id;
+    const sections = this.createElementSectionsFromSection({
+      ...sourceSection,
+      fields: this.normalizeFields(sourceSection.fields)
+    });
+    sections.forEach(section => {
+      this.ensureGridContains(section.layout.row + section.layout.rowSpan - 1, section.layout.col + section.layout.colSpan - 1);
+      section.fields.forEach(field => this.initializeFieldValue(field));
+    });
+    this.activePage.sections = [...this.activePage.sections, ...sections];
+    this.customFieldSectionId = sections.at(-1)?.id ?? '';
     this.syncTemplateSections();
   }
 
@@ -2353,17 +2428,6 @@ export class FormEditorComponent implements OnInit {
       colSpan,
       rowSpan
     };
-  }
-
-  private getFormContainerDropLayout(event: DragEvent): Partial<FormSectionLayout> {
-    return this.getFormDropLayout(event, {
-      id: 'container-drop',
-      title: 'Konténer',
-      navCode: 'CONTAINER',
-      mandatory: false,
-      layout: { col: 1, row: 1, colSpan: 4, rowSpan: 2 },
-      fields: []
-    });
   }
 
   private getContainerFieldDropLayout(event: DragEvent, fallback: FormFieldLayout): FormFieldLayout {
