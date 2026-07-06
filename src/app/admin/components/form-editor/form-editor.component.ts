@@ -18,6 +18,7 @@ import {
   FormSectionDefinition,
   FormSectionLayout,
   FormTemplate,
+  FormTemplateGrid,
   FormTemplatePage,
   SECTION_LIBRARY
 } from '../../models/form-editor.model';
@@ -2070,6 +2071,7 @@ export class FormEditorComponent implements OnInit {
         section.mandatory = section.mandatory ?? false;
         section.fields = this.normalizeFields(section.fields);
       });
+      this.arrangePageSections(page, normalized.grid);
     });
     normalized.sections = normalized.pages.flatMap(page => page.sections);
     return normalized;
@@ -2130,6 +2132,108 @@ export class FormEditorComponent implements OnInit {
       return;
     }
     this.activeTemplate.pages.forEach(page => this.ensurePageChromeSections(this.activeTemplate as FormTemplate, page));
+  }
+
+  private arrangePageSections(page: FormTemplatePage, grid: FormTemplateGrid): void {
+    const occupied = new Set<string>();
+    const chromeSections = page.sections.filter(section => this.isFormTitleSection(section) || this.isPageTabsSection(section));
+    chromeSections.forEach(section => this.markSectionCells(occupied, section.layout));
+
+    const minContentRow = Math.max(
+      3,
+      ...chromeSections.map(section => section.layout.row + section.layout.rowSpan)
+    );
+
+    page.sections
+      .filter(section => !this.isFormTitleSection(section) && !this.isPageTabsSection(section))
+      .forEach(section => {
+        this.normalizeCanvasElementSize(section);
+        const desiredLayout = {
+          ...section.layout,
+          row: minContentRow
+        };
+        section.layout = this.sectionLayoutFits(desiredLayout, occupied)
+          ? desiredLayout
+          : this.findOpenSectionLayout(desiredLayout, occupied, minContentRow);
+        this.markSectionCells(occupied, section.layout);
+      });
+
+    const maxRow = Math.max(
+      grid.rows,
+      ...page.sections.map(section => section.layout.row + section.layout.rowSpan - 1)
+    );
+    grid.rows = this.clamp(maxRow, 12, 24);
+  }
+
+  private normalizeCanvasElementSize(section: FormSectionDefinition): void {
+    if (!this.isFormFieldSection(section)) {
+      section.layout = this.normalizeSectionCanvasLayout(section.layout, section.layout);
+      return;
+    }
+
+    const field = section.fields[0];
+    const fieldLayout = this.getDefaultFieldLayout(field.type);
+    const colSpan = this.clamp(Math.max(section.layout.colSpan, fieldLayout.colSpan), 2, this.gridColumns);
+    const rowSpan = this.clamp(Math.max(section.layout.rowSpan, fieldLayout.rowSpan), 1, this.gridRows);
+    section.layout = this.normalizeSectionCanvasLayout(
+      {
+        ...section.layout,
+        colSpan,
+        rowSpan
+      },
+      { col: 1, row: 1, colSpan, rowSpan }
+    );
+    field.layout = {
+      col: 1,
+      row: 1,
+      colSpan: 12,
+      rowSpan: this.clamp(fieldLayout.rowSpan, 1, this.getMaxFieldRowSpan(field.type))
+    };
+  }
+
+  private sectionLayoutFits(layout: FormSectionLayout, occupied: Set<string>): boolean {
+    if (layout.col < 1 || layout.row < 1 || layout.col + layout.colSpan - 1 > this.gridColumns) {
+      return false;
+    }
+
+    for (let row = layout.row; row < layout.row + layout.rowSpan; row += 1) {
+      for (let col = layout.col; col < layout.col + layout.colSpan; col += 1) {
+        if (occupied.has(`${row}:${col}`)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  private findOpenSectionLayout(layout: FormSectionLayout, occupied: Set<string>, minRow: number): FormSectionLayout {
+    const colSpan = this.clamp(layout.colSpan, 2, this.gridColumns);
+    const rowSpan = this.clamp(layout.rowSpan, 1, this.gridRows);
+    const startRow = Math.max(layout.row, minRow);
+    const preferredCol = this.clamp(layout.col, 1, Math.max(1, this.gridColumns - colSpan + 1));
+
+    for (let row = startRow; row <= 24 - rowSpan + 1; row += 1) {
+      const columns = [
+        ...Array.from({ length: this.gridColumns - preferredCol - colSpan + 2 }, (_, index) => preferredCol + index),
+        ...Array.from({ length: preferredCol - 1 }, (_, index) => index + 1)
+      ];
+      for (const col of columns) {
+        const candidate = { col, row, colSpan, rowSpan };
+        if (this.sectionLayoutFits(candidate, occupied)) {
+          return candidate;
+        }
+      }
+    }
+
+    return { col: 1, row: startRow, colSpan, rowSpan };
+  }
+
+  private markSectionCells(occupied: Set<string>, layout: FormSectionLayout): void {
+    for (let row = layout.row; row < layout.row + layout.rowSpan; row += 1) {
+      for (let col = layout.col; col < layout.col + layout.colSpan; col += 1) {
+        occupied.add(`${row}:${col}`);
+      }
+    }
   }
 
   private propagateChromeLayout(source: FormSectionDefinition): void {
@@ -2219,10 +2323,8 @@ export class FormEditorComponent implements OnInit {
     const fieldLayout = this.normalizeFieldLayout(field);
     const localCol = fieldLayout.col ?? 1;
     const localRow = fieldLayout.row ?? 1;
-    const colOffset = Math.floor(((localCol - 1) * sourceLayout.colSpan) / 12);
-    const col = this.clamp(sourceLayout.col + colOffset, 1, this.gridColumns);
-    const scaledColSpan = Math.max(2, Math.round((fieldLayout.colSpan * sourceLayout.colSpan) / 12));
-    const colSpan = this.clamp(scaledColSpan, 2, Math.max(2, this.gridColumns - col + 1));
+    const colSpan = this.clamp(fieldLayout.colSpan, 2, this.gridColumns);
+    const col = this.clamp(sourceLayout.col + localCol - 1, 1, Math.max(1, this.gridColumns - colSpan + 1));
     const row = this.clamp(sourceLayout.row + localRow - 1, 1, this.gridRows);
     const rowSpan = this.clamp(fieldLayout.rowSpan, 1, Math.max(1, this.gridRows - row + 1));
     const clonedField = this.clone(field);
@@ -2579,7 +2681,7 @@ export class FormEditorComponent implements OnInit {
     if (type === 'checkbox') {
       return { colSpan: 4, rowSpan: 1 };
     }
-    if (type === 'date' || type === 'number' || type === 'tel') {
+    if (type === 'date' || type === 'number' || type === 'email' || type === 'tel') {
       return { colSpan: 4, rowSpan: 1 };
     }
     return { colSpan: 6, rowSpan: 1 };

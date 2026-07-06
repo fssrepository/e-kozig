@@ -272,19 +272,19 @@
                     </div>
 
                     <ng-template #formFieldBody>
-                      <mat-checkbox *ngIf="field.type === 'checkbox'; else nonCheckboxField" [(ngModel)]="fieldValues[field.id]" [name]="field.id" [disabled]="true">
+                      <mat-checkbox *ngIf="field.type === 'checkbox'; else nonCheckboxField" [(ngModel)]="fieldValues[field.id]" [name]="field.id" [disabled]="builderEditing">
                         {{ field.label }}
                       </mat-checkbox>
 
                       <ng-template #nonCheckboxField>
                         <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type !== 'select' && field.type !== 'textarea'">
-                          <input matInput [type]="getInputType(field)" [placeholder]="field.placeholder || field.label" [(ngModel)]="fieldValues[field.id]" [name]="field.id" readonly>
+                          <input matInput [type]="getInputType(field)" [placeholder]="field.placeholder || field.label" [(ngModel)]="fieldValues[field.id]" [name]="field.id" [readonly]="builderEditing">
                         </mat-form-field>
                         <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type === 'textarea'">
-                          <textarea matInput rows="3" [placeholder]="field.placeholder || field.label" [(ngModel)]="fieldValues[field.id]" [name]="field.id" readonly></textarea>
+                          <textarea matInput rows="3" [placeholder]="field.placeholder || field.label" [(ngModel)]="fieldValues[field.id]" [name]="field.id" [readonly]="builderEditing"></textarea>
                         </mat-form-field>
                         <mat-form-field appearance="outline" class="rendered-field" *ngIf="field.type === 'select'">
-                          <mat-select [(ngModel)]="fieldValues[field.id]" [name]="field.id" [placeholder]="field.label" disabled>
+                          <mat-select [(ngModel)]="fieldValues[field.id]" [name]="field.id" [placeholder]="field.label" [disabled]="builderEditing">
                             <mat-option *ngFor="let option of field.options ?? []" [value]="option.value">
                               {{ option.label }}
                             </mat-option>
