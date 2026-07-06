@@ -2,6 +2,7 @@
   display: block;
   height: 100%;
   min-height: 0;
+  overflow: visible;
   color: #1f2933;
 }
 
@@ -11,7 +12,7 @@
   padding: 0.75rem;
   box-sizing: border-box;
   background: transparent;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .editor-loading {
@@ -110,7 +111,9 @@
 .selector-group button[mat-mini-fab] {
   width: 34px;
   height: 34px;
-  box-shadow: none;
+  background: #fff;
+  color: #0067b1;
+  box-shadow: 0 1px 3px rgba(15, 47, 74, 0.18);
 }
 
 .selector-group button[mat-icon-button].active {
@@ -146,10 +149,10 @@
 
 .selector-group.active .selector-secondary-actions {
   padding: 0.2rem;
-  border: 1px solid #78aedc;
+  border: 1px solid #8aa8c4;
   border-radius: 4px;
-  background: #dceefb;
-  box-shadow: 0 1px 2px rgba(0, 103, 177, 0.12);
+  background: #c6d9ea;
+  box-shadow: 0 1px 3px rgba(15, 47, 74, 0.16);
 }
 
 .toolbar-actions {
@@ -858,6 +861,11 @@
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
+.form-container-element {
+  border-color: #9fb7cf;
+  background: #fff;
+}
+
 .section-header {
   min-height: 40px;
   display: grid;
@@ -870,12 +878,51 @@
   box-sizing: border-box;
 }
 
-.builder-editing .section-header {
+.container-header {
+  grid-template-columns: 28px minmax(0, 1fr) auto auto 30px;
+  min-height: 38px;
+  padding: 0.25rem 0.35rem;
+  background: #eef4f9;
+}
+
+.container-grip,
+.form-field-grip,
+.container-more,
+.form-field-more {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #c8d6e3;
+  border-radius: 5px;
+  background: #fff;
+  color: #5c6f82;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(15, 47, 74, 0.14);
+}
+
+.builder-editing .container-grip,
+.form-field-grip {
   cursor: move;
+}
+
+.container-more,
+.form-field-more {
+  padding: 0;
+  cursor: pointer;
+}
+
+.container-more:hover,
+.form-field-more:hover {
+  border-color: #7caed6;
+  color: #0067b1;
 }
 
 .section-header mat-icon {
   color: #6b7d90;
+  width: 17px;
+  height: 17px;
+  font-size: 17px;
 }
 
 .section-title-input,
@@ -908,6 +955,13 @@
   white-space: nowrap;
 }
 
+.section-required-text {
+  color: #5c6f82;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .section-fields {
   min-height: 0;
   overflow: auto;
@@ -919,6 +973,20 @@
   gap: 0.5rem;
 }
 
+.container-empty {
+  grid-column: 1 / -1;
+  min-height: 64px;
+  border: 1px dashed #b8c9d9;
+  border-radius: 4px;
+  background: #f8fbfd;
+  color: #6b7d90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .field-editor {
   min-width: 0;
   min-height: 0;
@@ -926,6 +994,30 @@
   border-radius: 3px;
   padding: 0.35rem;
   background: #fff;
+}
+
+.form-field-element {
+  border-color: #d7e0ea;
+  box-shadow: 0 1px 2px rgba(15, 47, 74, 0.06);
+}
+
+.form-field-toolbar {
+  min-height: 26px;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 24px;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.25rem;
+  color: #0f2f4a;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.form-field-toolbar > span:nth-child(2) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .field-editor:last-child {
@@ -1621,6 +1713,8 @@
 
 @media (min-width: 881px) {
   .editor-toolbar {
+    position: relative;
+    top: -1.35rem;
     min-height: 48px;
     justify-content: flex-end;
     padding: 0;
@@ -1648,7 +1742,9 @@
   }
 
   .editor-toolbar {
-    min-height: 94px;
+    position: relative;
+    top: -0.75rem;
+    min-height: 82px;
     justify-content: center;
     padding: 0;
     background: transparent;
