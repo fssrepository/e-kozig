@@ -156,6 +156,8 @@ export class FormEditorComponent implements OnInit {
   selectedTemplateFieldIds: string[] = [];
   sectionFilter = '';
   selectionTemplateName = '';
+  newWizardDialogOpen = false;
+  newWizardName = '';
   fieldSettingsOpen = false;
   previewTemplate: FormTemplate | null = null;
   previewPageIndex = 0;
@@ -359,6 +361,56 @@ export class FormEditorComponent implements OnInit {
     this.builderEditing = !this.builderEditing;
   }
 
+  async handleStencilAction(): Promise<void> {
+    if (this.panelMode === 'template') {
+      await this.saveSectionTemplate();
+      return;
+    }
+
+    if (this.builderEditing) {
+      await this.saveTemplate();
+      return;
+    }
+
+    this.panelMode = 'form';
+    this.builderEditing = true;
+  }
+
+  async handlePrimaryEditAction(): Promise<void> {
+    if (this.panelMode === 'template') {
+      await this.saveSectionTemplate();
+      return;
+    }
+
+    if (!this.builderEditing) {
+      this.builderEditing = true;
+      return;
+    }
+
+    await this.saveTemplate();
+  }
+
+  openNewWizardDialog(): void {
+    this.newWizardName = '';
+    this.newWizardDialogOpen = true;
+  }
+
+  closeNewWizardDialog(): void {
+    this.newWizardDialogOpen = false;
+    this.newWizardName = '';
+  }
+
+  async confirmCreateWizard(): Promise<void> {
+    const name = this.newWizardName.trim();
+    if (!name) {
+      this.statusMessage = 'Űrlapnév szükséges.';
+      return;
+    }
+
+    await this.createWizard(name);
+    this.closeNewWizardDialog();
+  }
+
   setActivePage(index: number): void {
     if (!this.activeTemplate || index < 0 || index >= this.activeTemplate.pages.length) {
       return;
@@ -394,11 +446,31 @@ export class FormEditorComponent implements OnInit {
     this.syncTemplateSections();
   }
 
-  createWizard(): void {
+  removePage(index: number, event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    if (!this.activeTemplate || !this.builderEditing || this.activeTemplate.pages.length <= 1) {
+      return;
+    }
+
+    const removed = this.activeTemplate.pages[index];
+    removed?.sections.flatMap(section => section.fields).forEach(field => delete this.fieldValues[field.id]);
+    this.activeTemplate.pages = this.activeTemplate.pages.filter((_, pageIndex) => pageIndex !== index);
+    if (this.activePageIndex >= this.activeTemplate.pages.length) {
+      this.activePageIndex = this.activeTemplate.pages.length - 1;
+    } else if (index < this.activePageIndex) {
+      this.activePageIndex -= 1;
+    }
+    this.customFieldSectionId = this.activeSections[0]?.id ?? '';
+    this.syncTemplateSections();
+  }
+
+  async createWizard(name = 'Új űrlap'): Promise<void> {
+    const navCode = this.slugify(name).toUpperCase().slice(0, 12) || 'UJURLAP';
     const template: FormTemplate = {
       id: this.createId('form-template'),
-      name: 'Új űrlap',
-      navCode: 'UJEGYKE',
+      name,
+      navCode,
       description: 'Összeállított NAV űrlap',
       mandatory: false,
       grid: { columns: 12, rows: 6 },
@@ -413,11 +485,21 @@ export class FormEditorComponent implements OnInit {
       updatedAt: new Date().toISOString(),
       sections: []
     };
-    this.templates = [template, ...this.templates];
-    this.selectTemplate(template.id);
-    this.panelMode = 'form';
-    this.builderEditing = true;
-    this.statusMessage = 'Új űrlap létrehozva.';
+
+    this.saving = true;
+    try {
+      await this.store.saveTemplate(template);
+      this.templates = (await this.store.getTemplates()).map(item => this.normalizeTemplate(item));
+      this.selectTemplate(template.id);
+      this.panelMode = 'form';
+      this.builderEditing = true;
+      this.statusMessage = 'Új űrlap létrehozva.';
+    } catch (error) {
+      this.statusMessage = 'Az új űrlap mentése sikertelen.';
+      console.error(error);
+    } finally {
+      this.saving = false;
+    }
   }
 
   createSectionTemplate(): void {
@@ -524,7 +606,14 @@ export class FormEditorComponent implements OnInit {
   }
 
   onFormCanvasDragOver(event: DragEvent): void {
-    if (!this.builderEditing || (!this.hasDragData(event, this.sectionDragType) && this.getDragData(event, this.formElementDragType) !== 'page')) {
+    if (
+      !this.builderEditing
+      || (
+        !this.hasDragData(event, this.sectionDragType)
+        && !this.hasDragData(event, this.fieldDragType)
+        && this.getDragData(event, this.formElementDragType) !== 'page'
+      )
+    ) {
       return;
     }
 
@@ -543,6 +632,13 @@ export class FormEditorComponent implements OnInit {
     if (formElement === 'page') {
       event.preventDefault();
       this.addPage();
+      return;
+    }
+
+    const fieldType = this.getDragData(event, this.fieldDragType) as FormFieldType;
+    if (this.fieldPalette.some(item => item.type === fieldType)) {
+      event.preventDefault();
+      this.addFieldToActiveForm(fieldType, this.getFormFieldDropLayout(event, fieldType));
       return;
     }
 
@@ -638,6 +734,53 @@ export class FormEditorComponent implements OnInit {
     this.customFieldLabel = '';
     this.statusMessage = 'Mező hozzáadva.';
     this.syncTemplateSections();
+  }
+
+  addFieldToActiveForm(type: FormFieldType, placement: Partial<FormSectionLayout> = {}): void {
+    if (!this.activeTemplate || !this.activePage || !this.builderEditing) {
+      return;
+    }
+
+    const label = this.getDefaultFieldLabel(type);
+    const suffix = this.createShortId();
+    const fieldLayout = this.getDefaultFieldLayout(type);
+    const colSpan = this.clamp(placement.colSpan ?? fieldLayout.colSpan, 2, this.gridColumns);
+    const rowSpan = this.clamp(placement.rowSpan ?? (type === 'header' ? 1 : 1), 1, this.gridRows);
+    const section: FormSectionDefinition = {
+      id: `${this.slugify(label)}-elem-${suffix}`,
+      title: label,
+      navCode: type === 'header' ? 'CIMSOR' : 'ELEM',
+      description: 'Vászon elem',
+      mandatory: false,
+      layout: {
+        col: this.clamp(placement.col ?? 1, 1, Math.max(1, this.gridColumns - colSpan + 1)),
+        row: this.clamp(placement.row ?? this.getNextRow(), 1, 16),
+        colSpan,
+        rowSpan
+      },
+      fields: [
+        {
+          id: `${this.slugify(label)}-${suffix}`,
+          label,
+          type,
+          required: false,
+          layout: {
+            col: 1,
+            row: 1,
+            colSpan: 12,
+            rowSpan: this.getMaxFieldRowSpan(type) > 1 ? Math.min(rowSpan, this.getMaxFieldRowSpan(type)) : 1
+          },
+          options: type === 'select' ? this.parseOptions(this.microFieldOptions) : undefined
+        }
+      ]
+    };
+
+    this.ensureGridContains(section.layout.row + section.layout.rowSpan - 1, section.layout.col + section.layout.colSpan - 1);
+    this.activePage.sections = [...this.activePage.sections, section];
+    section.fields.forEach(field => this.initializeFieldValue(field));
+    this.customFieldSectionId = section.id;
+    this.syncTemplateSections();
+    this.statusMessage = 'Elem hozzáadva az űrlaphoz.';
   }
 
   addMicroField(): void {
@@ -1041,6 +1184,11 @@ export class FormEditorComponent implements OnInit {
   }
 
   onPaletteDragStart(event: DragEvent, type: FormFieldType): void {
+    if (this.panelMode === 'form' && !this.builderEditing) {
+      event.preventDefault();
+      return;
+    }
+
     event.dataTransfer?.setData(this.fieldDragType, type);
     event.dataTransfer?.setData('text/plain', type);
     if (event.dataTransfer) {
@@ -1712,6 +1860,24 @@ export class FormEditorComponent implements OnInit {
     const layout = section.layout ?? { col: 1, row: 1, colSpan: 4, rowSpan: 1 };
     const colSpan = this.clamp(layout.colSpan, 2, this.gridColumns);
     const rowSpan = this.clamp(layout.rowSpan, 1, this.gridRows);
+    const columnWidth = rect.width / this.gridColumns;
+    const x = this.clamp(event.clientX - rect.left, 0, rect.width);
+    const y = Math.max(0, event.clientY - rect.top + canvas.scrollTop);
+
+    return {
+      col: this.clamp(Math.floor(x / columnWidth) + 1, 1, Math.max(1, this.gridColumns - colSpan + 1)),
+      row: this.clamp(Math.floor(y / 132) + 1, 1, Math.max(1, 16 - rowSpan + 1)),
+      colSpan,
+      rowSpan
+    };
+  }
+
+  private getFormFieldDropLayout(event: DragEvent, type: FormFieldType): Partial<FormSectionLayout> {
+    const canvas = this.formCanvas?.nativeElement ?? (event.currentTarget as HTMLElement);
+    const rect = canvas.getBoundingClientRect();
+    const fieldLayout = this.getDefaultFieldLayout(type);
+    const colSpan = this.clamp(fieldLayout.colSpan, 2, this.gridColumns);
+    const rowSpan = type === 'header' ? 1 : 1;
     const columnWidth = rect.width / this.gridColumns;
     const x = this.clamp(event.clientX - rect.left, 0, rect.width);
     const y = Math.max(0, event.clientY - rect.top + canvas.scrollTop);

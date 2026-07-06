@@ -54,9 +54,9 @@
 }
 
 .selector-group {
-  min-width: min(360px, 100%);
+  min-width: min(405px, 100%);
   display: grid;
-  grid-template-columns: auto minmax(190px, 1fr) 40px 36px;
+  grid-template-columns: auto minmax(190px, 1fr) 40px 36px 36px;
   align-items: center;
   gap: 0.35rem;
   padding: 0.25rem 0.35rem;
@@ -84,6 +84,11 @@
   width: 34px;
   height: 34px;
   box-shadow: none;
+}
+
+.selector-group button[mat-icon-button].active {
+  background: #0067b1;
+  color: #fff;
 }
 
 .toolbar-actions {
@@ -302,6 +307,10 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.35rem;
+}
+
+.form-field-palette {
+  margin-top: 0.45rem;
 }
 
 .field-palette button {
@@ -634,6 +643,53 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 13px;
+}
+
+.page-tab-grip {
+  width: 22px;
+  height: 24px;
+  border: 1px solid #c5d3e2;
+  border-radius: 4px;
+  background: #f8fbff;
+  color: #6b7d90;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(15, 47, 74, 0.18);
+  flex: 0 0 auto;
+}
+
+.page-tab-grip mat-icon {
+  width: 15px;
+  height: 15px;
+  font-size: 15px;
+}
+
+.page-tab-more {
+  margin-left: auto;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #c5d3e2;
+  border-radius: 50%;
+  background: #fff;
+  color: #6b7d90;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(15, 47, 74, 0.2);
+  flex: 0 0 auto;
+}
+
+.page-tab-more:hover {
+  border-color: #9fb7cf;
+  background: #eef3f8;
+  color: #0f2f4a;
+}
+
+.page-tab-more mat-icon {
+  width: 17px;
+  height: 17px;
+  font-size: 17px;
 }
 
 .form-canvas {
@@ -1206,7 +1262,8 @@
   cursor: nwse-resize;
 }
 
-.field-settings-popup {
+.field-settings-popup,
+.new-wizard-popup {
   position: fixed;
   inset: 0;
   z-index: 3300;
@@ -1217,13 +1274,15 @@
   box-sizing: border-box;
 }
 
-.field-settings-backdrop {
+.field-settings-backdrop,
+.new-wizard-backdrop {
   position: absolute;
   inset: 0;
   background: rgba(15, 23, 42, 0.34);
 }
 
-.field-settings-panel {
+.field-settings-panel,
+.new-wizard-panel {
   position: relative;
   z-index: 1;
   width: min(420px, 94vw);

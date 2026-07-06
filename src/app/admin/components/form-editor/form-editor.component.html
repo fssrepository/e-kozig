@@ -6,7 +6,7 @@
   <ng-container *ngIf="!loading && activeTemplate as template">
     <header class="editor-toolbar">
       <div class="compact-selectors">
-        <div class="selector-group" [class.active]="panelMode === 'form'">
+        <div class="selector-group" [class.active]="panelMode === 'form' || panelMode === 'template'">
           <label>Űrlap</label>
           <mat-form-field appearance="outline" class="toolbar-select">
             <mat-select [ngModel]="selectedTemplateId" (selectionChange)="selectTemplate($event.value)" aria-label="Űrlap kiválasztása">
@@ -15,25 +15,21 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
-          <button mat-mini-fab type="button" color="primary" (click)="createWizard()" matTooltip="Új űrlap" aria-label="Új űrlap">
+          <button mat-mini-fab type="button" color="primary" (click)="openNewWizardDialog()" matTooltip="Új űrlap" aria-label="Új űrlap">
             <mat-icon>add</mat-icon>
           </button>
           <button mat-icon-button type="button" (click)="showFormPanel(); openOnyaPreview()" matTooltip="ONYA előnézet" aria-label="ONYA előnézet">
             <mat-icon>visibility</mat-icon>
           </button>
-        </div>
-
-        <div class="selector-group" [class.active]="panelMode === 'template'">
-          <label>Sablon</label>
-          <mat-form-field appearance="outline" class="toolbar-select">
-            <mat-select [ngModel]="selectedSectionId" (selectionChange)="selectSectionTemplate($event.value)" aria-label="Sablon kiválasztása">
-              <mat-option *ngFor="let section of sectionLibrary; trackBy: trackById" [value]="section.id">
-                {{ section.title }} · {{ section.navCode || 'CUSTOM' }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-          <button mat-mini-fab type="button" color="primary" (click)="createSectionTemplate()" matTooltip="Új sablon" aria-label="Új sablon">
-            <mat-icon>add</mat-icon>
+          <button
+            mat-icon-button
+            type="button"
+            [class.active]="builderEditing || panelMode === 'template'"
+            (click)="handleStencilAction()"
+            [matTooltip]="builderEditing || panelMode === 'template' ? 'Mentés' : 'Stencil szerkesztés'"
+            [attr.aria-label]="builderEditing || panelMode === 'template' ? 'Mentés' : 'Stencil szerkesztés'"
+          >
+            <mat-icon>{{ builderEditing || panelMode === 'template' ? 'save' : 'format_shapes' }}</mat-icon>
           </button>
         </div>
       </div>
@@ -47,32 +43,6 @@
             <mat-icon>phone_iphone</mat-icon>
           </button>
         </div>
-
-        <button
-          mat-icon-button
-          type="button"
-          *ngIf="panelMode === 'form'"
-          [class.mode-active]="builderEditing"
-          (click)="toggleBuilderEditing()"
-          matTooltip="Űrlap elrendezés szerkesztése"
-          aria-label="Űrlap elrendezés szerkesztése"
-        >
-          <mat-icon>{{ builderEditing ? 'lock_open' : 'edit' }}</mat-icon>
-        </button>
-        <button mat-icon-button type="button" *ngIf="panelMode === 'form'" (click)="autofillUserData()" matTooltip="Autofill előnézethez" aria-label="Autofill előnézethez">
-          <mat-icon>auto_fix_high</mat-icon>
-        </button>
-        <button mat-icon-button type="button" *ngIf="panelMode === 'form'" (click)="duplicateWizard()" [disabled]="saving" matTooltip="Űrlap másolása" aria-label="Űrlap másolása">
-          <mat-icon>content_copy</mat-icon>
-        </button>
-        <button mat-raised-button color="primary" type="button" *ngIf="panelMode === 'form'" (click)="saveTemplate()" [disabled]="saving || !builderEditing">
-          <mat-icon>save</mat-icon>
-          <span>Űrlap mentése</span>
-        </button>
-        <button mat-raised-button color="primary" type="button" *ngIf="panelMode === 'template'" (click)="saveSectionTemplate()" [disabled]="saving || !activeSectionTemplate">
-          <mat-icon>save</mat-icon>
-          <span>Sablon mentése</span>
-        </button>
       </div>
     </header>
 
@@ -84,91 +54,28 @@
       <aside class="builder-panel" [class.locked]="panelMode === 'form' && !builderEditing">
         <ng-container *ngIf="panelMode === 'form'">
           <div class="panel-section">
-            <h2>Űrlap</h2>
-            <mat-form-field appearance="outline" class="full-field">
-              <mat-label>Név</mat-label>
-              <input matInput [(ngModel)]="template.name" [readonly]="!builderEditing">
-            </mat-form-field>
-            <mat-form-field appearance="outline" class="full-field">
-              <mat-label>NAV kód</mat-label>
-              <input matInput [(ngModel)]="template.navCode" [readonly]="!builderEditing">
-            </mat-form-field>
-            <mat-checkbox [(ngModel)]="template.mandatory" [disabled]="!builderEditing">Kötelező űrlap</mat-checkbox>
-          </div>
-
-          <div class="panel-section">
-            <h2>Oldalak</h2>
-            <div class="page-list">
-              <button
-                type="button"
-                *ngFor="let page of template.pages; let i = index; trackBy: trackById"
-                [class.active]="i === activePageIndex"
-                (click)="setActivePage(i)"
-              >
-                <span>{{ page.title }}</span>
-                <small>{{ page.mandatory ? 'Kötelező' : 'Opcionális' }}</small>
-              </button>
-            </div>
-
-            <div class="page-actions" *ngIf="activePage as page">
-              <mat-form-field appearance="outline" class="full-field">
-                <mat-label>Oldalnév</mat-label>
-                <input matInput [(ngModel)]="page.title" [readonly]="!builderEditing">
-              </mat-form-field>
-              <mat-checkbox [(ngModel)]="page.mandatory" [disabled]="!builderEditing">Kötelező oldal</mat-checkbox>
-              <div class="page-action-buttons">
-                <button mat-stroked-button type="button" (click)="addPage()" [disabled]="!builderEditing">
-                  <mat-icon>add</mat-icon>
-                  <span>Oldal</span>
-                </button>
-                <button mat-stroked-button type="button" (click)="removeActivePage()" [disabled]="!builderEditing || template.pages.length <= 1">
-                  <mat-icon>delete</mat-icon>
-                  <span>Törlés</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel-section">
-            <h2>Grid</h2>
-            <div class="grid-controls">
-              <div class="stepper">
-                <span>Oszlop</span>
-                <button mat-icon-button type="button" (click)="removeGridColumn()" [disabled]="!builderEditing" matTooltip="Oszlop törlése" aria-label="Oszlop törlése">
-                  <mat-icon>remove</mat-icon>
-                </button>
-                <strong>{{ gridColumns }}</strong>
-                <button mat-icon-button type="button" (click)="addGridColumn()" [disabled]="!builderEditing" matTooltip="Oszlop hozzáadása" aria-label="Oszlop hozzáadása">
-                  <mat-icon>add</mat-icon>
-                </button>
-              </div>
-              <div class="stepper">
-                <span>Sor</span>
-                <button mat-icon-button type="button" (click)="removeGridRow()" [disabled]="!builderEditing" matTooltip="Sor törlése" aria-label="Sor törlése">
-                  <mat-icon>remove</mat-icon>
-                </button>
-                <strong>{{ gridRows }}</strong>
-                <button mat-icon-button type="button" (click)="addGridRow()" [disabled]="!builderEditing" matTooltip="Sor hozzáadása" aria-label="Sor hozzáadása">
-                  <mat-icon>add</mat-icon>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel-section">
             <h2>Elemek</h2>
-            <div class="form-element-palette">
+            <div class="field-palette form-field-palette">
               <button
                 type="button"
-                *ngFor="let item of formElementPalette"
                 draggable="true"
                 [attr.aria-disabled]="!builderEditing"
-                (dragstart)="onFormElementDragStart($event, item.type)"
+                (dragstart)="onFormElementDragStart($event, 'page')"
                 (click)="addPage()"
+              >
+                <mat-icon>tab</mat-icon>
+                <span>Oldal / tab</span>
+              </button>
+              <button
+                type="button"
+                *ngFor="let item of fieldPalette"
+                draggable="true"
+                [attr.aria-disabled]="!builderEditing"
+                (dragstart)="onPaletteDragStart($event, item.type)"
+                (click)="addFieldToActiveForm(item.type)"
               >
                 <mat-icon>{{ item.icon }}</mat-icon>
                 <span>{{ item.label }}</span>
-                <small>{{ item.description }}</small>
               </button>
             </div>
           </div>
@@ -186,7 +93,7 @@
                 draggable="true"
                 [attr.aria-disabled]="!builderEditing"
                 (dragstart)="onSectionPaletteDragStart($event, section.id)"
-                (click)="addSection(section.id)"
+                (click)="selectSectionTemplate(section.id)"
                 role="button"
                 tabindex="0"
               >
@@ -305,8 +212,22 @@
               [class.active]="i === activePageIndex"
               (click)="setActivePage(i)"
             >
+              <span class="page-tab-grip" aria-hidden="true">
+                <mat-icon>drag_indicator</mat-icon>
+              </span>
               <span>{{ i + 1 }}</span>
               <strong>{{ page.title }}</strong>
+              <span
+                class="page-tab-more"
+                *ngIf="builderEditing && template.pages.length > 1"
+                (click)="removePage(i, $event)"
+                matTooltip="Oldal műveletek"
+                aria-label="Oldal műveletek"
+                role="button"
+                tabindex="0"
+              >
+                <mat-icon>more_horiz</mat-icon>
+              </span>
             </button>
           </nav>
 
@@ -483,6 +404,34 @@
     </section>
   </ng-container>
 </div>
+
+<section class="new-wizard-popup" *ngIf="newWizardDialogOpen">
+  <div class="new-wizard-backdrop" (click)="closeNewWizardDialog()"></div>
+  <form class="new-wizard-panel" (ngSubmit)="confirmCreateWizard()" (click)="$event.stopPropagation()">
+    <div class="field-settings-header">
+      <div>
+        <span>Új űrlap</span>
+        <strong>Űrlap létrehozása</strong>
+      </div>
+      <button mat-icon-button type="button" (click)="closeNewWizardDialog()" aria-label="Bezárás">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="field-settings-body">
+      <mat-form-field appearance="outline" class="full-field">
+        <mat-label>Űrlap neve</mat-label>
+        <input matInput name="newWizardName" [(ngModel)]="newWizardName">
+      </mat-form-field>
+    </div>
+    <div class="field-settings-actions">
+      <button mat-stroked-button type="button" (click)="closeNewWizardDialog()">Mégse</button>
+      <button mat-raised-button color="primary" type="submit" [disabled]="saving">
+        <mat-icon>save</mat-icon>
+        <span>Létrehozás</span>
+      </button>
+    </div>
+  </form>
+</section>
 
 <section class="field-settings-popup" *ngIf="fieldSettingsOpen && selectedTemplateField as field">
   <div class="field-settings-backdrop" (click)="closeTemplateFieldSettings()"></div>
