@@ -8,7 +8,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   standalone: true,
   imports: [CommonModule, MatIconModule, MatTooltipModule],
   template: `
-    <span class="canvas-element-chrome" [class.two-line]="!!subLabel">
+    <span class="canvas-element-chrome" [class.two-line]="!!subLabel" [class.has-badge]="badge !== null && badge !== undefined" [class.editing]="editing">
       <button
         *ngIf="editing"
         type="button"
@@ -112,6 +112,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
       flex: 1 1 auto;
       display: grid;
       gap: 0.1rem;
+    }
+
+    .canvas-element-chrome.has-badge:not(.editing) .canvas-element-label {
+      flex: 0 1 auto;
     }
 
     .canvas-element-label strong,
