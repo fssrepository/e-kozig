@@ -935,13 +935,13 @@
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
-.form-container-element.selected:not(.form-field-section):not(.form-tabs-section) {
+.form-canvas:not(.has-compound-selection) .form-container-element.selected:not(.form-field-section):not(.form-tabs-section) {
   outline: 1px solid #0067b1;
   outline-offset: -1px;
 }
 
-.form-field-section.selected .form-field-element,
-.form-tabs-section.selected .page-carousel--canvas {
+.form-canvas:not(.has-compound-selection) .form-field-section.selected .form-field-element,
+.form-canvas:not(.has-compound-selection) .form-tabs-section.selected .page-carousel--canvas {
   border-color: #0067b1;
   box-shadow:
     0 1px 2px rgba(15, 47, 74, 0.06),
@@ -955,6 +955,8 @@
   min-height: 0;
   align-self: stretch;
   justify-self: stretch;
+  border: 2px solid #0067b1;
+  border-radius: 4px;
   pointer-events: none;
   box-sizing: border-box;
 }

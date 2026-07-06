@@ -227,6 +227,7 @@
             class="form-canvas"
             [class.is-mobile]="viewport === 'mobile'"
             [class.builder-editing]="builderEditing"
+            [class.has-compound-selection]="hasMultiFormSelection"
             [style.--grid-columns]="gridColumns"
             [ngStyle]="gridStyle"
             (dragover)="onFormCanvasDragOver($event)"
