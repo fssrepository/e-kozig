@@ -10,7 +10,7 @@
   min-height: 0;
   padding: 0.75rem;
   box-sizing: border-box;
-  background: #eef3f8;
+  background: transparent;
   overflow: hidden;
 }
 
@@ -170,9 +170,15 @@
   height: calc(100% - 76px);
   min-height: 0;
   margin-top: 0.6rem;
+  padding: 0.75rem;
   display: grid;
   grid-template-columns: 292px minmax(0, 1fr);
   gap: 0.6rem;
+  border: 1px solid #d7e0ea;
+  border-bottom: 0;
+  border-radius: 20px 20px 0 0;
+  background: #eef3f8;
+  box-sizing: border-box;
 }
 
 .builder-panel {
@@ -452,10 +458,12 @@
 
 .compact-filter {
   margin-bottom: 0.4rem;
+  height: 42px;
 }
 
 ::ng-deep .form-editor-page .compact-filter .mat-mdc-text-field-wrapper {
   height: 42px;
+  padding: 0 0.75rem;
 }
 
 ::ng-deep .form-editor-page .compact-filter .mat-mdc-form-field-flex {
@@ -464,19 +472,19 @@
 }
 
 ::ng-deep .form-editor-page .compact-filter .mat-mdc-form-field-infix {
-  min-height: 42px;
+  width: 100%;
+  min-height: 0;
+  height: 42px;
   display: flex;
   align-items: center;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
 }
 
-::ng-deep .form-editor-page .compact-filter .mat-mdc-floating-label {
-  top: 50%;
-}
-
 ::ng-deep .form-editor-page .compact-filter input.mat-mdc-input-element {
-  line-height: 22px;
+  height: 42px;
+  line-height: 42px;
+  padding: 0;
 }
 
 .sablon-library-item {
