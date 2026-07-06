@@ -6,11 +6,11 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import {
   DEFAULT_USER_PROFILE,
-  DEFAULT_FORM_TEMPLATES,
   FormEditorViewport,
   FormFieldDefinition,
   FormFieldLayout,
@@ -100,6 +100,7 @@ interface FormElementPaletteItem {
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
+    MatProgressSpinnerModule,
     MatSelectModule,
     MatTooltipModule,
     CanvasElementChromeComponent
@@ -141,10 +142,10 @@ export class FormEditorComponent implements OnInit {
   ];
   readonly currentUser = DEFAULT_USER_PROFILE;
 
-  templates: FormTemplate[] = DEFAULT_FORM_TEMPLATES.map(template => this.normalizeTemplate(template));
-  activeTemplate: FormTemplate | null = this.templates[0] ?? null;
+  templates: FormTemplate[] = [];
+  activeTemplate: FormTemplate | null = null;
   activeSectionTemplate: FormSectionDefinition | null = null;
-  selectedTemplateId = this.activeTemplate?.id ?? '';
+  selectedTemplateId = '';
   selectedSectionId = SECTION_LIBRARY[0]?.id ?? '';
   selectedLibrarySectionId = SECTION_LIBRARY[0]?.id ?? '';
   panelMode: EditorPanelMode = 'form';
@@ -186,7 +187,7 @@ export class FormEditorComponent implements OnInit {
   previewTemplate: FormTemplate | null = null;
   previewPageIndex = 0;
   previewFieldValues: Record<string, string | boolean | number | null> = {};
-  loading = false;
+  loading = true;
   saving = false;
   stencilSavePending = false;
   stencilSaveSuccess = false;
