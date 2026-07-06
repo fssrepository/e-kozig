@@ -19,13 +19,6 @@
   overflow: visible;
 }
 
-.editor-loading {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .editor-toolbar,
 .builder-panel,
 .preview-frame {
@@ -152,8 +145,10 @@
   animation: stencil-save-spin 0.65s linear infinite;
 }
 
-.selector-stencil.saved {
-  animation: stencil-save-flash 0.45s ease-out;
+.selector-group button[mat-icon-button].selector-stencil.saved,
+.selector-group button[mat-icon-button].selector-stencil.saved.active {
+  background: #14843c;
+  color: #fff;
 }
 
 .selector-divider {
@@ -312,20 +307,6 @@
 @keyframes stencil-save-spin {
   to {
     transform: rotate(360deg);
-  }
-}
-
-@keyframes stencil-save-flash {
-  0%,
-  100% {
-    background: #0067b1;
-    color: #fff;
-  }
-
-  25%,
-  75% {
-    background: #14843c;
-    color: #fff;
   }
 }
 

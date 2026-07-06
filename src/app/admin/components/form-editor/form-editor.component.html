@@ -1,9 +1,5 @@
 <div class="form-editor-page">
-  <div class="editor-loading" *ngIf="loading">
-    <mat-progress-spinner mode="indeterminate" diameter="36"></mat-progress-spinner>
-  </div>
-
-  <ng-container *ngIf="!loading && activeTemplate as template">
+  <ng-container *ngIf="activeTemplate as template">
     <header class="editor-toolbar">
       <div class="compact-selectors">
         <div class="selector-group" [class.active]="panelMode === 'form' || panelMode === 'template'">
@@ -25,7 +21,6 @@
               [class.active]="builderEditing || panelMode === 'template'"
               [class.saving]="stencilSavePending"
               [class.saved]="stencilSaveSuccess"
-              [disabled]="stencilSavePending"
               (click)="handleStencilAction()"
               [matTooltip]="builderEditing || panelMode === 'template' ? 'Megtekintés' : 'Stencil szerkesztés'"
               [attr.aria-label]="builderEditing || panelMode === 'template' ? 'Megtekintés' : 'Stencil szerkesztés'"

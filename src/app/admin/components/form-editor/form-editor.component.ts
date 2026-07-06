@@ -6,11 +6,11 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import {
   DEFAULT_USER_PROFILE,
+  DEFAULT_FORM_TEMPLATES,
   FormEditorViewport,
   FormFieldDefinition,
   FormFieldLayout,
@@ -100,7 +100,6 @@ interface FormElementPaletteItem {
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatProgressSpinnerModule,
     MatSelectModule,
     MatTooltipModule,
     CanvasElementChromeComponent
@@ -120,6 +119,7 @@ export class FormEditorComponent implements OnInit {
   private readonly autoMobileViewportQuery = '(max-width: 760px)';
   private stencilSavePendingTimer = 0;
   private stencilSaveSuccessTimer = 0;
+  private stencilFeedbackRunId = 0;
   private preferredViewport: FormEditorViewport = 'desktop';
 
   @ViewChild('formCanvas') formCanvas?: ElementRef<HTMLElement>;
@@ -141,10 +141,10 @@ export class FormEditorComponent implements OnInit {
   ];
   readonly currentUser = DEFAULT_USER_PROFILE;
 
-  templates: FormTemplate[] = [];
-  activeTemplate: FormTemplate | null = null;
+  templates: FormTemplate[] = DEFAULT_FORM_TEMPLATES.map(template => this.normalizeTemplate(template));
+  activeTemplate: FormTemplate | null = this.templates[0] ?? null;
   activeSectionTemplate: FormSectionDefinition | null = null;
-  selectedTemplateId = '';
+  selectedTemplateId = this.activeTemplate?.id ?? '';
   selectedSectionId = SECTION_LIBRARY[0]?.id ?? '';
   selectedLibrarySectionId = SECTION_LIBRARY[0]?.id ?? '';
   panelMode: EditorPanelMode = 'form';
@@ -186,7 +186,7 @@ export class FormEditorComponent implements OnInit {
   previewTemplate: FormTemplate | null = null;
   previewPageIndex = 0;
   previewFieldValues: Record<string, string | boolean | number | null> = {};
-  loading = true;
+  loading = false;
   saving = false;
   stencilSavePending = false;
   stencilSaveSuccess = false;
@@ -310,6 +310,7 @@ export class FormEditorComponent implements OnInit {
   async loadEditorData(): Promise<void> {
     this.loading = true;
     this.statusMessage = '';
+    this.resetStencilSaveFeedback();
     try {
       const [templates, sectionTemplates] = await Promise.all([
         this.store.getTemplates(),
@@ -340,6 +341,7 @@ export class FormEditorComponent implements OnInit {
       return;
     }
 
+    this.resetStencilSaveFeedback();
     this.activeTemplate = this.normalizeTemplate(template);
     this.selectedTemplateId = template.id;
     this.panelMode = 'form';
@@ -439,22 +441,25 @@ export class FormEditorComponent implements OnInit {
 
   async handleStencilAction(): Promise<void> {
     if (this.panelMode === 'template') {
-      await this.runStencilSaveFeedback(() => this.saveSectionTemplate());
+      this.runStencilSaveFeedback(() => this.saveSectionTemplate());
       this.panelMode = 'form';
       this.builderEditing = false;
       return;
     }
 
     if (this.builderEditing) {
-      await this.runStencilSaveFeedback(() => this.saveTemplate());
+      this.builderEditing = false;
+      this.runStencilSaveFeedback(() => this.saveTemplate());
       return;
     }
 
+    this.resetStencilSaveFeedback();
     this.panelMode = 'form';
     this.builderEditing = true;
   }
 
   toggleSideMenu(): void {
+    this.resetStencilSaveFeedback();
     this.sideMenuCollapsed = !this.sideMenuCollapsed;
   }
 
@@ -2658,47 +2663,51 @@ export class FormEditorComponent implements OnInit {
     this.statusMessage = 'Sablon csoportként hozzáadva.';
   }
 
-  private async runStencilSaveFeedback(saveAction: () => Promise<void>): Promise<void> {
+  private runStencilSaveFeedback(saveAction: () => Promise<void>): void {
+    this.startStencilSaveAnimation();
+
+    window.setTimeout(() => {
+      void saveAction()
+        .then(() => {
+          const saved =
+            this.statusMessage === 'Űrlapszerkezet mentve.'
+            || this.statusMessage === 'Sablon mentve.';
+          if (saved) {
+            this.statusMessage = '';
+          }
+        })
+        .catch(error => console.error(error));
+    }, 0);
+  }
+
+  private startStencilSaveAnimation(): void {
     window.clearTimeout(this.stencilSavePendingTimer);
     window.clearTimeout(this.stencilSaveSuccessTimer);
+    const runId = ++this.stencilFeedbackRunId;
     this.stencilSavePending = true;
     this.stencilSaveSuccess = false;
-    const startedAt = Date.now();
-    let spinnerDone = false;
 
     this.stencilSavePendingTimer = window.setTimeout(() => {
-      spinnerDone = true;
+      if (runId !== this.stencilFeedbackRunId) {
+        return;
+      }
       this.stencilSavePending = false;
-    }, 1000);
-
-    await saveAction();
-
-    const saved =
-      this.statusMessage === 'Űrlapszerkezet mentve.'
-      || this.statusMessage === 'Sablon mentve.';
-    if (saved) {
-      this.statusMessage = '';
-    }
-
-    const flash = () => {
-      this.stencilSavePending = false;
-      this.stencilSaveSuccess = saved;
+      this.stencilSaveSuccess = true;
       this.stencilSaveSuccessTimer = window.setTimeout(() => {
+        if (runId !== this.stencilFeedbackRunId) {
+          return;
+        }
         this.stencilSaveSuccess = false;
       }, 450);
-    };
+    }, 1000);
+  }
 
-    const remaining = Math.max(0, 1000 - (Date.now() - startedAt));
-    if (spinnerDone || remaining === 0) {
-      flash();
-      return;
-    }
-
+  private resetStencilSaveFeedback(): void {
+    this.stencilFeedbackRunId += 1;
     window.clearTimeout(this.stencilSavePendingTimer);
-    this.stencilSavePendingTimer = window.setTimeout(() => {
-      spinnerDone = true;
-      flash();
-    }, remaining);
+    window.clearTimeout(this.stencilSaveSuccessTimer);
+    this.stencilSavePending = false;
+    this.stencilSaveSuccess = false;
   }
 
   private syncViewportFromScreen(): void {
