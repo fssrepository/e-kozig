@@ -578,9 +578,8 @@
 }
 
 .sablon-library-list {
-  max-height: min(360px, 42dvh);
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: visible;
   padding-right: 0.2rem;
 }
 
@@ -2110,7 +2109,6 @@
 @media (min-width: 881px) {
   .builder-panel,
   .form-canvas,
-  .sablon-library-list,
   .template-builder-surface,
   .field-settings-body,
   .onya-preview-body {
@@ -2120,7 +2118,6 @@
 
   .builder-panel::-webkit-scrollbar,
   .form-canvas::-webkit-scrollbar,
-  .sablon-library-list::-webkit-scrollbar,
   .template-builder-surface::-webkit-scrollbar,
   .field-settings-body::-webkit-scrollbar,
   .onya-preview-body::-webkit-scrollbar {
@@ -2130,7 +2127,6 @@
 
   .builder-panel::-webkit-scrollbar-track,
   .form-canvas::-webkit-scrollbar-track,
-  .sablon-library-list::-webkit-scrollbar-track,
   .template-builder-surface::-webkit-scrollbar-track,
   .field-settings-body::-webkit-scrollbar-track,
   .onya-preview-body::-webkit-scrollbar-track {
@@ -2140,7 +2136,6 @@
 
   .builder-panel::-webkit-scrollbar-thumb,
   .form-canvas::-webkit-scrollbar-thumb,
-  .sablon-library-list::-webkit-scrollbar-thumb,
   .template-builder-surface::-webkit-scrollbar-thumb,
   .field-settings-body::-webkit-scrollbar-thumb,
   .onya-preview-body::-webkit-scrollbar-thumb {
@@ -2151,7 +2146,6 @@
 
   .builder-panel::-webkit-scrollbar-thumb:hover,
   .form-canvas::-webkit-scrollbar-thumb:hover,
-  .sablon-library-list::-webkit-scrollbar-thumb:hover,
   .template-builder-surface::-webkit-scrollbar-thumb:hover,
   .field-settings-body::-webkit-scrollbar-thumb:hover,
   .onya-preview-body::-webkit-scrollbar-thumb:hover {
