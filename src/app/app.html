@@ -24,7 +24,7 @@
     </button>
 
     <!-- User Selector Button - Global -->
-    <button mat-icon-button class="user-selector-btn-global" (click)="onUserSelect()" aria-label="Felhasználó választása">
+    <button mat-icon-button class="user-selector-btn-global" (click)="onUserSelect()" aria-label="Felhasználó kiválasztása">
       <span class="user-initial" [class]="getUserColorClass(activeUser.id)">{{ activeUser.initials }}</span>
       <span class="badge-dot" *ngIf="userBadgeCount > 0">{{ userBadgeCount }}</span>
     </button>
@@ -43,7 +43,7 @@
         >
           <span class="balance-copy">
             <span class="balance-title">Egyenleg</span>
-            <span class="balance-value">-200e Ft</span>
+            <span class="balance-value">-200 000 Ft</span>
           </span>
           <mat-icon class="balance-chevron" aria-hidden="true">chevron_right</mat-icon>
         </button>
@@ -72,10 +72,10 @@
           <mat-icon>settings</mat-icon>
           <span>Beállítások</span>
         </button>
-        <div *ngIf="isAdmin" class="mobile-menu-section-label">Admin</div>
+        <div *ngIf="isAdmin" class="mobile-menu-section-label">Adminisztráció</div>
         <a *ngIf="isAdmin" class="menu-item" routerLink="/admin/forms" routerLinkActive="active" (click)="closeMobileMenu()">
           <mat-icon>dynamic_form</mat-icon>
-          <span>Űrlap szerkesztő</span>
+          <span>Űrlapszerkesztő</span>
         </a>
       </div>
     </div>
@@ -187,7 +187,7 @@
             <div class="card-header card-header-action" role="button" tabindex="0" (click)="toggleUserSection('users')">
               <span class="card-header-left">
                 <span class="card-badge">{{ otherUsers.length }}</span>
-                <span class="card-title">Felhasználó</span>
+                <span class="card-title">Felhasználók</span>
               </span>
               <button class="header-icon-btn" type="button" (click)="$event.stopPropagation(); openUserPopup('addUser')">
                 <mat-icon>add</mat-icon>
@@ -233,7 +233,7 @@
       </div>
     </aside>
 
-    <nav class="sidebar" aria-label="Primary navigation">
+    <nav class="sidebar" aria-label="Elsődleges navigáció">
       <div class="sidebar-top">
         <img [src]="getIssueLogo()" [alt]="selectedIssueLabel" />
         <button
@@ -245,7 +245,7 @@
         >
           <span class="balance-copy">
             <span class="balance-title">Egyenleg</span>
-            <span class="balance-value">-200e Ft</span>
+            <span class="balance-value">-200 000 Ft</span>
           </span>
           <mat-icon class="balance-chevron" aria-hidden="true">chevron_right</mat-icon>
         </button>
@@ -274,10 +274,10 @@
           <mat-icon aria-hidden="false" aria-label="Beállítások">settings</mat-icon>
           <span>Beállítások</span>
         </button>
-        <div *ngIf="isAdmin" class="sidebar-section-label">Admin</div>
+        <div *ngIf="isAdmin" class="sidebar-section-label">Adminisztráció</div>
         <a *ngIf="isAdmin" mat-list-item routerLink="/admin/forms" routerLinkActive="selected">
-          <mat-icon aria-hidden="false" aria-label="Űrlap szerkesztő">dynamic_form</mat-icon>
-          <span>Űrlap szerkesztő</span>
+          <mat-icon aria-hidden="false" aria-label="Űrlapszerkesztő">dynamic_form</mat-icon>
+          <span>Űrlapszerkesztő</span>
         </a>
       </mat-nav-list>
     </nav>
@@ -313,15 +313,15 @@
         </div>
         <div class="appointment-links">
           <button type="button" class="link-btn map-btn" (click)="openMapLinkSmart(selectedAppointment.mapUrl)">Térkép</button>
-          <button type="button" class="link-btn">Video chat</button>
+          <button type="button" class="link-btn">Videóhívás</button>
         </div>
         <div class="appointment-categories">
           <p>Kategória</p>
           <div class="category-chip">{{ selectedAppointmentCategory }}</div>
         </div>
         <div class="appointment-actions">
-          <p>{{ selectedAppointmentCategory }} - részletek megjelenítése</p>
-          <button type="button" class="link-btn">Lemondás / áthelyezés</button>
+          <p>{{ selectedAppointmentCategory }} részletei</p>
+          <button type="button" class="link-btn">Lemondás vagy áthelyezés</button>
         </div>
       </div>
       <div *ngIf="activePopup === 'settings'">
@@ -341,7 +341,7 @@
               </ng-template>
               <figure class="qa-process-figure" *ngIf="panel.title === 'Minőségbiztosítás'">
                 <img src="assets/img/process.png" alt="Folyamatábra" class="qa-process-image">
-                <figcaption>Folyamatábra a prototípus és a háttérfolyamatok együttműködéséről.</figcaption>
+                <figcaption>A prototípus és a háttérfolyamatok kapcsolata.</figcaption>
               </figure>
             </div>
           </mat-expansion-panel>
@@ -381,29 +381,29 @@
         1818
       </div>
       <div *ngIf="activePopup === 'suspension'" class="suspension-popup">
-        <p>Egészségügyi Krízishelyzet Moratórium - betegség, baleset, gondnok stb.</p>
-        <p>A felhasználó nem tudja ellátni a feladatait.</p>
+        <p>Ügyintézési moratórium egészségügyi krízis, baleset vagy gondnokság esetén.</p>
+        <p>A felhasználó átmenetileg nem tudja intézni az ügyeit.</p>
         <div class="suspension-user" *ngIf="pendingDeleteUser">
           {{ pendingDeleteUser.name }}
         </div>
         <div class="suspension-actions">
-          <button type="button" class="link-btn">Felfüggeszt</button>
-          <button type="button" class="link-btn">Felfüggesztés törlése</button>
-          <button type="button" class="link-btn">Adott dátumok között</button>
+          <button type="button" class="link-btn">Felfüggesztés indítása</button>
+          <button type="button" class="link-btn">Felfüggesztés megszüntetése</button>
+          <button type="button" class="link-btn">Időszak megadása</button>
         </div>
       </div>
       <div *ngIf="activePopup === 'userSettings'" class="contact-content">
-        nyelv választás stb.
+        Nyelv kiválasztása
       </div>
       <div *ngIf="activePopup === 'addUser'" class="contact-content">
-        KAÜ (Ügyfélkapu+ bejelentkezés)
+        KAÜ-azonosítás (Ügyfélkapu+)
       </div>
       <div *ngIf="activePopup === 'addAppointment'" class="contact-content">
         <p>Helyszín:</p>
         <p>Cím:</p>
         <p>Időpont:</p>
         <p>Kategória:</p>
-        <p>Térkép link:</p>
+        <p>Térképhivatkozás:</p>
       </div>
     </div>
   </div>
@@ -412,7 +412,7 @@
 <section class="user-delete-confirm" *ngIf="activePopup === 'deleteUser'">
   <div class="user-delete-confirm-backdrop" (click)="closePopup()"></div>
   <div class="user-delete-confirm-panel" (click)="$event.stopPropagation()">
-    <h3>Valóban törölni akarja?</h3>
+    <h3>Valóban törli a felhasználót?</h3>
     <div class="user-delete-confirm-name" *ngIf="pendingDeleteUser">
       {{ pendingDeleteUser.name }}
     </div>

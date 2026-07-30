@@ -26,8 +26,8 @@
               [class.saving]="stencilSavePending"
               [class.saved]="stencilSaveSuccess"
               (click)="handleStencilAction()"
-              [matTooltip]="builderEditing || panelMode === 'template' ? 'Megtekintés' : 'Stencil szerkesztés'"
-              [attr.aria-label]="builderEditing || panelMode === 'template' ? 'Megtekintés' : 'Stencil szerkesztés'"
+              [matTooltip]="builderEditing || panelMode === 'template' ? 'Megtekintés' : 'Sablon szerkesztése'"
+              [attr.aria-label]="builderEditing || panelMode === 'template' ? 'Megtekintés' : 'Sablon szerkesztése'"
             >
               <mat-icon>{{ builderEditing || panelMode === 'template' ? 'visibility' : 'format_shapes' }}</mat-icon>
             </button>
@@ -107,7 +107,7 @@
             </button>
             <div class="panel-section-content" *ngIf="sablonPanelOpen">
               <mat-form-field appearance="outline" class="full-field compact-filter">
-                <input matInput placeholder="Keresés" aria-label="Sablon keresés" [(ngModel)]="sectionFilter">
+                <input matInput placeholder="Keresés" aria-label="Sablon keresése" [(ngModel)]="sectionFilter">
               </mat-form-field>
               <div class="sablon-library-list">
                 <div
@@ -179,7 +179,7 @@
             </button>
             <div class="panel-section-content" *ngIf="sablonPanelOpen">
               <mat-form-field appearance="outline" class="full-field compact-filter">
-                <input matInput placeholder="Keresés" aria-label="Sablon keresés" [(ngModel)]="sectionFilter">
+                <input matInput placeholder="Keresés" aria-label="Sablon keresése" [(ngModel)]="sectionFilter">
               </mat-form-field>
               <div class="sablon-library-list">
                 <div
@@ -383,7 +383,7 @@
               <span class="document-code">{{ block.navCode || 'CUSTOM' }}</span>
             </div>
             <div class="document-state">
-              <span>Sablon editor</span>
+              <span>Sablonszerkesztő</span>
             </div>
           </div>
 
@@ -394,8 +394,8 @@
           >
             <div class="template-empty-state" *ngIf="!activeSectionTemplateFields.length">
               <mat-icon>playlist_add</mat-icon>
-              <strong>Húzz ide mező típust a bal oldalról</strong>
-              <span>Vagy kattints egy mező típusra, és bekerül ebbe a sablonba.</span>
+              <strong>Húzz ide egy mezőt a bal oldalról</strong>
+              <span>Kattintással is hozzáadhatod a sablonhoz.</span>
             </div>
 
             <article
@@ -428,7 +428,7 @@
 
                 <span class="template-field-checkbox-preview" *ngIf="field.type === 'checkbox'">
                   <span class="template-field-checkbox-box"></span>
-                  <span>{{ field.label || 'Checkbox' }}</span>
+                  <span>{{ field.label || 'Jelölőnégyzet' }}</span>
                   <strong *ngIf="field.required">*</strong>
                 </span>
 
@@ -509,7 +509,7 @@
   <div class="field-settings-panel" (click)="$event.stopPropagation()">
     <div class="field-settings-header">
       <div>
-        <span>Oldal / tab</span>
+        <span>Űrlapoldal</span>
         <strong>{{ page.title }}</strong>
       </div>
       <button mat-icon-button type="button" (click)="closePageSettings()" aria-label="Bezárás">
@@ -519,7 +519,7 @@
 
     <div class="field-settings-body">
       <mat-form-field appearance="outline" class="full-field">
-        <mat-label>Tab neve</mat-label>
+        <mat-label>Oldal neve</mat-label>
         <input matInput [(ngModel)]="page.title">
       </mat-form-field>
     </div>
@@ -570,7 +570,7 @@
       </button>
       <button mat-raised-button color="primary" type="button" (click)="wrapSelectedFormSectionsAsSablon()" [disabled]="saving || wrappableFormSections.length < 2">
         <mat-icon>inventory_2</mat-icon>
-        <span>Wrap</span>
+        <span>Csoportosítás sablonként</span>
       </button>
     </div>
   </div>
@@ -661,7 +661,7 @@
           <mat-option value="text">Szöveg</mat-option>
           <mat-option value="textarea">Hosszú szöveg</mat-option>
           <mat-option value="select">Választólista</mat-option>
-          <mat-option value="checkbox">Checkbox</mat-option>
+          <mat-option value="checkbox">Jelölőnégyzet</mat-option>
           <mat-option value="date">Dátum</mat-option>
           <mat-option value="number">Szám</mat-option>
           <mat-option value="email">E-mail</mat-option>
@@ -694,7 +694,7 @@
       <mat-checkbox *ngIf="field.type !== 'header'" [(ngModel)]="field.required">Kötelező mező</mat-checkbox>
 
       <mat-form-field appearance="outline" class="full-field" *ngIf="field.type === 'select'">
-        <mat-label>Lista értékek</mat-label>
+        <mat-label>Listaelemek</mat-label>
         <textarea matInput rows="4" [ngModel]="getFieldOptionsText(field)" (ngModelChange)="setFormFieldOptions(field, $event)"></textarea>
       </mat-form-field>
 
@@ -762,7 +762,7 @@
           <mat-option value="text">Szöveg</mat-option>
           <mat-option value="textarea">Hosszú szöveg</mat-option>
           <mat-option value="select">Választólista</mat-option>
-          <mat-option value="checkbox">Checkbox</mat-option>
+          <mat-option value="checkbox">Jelölőnégyzet</mat-option>
           <mat-option value="date">Dátum</mat-option>
           <mat-option value="number">Szám</mat-option>
           <mat-option value="email">E-mail</mat-option>
@@ -795,7 +795,7 @@
       <mat-checkbox *ngIf="field.type !== 'header'" [(ngModel)]="field.required">Kötelező mező</mat-checkbox>
 
       <mat-form-field appearance="outline" class="full-field" *ngIf="field.type === 'select'">
-        <mat-label>Lista értékek</mat-label>
+        <mat-label>Listaelemek</mat-label>
         <textarea matInput rows="4" [ngModel]="getFieldOptionsText(field)" (ngModelChange)="setFieldOptions(field, $event)"></textarea>
       </mat-form-field>
 
@@ -855,12 +855,12 @@
         <span class="document-code">{{ formTemplate.navCode }}</span>
       </div>
       <div class="document-state">
-        <span>ONYA előnézet</span>
-        <span>Csak olvasás</span>
+        <span>ONYA-előnézet</span>
+        <span>Csak olvasható</span>
       </div>
     </div>
 
-    <nav class="page-carousel" aria-label="ONYA előnézeti oldalak">
+    <nav class="page-carousel" aria-label="Az ONYA-előnézet oldalai">
       <button
         type="button"
         *ngFor="let page of previewPages; let i = index; trackBy: trackById"

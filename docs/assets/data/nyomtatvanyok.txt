@@ -25,13 +25,13 @@ Verziószám
 Adóév
 -
 KTRAKT
-Adatszolgáltatás a termékdíj raktárba történő be- és kiszállításról, továbbá a raktárkészletről
+Adatszolgáltatás a termékdíjraktárba történő be- és kiszállításról, továbbá a raktárkészletről
 Verziószám
 14.0
 Adóév
 -
 VHJOV
-Elektronikus visszaigazolás jövedelem letiltásról
+Elektronikus visszaigazolás jövedelemletiltásról
 Verziószám
 11.0
 Adóév
@@ -63,7 +63,7 @@ Verziószám
 Adóév
 -
 T201
-Cégbejegyzésre nem kötelezett jogi személyek, nonprofit szervezetek ? a törzskönyvi jogi személyek és a civil szervezetek kivételével ?, külföldi vállalkozások, tulajdonostársak közössége, a bizalmi vagyonkezelésbe adott vagyontömeg, valamint csoportos adóalanyiság esetén a csoport részére
+Cégbejegyzésre nem kötelezett jogi személyek, nonprofit szervezetek – a törzskönyvi jogi személyek és a civil szervezetek kivételével –, külföldi vállalkozások, tulajdonostársak közössége, a bizalmi vagyonkezelésbe adott vagyontömeg, valamint csoportos adóalanyiság esetén a csoport részére
 Verziószám
 2.0
 Adóév
@@ -75,7 +75,7 @@ Verziószám
 Adóév
 -
 Regisztrációs adatlap az adózó 'Fészekrakó' adatbázis
-Regisztrációs adatlap az adózó 'Fészekrakó' adatbázisba történő felvételéhez, illetve törléséhez
+Regisztrációs adatlap az adózó „Fészekrakó” adatbázisba történő felvételéhez, illetve törléséhez
 Verziószám
 1.0
 Adóév
@@ -101,7 +101,7 @@ Adóév
 -
 Fémkereskedelem (sub fomenu)
 NAV_F04
-"Érzékeny" FAJ kódos bejelentés
+„Érzékeny” FAJ-kódos bejelentés
 Verziószám
 2.3
 Adóév
@@ -176,30 +176,30 @@ Verziószám
 14.0
 Adóév
 -
-Járulék típusú bevallások (sub fomenu)
+Járuléktípusú bevallások (sub fomenu)
 2558
-Bevallás a kiegészítő tevékenységet folytatónak nem minősülő egyéni vállalkozó szociális hozzájárulási adó és járulék kötelezettségéről, valamint a biztosított mezőgazdasági őstermelő járulék kötelezettségéről
+Bevallás a kiegészítő tevékenységet folytatónak nem minősülő egyéni vállalkozó szociális hozzájárulási adó- és járulékkötelezettségéről, valamint a biztosított mezőgazdasági őstermelő járulékkötelezettségéről
 Verziószám
 7.0
 Adóév
 2025
 -
 2458
-Bevallás a kiegészítő tevékenységet folytatónak nem minősülő egyéni vállalkozó szociális hozzájárulási adó és járulék kötelezettségéről, valamint a biztosított mezőgazdasági őstermelő járulék kötelezettségéről
+Bevallás a kiegészítő tevékenységet folytatónak nem minősülő egyéni vállalkozó szociális hozzájárulási adó- és járulékkötelezettségéről, valamint a biztosított mezőgazdasági őstermelő járulékkötelezettségéről
 Verziószám
 7.0
 Adóév
 2024
 -
 2358
-Bevallás a kiegészítő tevékenységet folytatónak nem minősülő egyéni vállalkozó szociális hozzájárulási adó és járulék kötelezettségéről, valamint a biztosított mezőgazdasági őstermelő járulék kötelezettségéről
+Bevallás a kiegészítő tevékenységet folytatónak nem minősülő egyéni vállalkozó szociális hozzájárulási adó- és járulékkötelezettségéről, valamint a biztosított mezőgazdasági őstermelő járulékkötelezettségéről
 Verziószám
 10.0
 Adóév
 2023
 -
 2258
-Bevallás a kiegészítő tevékenységet folytatónak nem minősülő egyéni vállalkozó szociális hozzájárulási adó és járulék kötelezettségéről, valamint a biztosított mezőgazdasági őstermelő járulék kötelezettségéről
+Bevallás a kiegészítő tevékenységet folytatónak nem minősülő egyéni vállalkozó szociális hozzájárulási adó- és járulékkötelezettségéről, valamint a biztosított mezőgazdasági őstermelő járulékkötelezettségéről
 Verziószám
 6.0
 Adóév
@@ -219,7 +219,7 @@ Verziószám
 Adóév
 2025
 -
-Jövedelem típusú bevallások (sub fomenu)
+Jövedelemtípusú bevallások (sub fomenu)
 53INT
 53INT külföldi illetőségű előadóművészek személyi jövedelemadó bevallása / 53INT tax return on the personal income tax and social contribution tax of foreign art performers and foreign crew members
 Verziószám
@@ -234,28 +234,28 @@ Verziószám
 42.17
 Adóév
 -
-SAAFA (this item is for "forgami tipusu" sub fomenu)
+SAAFA
 Bevallás a termékimport utáni általános forgalmi adó bevallására és megfizetésére vonatkozó különös szabályokat alkalmazó adózó részére
 Verziószám
 3.0
 Adóév
 -
 26KTBEV
-Környezetvédelmi termékdíj és a gépjármű termékdíjátalány 2026. évi bevallása
+Környezetvédelmi termékdíj és a gépjármű-termékdíjátalány 2026. évi bevallása
 Verziószám
 1.0
 Adóév
 2026
 -
 25KTBEV
-Környezetvédelmi termékdíj és a gépjármű termékdíjátalány 2025. évi bevallása
+Környezetvédelmi termékdíj és a gépjármű-termékdíjátalány 2025. évi bevallása
 Verziószám
 1.0
 Adóév
 2025
 -
 24KTBEV
-Környezetvédelmi termékdíj és a gépjármű termékdíjátalány 2024. évi bevallása
+Környezetvédelmi termékdíj és a gépjármű-termékdíjátalány 2024. évi bevallása
 Verziószám
 4.0
 Adóév

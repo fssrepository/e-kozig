@@ -153,18 +153,18 @@ export class InvoicesComponent implements OnInit, AfterViewInit, OnDestroy {
   afaCodeCtrl = new FormControl<AfaCodeOption | string>('');
   filteredAfaCodes$!: Observable<AfaCodeOption[]>;
   afaCodes: AfaCodeOption[] = [
-    { code: '27%', name: 'Általános kulcs', description: 'Standard ÁFA mérték' },
+    { code: '27%', name: 'Általános kulcs', description: 'Általános áfamérték' },
     { code: '18%', name: 'Kedvezményes kulcs', description: 'Meghatározott termékek, szolgáltatások' },
     { code: '5%', name: 'Kedvezményes kulcs', description: 'Kiemelt termékek, szolgáltatások' },
     { code: '0%', name: 'Nulla kulcs', description: 'Közösségen belüli, export jellegű tételek' },
-    { code: 'AAM', name: 'Alanyi adómentes', description: 'ÁFA alanyi mentesség' },
-    { code: 'TAM', name: 'Tárgyi adómentes', description: 'ÁFA tárgyi mentesség' },
+    { code: 'AAM', name: 'Alanyi adómentes', description: 'Alanyi áfamentesség' },
+    { code: 'TAM', name: 'Tárgyi adómentes', description: 'Tárgyi áfamentesség' },
     { code: 'FAD', name: 'Fordított adózás', description: 'Belföldi fordított adózás' },
     { code: 'EUK', name: 'EU közösségi', description: 'Közösségen belüli értékesítés' }
   ];
 
   vatOptions: Array<{ code: string; name: string; description: string; rate: number }> = [
-    { code: '27%', name: 'Általános kulcs', description: 'Standard ÁFA mérték', rate: 0.27 },
+    { code: '27%', name: 'Általános kulcs', description: 'Általános áfamérték', rate: 0.27 },
     { code: '18%', name: 'Kedvezményes kulcs', description: 'Meghatározott termékek, szolgáltatások', rate: 0.18 },
     { code: '5%', name: 'Kedvezményes kulcs', description: 'Kiemelt termékek, szolgáltatások', rate: 0.05 },
     { code: '0%', name: 'Nulla kulcs', description: 'Közösségen belüli, export jellegű tételek', rate: 0 }
@@ -177,7 +177,7 @@ export class InvoicesComponent implements OnInit, AfterViewInit, OnDestroy {
     qty: number;
     unit: string;
   }> = [
-    { name: '', unitPrice: 0, vat: { code: '27%', name: 'Általános kulcs', description: 'Standard ÁFA mérték', rate: 0.27 }, qty: 1, unit: 'db' }
+    { name: '', unitPrice: 0, vat: { code: '27%', name: 'Általános kulcs', description: 'Általános áfamérték', rate: 0.27 }, qty: 1, unit: 'db' }
   ];
 
   paymentMethods = ['Készpénz', 'Átutalás', 'Utánvét', 'Bankkártya', 'SZÉP kártya'];
@@ -1027,7 +1027,7 @@ export class InvoicesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onDownloadAttachment() {
-    this.alertService.open('Számla letöltése! (pl. pdf fájl)');
+    this.alertService.open('A számla letöltése ebben a prototípusban nem érhető el.');
   }
 
   private filterUgyfel(value: string): string[] {
