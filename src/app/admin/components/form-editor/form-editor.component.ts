@@ -135,14 +135,14 @@ export class FormEditorComponent implements OnInit {
     { type: 'text', label: 'Szöveg', icon: 'short_text' },
     { type: 'textarea', label: 'Hosszú szöveg', icon: 'notes' },
     { type: 'select', label: 'Választólista', icon: 'arrow_drop_down_circle' },
-    { type: 'checkbox', label: 'Checkbox', icon: 'check_box' },
+    { type: 'checkbox', label: 'Jelölőnégyzet', icon: 'check_box' },
     { type: 'date', label: 'Dátum', icon: 'event' },
     { type: 'number', label: 'Szám', icon: 'pin' },
     { type: 'email', label: 'E-mail', icon: 'alternate_email' },
     { type: 'tel', label: 'Telefon', icon: 'phone' }
   ];
   readonly formElementPalette: FormElementPaletteItem[] = [
-    { type: 'page', label: 'Oldal / tab', description: 'Új űrlapoldal a varázslóban', icon: 'tab' }
+    { type: 'page', label: 'Űrlapoldal', description: 'Új oldal az űrlapban', icon: 'tab' }
   ];
   readonly currentUser = DEFAULT_USER_PROFILE;
 
@@ -463,16 +463,21 @@ export class FormEditorComponent implements OnInit {
   }
 
   async handleStencilAction(): Promise<void> {
+    if (this.saving) {
+      return;
+    }
+
     if (this.panelMode === 'template') {
-      this.runStencilSaveFeedback(() => this.saveSectionTemplate());
-      this.panelMode = 'form';
-      this.builderEditing = false;
+      await this.runStencilSaveFeedback(() => this.saveSectionTemplate());
+      if (!this.statusMessage) {
+        this.panelMode = 'form';
+        this.builderEditing = false;
+      }
       return;
     }
 
     if (this.builderEditing) {
-      this.builderEditing = false;
-      this.runStencilSaveFeedback(() => this.saveTemplate());
+      await this.runStencilSaveFeedback(() => this.saveTemplate());
       return;
     }
 
@@ -589,6 +594,10 @@ export class FormEditorComponent implements OnInit {
   closeSectionSettings(): void {
     const section = this.selectedSectionForSettings;
     if (section) {
+      if (this.activeTemplate && this.isFormTitleSection(section)) {
+        this.activeTemplate.name = section.title;
+        this.activeTemplate.navCode = section.navCode ?? '';
+      }
       section.layout.colSpan = this.clamp(Number(section.layout.colSpan) || 4, 2, this.gridColumns);
       section.layout.rowSpan = this.clamp(Number(section.layout.rowSpan) || 2, 1, this.gridRows);
       section.layout.col = this.clamp(Number(section.layout.col) || 1, 1, Math.max(1, this.gridColumns - section.layout.colSpan + 1));
@@ -738,7 +747,7 @@ export class FormEditorComponent implements OnInit {
     this.microFieldLabel = '';
     this.microFieldType = 'text';
     this.microFieldRequired = false;
-    this.statusMessage = 'Új sablon nyitva. Adj hozzá mezőket, majd mentsd.';
+    this.statusMessage = 'Új sablon megnyitva. Adj hozzá mezőket, majd mentsd.';
   }
 
   async duplicateWizard(): Promise<void> {
@@ -760,7 +769,7 @@ export class FormEditorComponent implements OnInit {
       await this.store.saveTemplate(template);
       this.templates = (await this.store.getTemplates()).map(item => this.normalizeTemplate(item));
       this.selectTemplate(template.id);
-      this.statusMessage = 'Űrlap másolat létrehozva.';
+      this.statusMessage = 'Az űrlap másolata létrejött.';
     } catch (error) {
       this.statusMessage = 'Az új sablon mentése sikertelen.';
       console.error(error);
@@ -1418,7 +1427,7 @@ export class FormEditorComponent implements OnInit {
       this.upsertSectionLibrary(section, { pinToTop: true });
       this.selectedLibrarySectionId = section.id;
       this.clearTemplateFieldSelection();
-      this.statusMessage = 'Kijelölt mezőkből sablon mentve.';
+      this.statusMessage = 'A kijelölt mezőkből sablon készült.';
     } catch (error) {
       this.statusMessage = 'A kijelölt mezők sablonként mentése sikertelen.';
       console.error(error);
@@ -1811,22 +1820,24 @@ export class FormEditorComponent implements OnInit {
       return;
     }
 
+    const wasBuilderEditing = this.builderEditing;
     this.saving = true;
     this.statusMessage = '';
     try {
       this.syncTemplateSections();
-      const template = {
-        ...this.activeTemplate,
+      const template: FormTemplate = {
+        ...this.clone(this.activeTemplate),
         updatedAt: new Date().toISOString()
       };
+      this.builderEditing = false;
       await this.store.saveTemplate(template);
       this.activeTemplate = template;
       this.templates = this.templates
         .map(item => (item.id === template.id ? template : item))
         .sort((a, b) => a.name.localeCompare(b.name, 'hu'));
-      this.builderEditing = false;
       this.statusMessage = 'Űrlapszerkezet mentve.';
     } catch (error) {
+      this.builderEditing = wasBuilderEditing;
       this.statusMessage = 'Az űrlapszerkezet mentése sikertelen.';
       console.error(error);
     } finally {
@@ -2309,7 +2320,7 @@ export class FormEditorComponent implements OnInit {
       this.formSelectionSettingsOpen = false;
       this.formSelectionTemplateName = '';
       this.syncTemplateSections();
-      this.statusMessage = 'Kijelölt elemek sablonként becsomagolva.';
+      this.statusMessage = 'A kijelölt elemekből sablon készült.';
     } catch (error) {
       this.statusMessage = 'A kijelölt elemek sablonként mentése sikertelen.';
       console.error(error);
@@ -2988,10 +2999,10 @@ export class FormEditorComponent implements OnInit {
     this.statusMessage = 'Sablon csoportként hozzáadva.';
   }
 
-  private runStencilSaveFeedback(saveAction: () => Promise<void>): void {
+  private runStencilSaveFeedback(saveAction: () => Promise<void>): Promise<void> {
     this.startStencilSaveAnimation();
 
-    void saveAction()
+    return saveAction()
       .then(() => {
         const saved =
           this.statusMessage === 'Űrlapszerkezet mentve.'

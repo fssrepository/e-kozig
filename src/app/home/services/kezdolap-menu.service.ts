@@ -12,7 +12,7 @@ export interface MenuNode {
 }
 
 const RAW_MENU = `
-Részletes keresés (főmenü) (pls. put search icon right hand side)
+Részletes keresés (főmenü)
 Ügyféliránytű (főmenü)
 Adókulcsok, járulékmértékek (sub fomenu)
 Adótáblák
@@ -51,12 +51,12 @@ Családikedvezmény-kalkulátorok
 Gépjárműadó-kalkulátor
 Ingatlanértékesítés
 Késedelmi kamat számítása
-Kivakalkulátor
+Kiva-kalkulátor
 Pótlékszámítás
-Regisztrációs adó kalkulátor
+Regisztrációsadó-kalkulátor
 Tevékenységlekérdező
 Vállalkozói kalkulátor
-Közérdekű bejelentés, panasz, Uniós/hazai támogatásokkal visszaélés (sub fomenu)
+Közérdekű bejelentés, panasz és visszaélés uniós vagy hazai támogatásokkal (sub fomenu)
 Közösségi adószámok megerősítése (sub fomenu)
 Keressen minket! (sub fomenu)
 Lépésről lépésre (sub fomenu)
@@ -72,14 +72,14 @@ Utastájékoztató
 Webes rendelés
 Számlaszámok a befizetéshez (sub fomenu)
 Személyes adónaptár (sub fomenu)
-Ügyfélszolgálati időpont foglalása (sub fomenu)
+Ügyfélszolgálati időpontfoglalás (sub fomenu)
 Ügyfélszolgálatok (sub fomenu)
 Ügykatalógus (dokumentumtípusok) (sub fomenu)
 Üzemanyag-elszámolás (sub fomenu)
 Válaszol a NAV (sub fomenu)
 Háromgyerekes anyák kedvezménye
 Az egyszerűsített foglalkoztatás változásai 2025-ben
-Online Számla eltérés
+Online Számla-eltérés
 Állandó meghatalmazás
 ÁNYK - eBEV
 Cégkapu
@@ -145,14 +145,14 @@ Nyomtatványok (főmenü)
 Nyomtatványok (sub fomenu)
 Nyomtatványkereső
 ÁNYK keretprogram
-Pénzintézetek számlaszám adatszolgáltatása
+Pénzintézetek számlaszám-adatszolgáltatása
 Elektronikus benyújtás
 Online Nyomtatványkitöltő Alkalmazás (sub fomenu)
 Letöltések - egyéb (sub fomenu)
 Adatlapok, igazolások, meghatalmazásminták
 Tájékoztatók az adatszolgáltatáshoz
 Nyomtatványtervezetek
-ONYA segédletek
+ONYA-segédletek
 E-bevallás, Java (sub fomenu)
 Általános tudnivalók az e-bevallásról
 ÁNYK-AbevJava kitöltőprogram
@@ -196,7 +196,7 @@ Kizárt civil szervezetek 2026
 Tájékoztatók
 Kimutatások és elszámolások
 Egyéb kötelezettség és költségvetési támogatás (sub fomenu)
-OSS belépés (sub fomenu)
+OSS-belépés (sub fomenu)
 Online pénztárgépek (sub fomenu)
 Jövedéki adó (sub fomenu)
 Jövedéki nyomtatványok
@@ -206,7 +206,7 @@ Tájékoztatók, információk
 Egyéb (sub fomenu)
 CESOP (sub fomenu)
 Vendégéjszakák száma (sub fomenu)
-SME - Kisvállalkozások Közösségi Alanyi Adómentességi Rendszere (sub fomenu)
+SME – kisvállalkozások közösségi alanyi adómentességi rendszere (sub fomenu)
 TADEUS (sub fomenu)
 Piacfelügyelet (sub fomenu)
 Vám (főmenü)
@@ -223,7 +223,7 @@ Határátkelőhelyi kamerák (sub fomenu)
 Határforgalom (sub fomenu)
 Kivitel (sub fomenu)
 Nem kereskedelmi (utas) forgalom (sub fomenu)
-Magyar-ukrán határ - szankciós információk (sub fomenu)
+Magyar–ukrán határ – szankciós információk (sub fomenu)
 Regisztrációs adó (sub fomenu)
 Származás (sub fomenu)
 Szellemi tulajdonjogok védelme (sub fomenu)
@@ -241,7 +241,7 @@ MERKUR Bevetési Egység (sub fomenu)
 e-Papír (sub fomenu)
 Kapcsolat (főmenü)
 Keressen minket
-Igazgatosagok
+Igazgatóságok
 Ügyfélszolgálatok
 Együttműködő szervek
 Sajtószoba
@@ -257,12 +257,12 @@ Kiadványok (főmenü)
 Mi vagyunk a NAV (sub főmenü)
 Évkönyvek (sub főmenü)
 Jubileumi kiadványok (sub főmenü)
-Stratégia 2021-2024 (sub főmenü)
+Stratégia 2021–2024 (sub főmenü)
 Röviden, egyszerűen (sub főmenü)
 Utastájékoztató (sub főmenü)
 Utastájékoztató
-Travel Guides
-Információk az EU határain kívül és belül
+Utazási útmutatók
+Információk az EU-n kívüli és az EU-n belüli utazáshoz
 Konténeres vámkezelés (sub főmenü)
 A NAV nyomozó hatósága (sub főmenü)
 Adóvilág (sub főmenü)
@@ -276,7 +276,7 @@ Adóvilág 2017
 Közérthetőségi kiadványok (sub főmenü)
 Hirdetmények (főmenü)
 Anonimizált határozatok (főmenü)
-Európai Uniós projektek (főmenü)
+Európai uniós projektek (főmenü)
 Pénzmosás (főmenü)
 OLAF (főmenü)
 Bemutatkozás (sub főmenü)

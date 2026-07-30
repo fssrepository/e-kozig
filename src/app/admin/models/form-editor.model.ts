@@ -169,12 +169,12 @@ export const SECTION_LIBRARY: FormSectionDefinition[] = [
     id: 'contact-data',
     title: 'Kapcsolattartás',
     navCode: 'NAV-KAPCS',
-    description: 'E-mail, telefon és tárhely értesítés',
+    description: 'E-mail, telefon és tárhelyértesítés',
     layout: { col: 1, row: 3, colSpan: 4, rowSpan: 1 },
     fields: [
       { id: 'email', label: 'E-mail', type: 'email', autofillKey: 'email' },
       { id: 'phone', label: 'Telefon', type: 'tel', autofillKey: 'phone' },
-      { id: 'tarhelyNotice', label: 'Tárhely értesítés', type: 'checkbox' }
+      { id: 'tarhelyNotice', label: 'Tárhelyértesítés', type: 'checkbox' }
     ]
   },
   {
@@ -200,13 +200,13 @@ export const SECTION_LIBRARY: FormSectionDefinition[] = [
   },
   {
     id: 'nav-permissions',
-    title: 'NAV jogosultságok',
+    title: 'NAV-jogosultságok',
     navCode: 'NAV-JOG',
-    description: 'ONYA, HIPA és tárhely műveletek',
+    description: 'ONYA-, HIPA- és tárhelyműveletek',
     layout: { col: 9, row: 3, colSpan: 4, rowSpan: 2 },
     fields: [
-      { id: 'onyaAccess', label: 'ONYA űrlapkitöltés', type: 'checkbox' },
-      { id: 'hipaAccess', label: 'HIPA ügyintézés', type: 'checkbox' },
+      { id: 'onyaAccess', label: 'ONYA-űrlapkitöltés', type: 'checkbox' },
+      { id: 'hipaAccess', label: 'HIPA-ügyintézés', type: 'checkbox' },
       { id: 'documentAccess', label: 'Dokumentumok olvasása', type: 'checkbox' },
       {
         id: 'approvalMode',
@@ -246,7 +246,7 @@ export const SECTION_LIBRARY: FormSectionDefinition[] = [
     id: 'case-message',
     title: 'Ügy leírása',
     navCode: 'NAV-UZENET',
-    description: 'Szabad szöveges beadvány rész',
+    description: 'Szabad szöveges beadványrész',
     layout: { col: 7, row: 5, colSpan: 6, rowSpan: 2 },
     fields: [
       { id: 'caseSubject', label: 'Tárgy', type: 'text' },
@@ -260,7 +260,7 @@ export const DEFAULT_FORM_TEMPLATES: FormTemplate[] = [
     id: 'nav-representation-template',
     name: 'Állandó meghatalmazás',
     navCode: 'UJEGYKE',
-    description: 'Képviseleti jogosultság és HIPA kapcsolódás ONYA-stílusú űrlaphoz.',
+    description: 'Képviseleti jogosultságok és HIPA-ügyintézés ONYA-stílusú űrlapon.',
     mandatory: true,
     grid: { columns: 12, rows: 6 },
     updatedAt: '2026-06-11T00:00:00.000Z',
@@ -284,7 +284,7 @@ export const DEFAULT_FORM_TEMPLATES: FormTemplate[] = [
     id: 'nav-tax-registration-template',
     name: 'Adózói adatbejelentő',
     navCode: 'T101E',
-    description: 'Alap személyes és vállalkozási adatok bejelentéséhez.',
+    description: 'Személyes és vállalkozási alapadatok bejelentéséhez.',
     mandatory: false,
     grid: { columns: 12, rows: 6 },
     updatedAt: '2026-06-11T00:00:00.000Z',

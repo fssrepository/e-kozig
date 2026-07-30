@@ -12,13 +12,13 @@
           <mat-chip-set class="search-chips" *ngIf="searchTerms.length > 0">
             <mat-chip *ngFor="let term of searchTerms" removable (removed)="removeSearchTerm(term)">
               {{ term }}
-              <button matChipRemove aria-label="Remove search term">✕</button>
+              <button matChipRemove aria-label="Keresési kifejezés eltávolítása">✕</button>
             </mat-chip>
           </mat-chip-set>
           <input
             matInput
             [formControl]="searchCtrl"
-            placeholder="Téma és Kifejezés keresés..."
+            placeholder="Keresés témára vagy kifejezésre"
             (keydown.enter)="addSearchTerm()"
           >
           <button
@@ -78,26 +78,24 @@
             <mat-icon>close</mat-icon>
           </button>
         </div>
-        <p>A menüpontokhoz kapcsolódó tartalom.</p>
+        <p>A kiválasztott menüponthoz tartozó tartalom.</p>
       </div>
     </section>
   </div>
 
   <section class="readme-content" *ngIf="isNavIssue(); else nonNavHome">
-    <h2>DÁP ügyféloldali prototípus</h2>
-    <p>
-      Ez a DÁP menüszerkezetben megjelenített NAV / Adóügy prototípus-szelet.
-    </p>
+    <h2>DÁP-ügyfélportál prototípusa</h2>
+    <p>A NAV adóügyeit a DÁP-menüszerkezetben bemutató prototípus.</p>
 
-    <h3>A prototípusban érintett NAV IT-rendszerek</h3>
+    <h3>Bemutatott területek</h3>
     <ul>
-      <li><strong>NAV Ügyfélportál - Dokumentumok:</strong> dokumentumlista, keresés, szűrés, státusz és ügyfél szerinti áttekintés.</li>
-      <li><strong>ONYA / ÁNYK / ÁBEV Java / eBEV:</strong> beadott űrlapok, nyugták, szerveroldali visszajelzések és hibaüzenetek ügyféloldali követése.</li>
-      <li><strong>Online Számla:</strong> számlalista, bizonylatnézet, időszaknézet és számlaalapú adózási koncepció.</li>
-      <li><strong>eBEV / Adószámla:</strong> egyenleg, befizetés, köztartozás, pótléklevezetés és fizetési tájékoztató.</li>
-      <li><strong>NAV Adónaptár:</strong> esedékes és hiányzó bevallások, határidők, átmeneti bevezetési időszakok.</li>
-      <li><strong>Képviseleti jogosultságok / meghatalmazások:</strong> könyvelői képviselet, HIPA, adónem-választás, vállalkozói jóváhagyás és értesítés.</li>
-      <li><strong>Tárhely / Cégkapu értesítési logika:</strong> bevallási, képviseleti, adószámla- és státuszváltozási értesítések.</li>
+      <li><strong>Dokumentumok:</strong> keresés, szűrés, valamint státusz és ügyfél szerinti áttekintés.</li>
+      <li><strong>Űrlapok (ONYA, ÁNYK, ÁBEV Java, eBEV):</strong> benyújtások, nyugták, visszajelzések és hibák követése.</li>
+      <li><strong>Online Számla:</strong> számla-, bizonylat- és időszaknézet, valamint számlaalapú adózási koncepció.</li>
+      <li><strong>Adószámla:</strong> egyenleg, befizetés, köztartozás, pótléklevezetés és fizetési tájékoztató.</li>
+      <li><strong>Adónaptár:</strong> esedékes és hiányzó bevallások, határidők és átmeneti bevezetési időszakok.</li>
+      <li><strong>Képviselet:</strong> könyvelői képviselet, HIPA, adónem-választás, vállalkozói jóváhagyás és értesítés.</li>
+      <li><strong>Tárhely és Cégkapu:</strong> értesítések a bevallási, képviseleti, adószámla- és státuszváltozásokról.</li>
     </ul>
     <figure>
       <img
@@ -105,7 +103,7 @@
         alt="Számlaalapú progresszív adózás társadalmi és adózási hatásai"
         class="tax-health-diagram"
       >
-      <figcaption class="caption">A számlaalapú progresszív adózás várható társadalmi és adózási hatása.</figcaption>
+      <figcaption class="caption">A számlaalapú progresszív adózás várható társadalmi és adózási hatásai.</figcaption>
     </figure>
   </section>
 
@@ -115,67 +113,59 @@
       <p>{{ selectedIssue() }}</p>
       <div [ngSwitch]="selectedIssueLabel()">
         <section *ngSwitchCase="'Bűnügy'">
-          <h3>Miért kell erősebb eljárási garancia?</h3>
+          <h3>Eljárási garanciák</h3>
           <p>
-            Az eljárás formailag haladhat akkor is, ha a gyanúsított nem látja pontosan,
-            mivel gyanúsítják, milyen iratok alapján járnak el, ki az előadó és hogyan
-            érheti el a kirendelt védőt. A védekezési jog viszont csak akkor használható,
-            ha ezek az adatok írásban, visszakereshetően és vallomástételtől függetlenül
-            rendelkezésre állnak.
+            A védekezéshez a gyanúsítottnak írásban, visszakereshetően meg kell kapnia
+            a gyanúsítás pontos leírását, az eljárási iratokat, valamint az előadó és
+            a kirendelt védő adatait. Ez nem függhet a vallomástételtől.
           </p>
           <p>
-            Ez különösen akkor lényeges, ha a telefonját vagy laptopját lefoglalják.
-            Ilyenkor nemcsak egy eszköz hiányzik, hanem a kapcsolatok, dokumentumok,
-            időpontok és ügyintézési csatornák is kieshetnek. Ezért kell külön biztosítani,
-            hogy az értesítések postán vagy tárhelyen is eljussanak hozzá, és a védő
-            aktivitása ellenőrizhető legyen.
+            Lefoglalt telefon vagy laptop esetén más elérési csatorna is szükséges.
+            Az értesítések érkezzenek postán vagy tárhelyre, a kirendelt védő
+            közreműködése pedig legyen ellenőrizhető.
           </p>
           <ul>
-            <li>A pontos gyanúsítás, az eljárási iratok, a rendőri előadó és a kirendelt védő adatai vallomástételtől függetlenül kerüljenek átadásra vagy tárhelyre/postára.</li>
-            <li>Előadó- vagy védőváltozáskor automatikus értesítés menjen, mert a lefoglalt telefon miatt a gyanúsított nem biztos, hogy a korábbi csatornákon elérhető.</li>
-            <li>A kihallgatásról alapértelmezett hangfelvétel készüljön, hogy később ellenőrizhető legyen a bánásmód és a jegyzőkönyv pontossága.</li>
-            <li>A kirendelt védő passzivitására legyen panasz- és státuszfolyamat, mert a védelem hiánya az egész eljárást torzíthatja.</li>
-            <li>Telefon és laptop lefoglalása csak arányosan, időkorláttal történjen; híváslista-ellenőrzésnél legalább két évre visszamenőleg lehessen vizsgálni.</li>
+            <li>A gyanúsított vallomástételtől függetlenül kapja meg a gyanúsítást, az iratokat, valamint az előadó és a védő adatait.</li>
+            <li>Előadó- vagy védőváltáskor automatikus értesítés érkezzen.</li>
+            <li>A kihallgatásról alapértelmezés szerint készüljön hangfelvétel, hogy ellenőrizhető legyen a bánásmód és a jegyzőkönyv pontossága.</li>
+            <li>A kirendelt védő tétlensége esetén lehessen panaszt tenni, és annak kezelését nyomon követni.</li>
+            <li>Telefon vagy laptop lefoglalása legyen arányos és időben korlátozott; a híváslistát legalább két évre visszamenőleg lehessen ellenőrizni.</li>
           </ul>
         </section>
 
         <section *ngSwitchCase="'Jog'">
-          <h3>Miért kell követhető és jóvátehető eljárás?</h3>
+          <h3>Átlátható eljárás és jóvátétel</h3>
           <p>
-            Egy hatósági vagy bírósági eljárás működhet formálisan, mégsem lesz az ügyfél
-            számára ellenőrizhető, ha az iratok, kézbesítések, határidők, ügyintézői
-            lépések és döntési indokok külön helyeken, összefüggés nélkül jelennek meg.
+            Az ügyfél akkor tudja követni az eljárást, ha az iratok, kézbesítések,
+            határidők, intézkedések és indokok egy helyen láthatók.
           </p>
           <p>
-            A cél az, hogy az ügyfél ne csak a végeredményt lássa, hanem azt is, milyen
-            lépések vezettek oda, mikor kellett volna reagálnia, és milyen jogorvoslat
-            maradt nyitva. Ha a sérelem közérdekű hibára mutat rá, a jóvátételnek is
-            legyen ellenőrizhető közérdekű hatása, ne csak egy egyedi ügy lezárása.
+            Az ügytörténet mutassa a döntéshez vezető lépéseket, a válaszadási
+            határidőket és a jogorvoslati lehetőségeket. Ha a sérelem közérdekű
+            hibára mutat rá, a jóvátétel legyen ellenőrizhető.
           </p>
           <ul>
-            <li>Minden lényeges eljárási lépés legyen időrendben, igazolható kézbesítéssel és érthető indokolással visszakereshető.</li>
-            <li>A határidő, az iratátadás, a képviseleti adat és az ügyintézői döntés ne külön szigetekben jelenjen meg, hanem egy ügytörténetben.</li>
-            <li>Rendszerhiba vagy jogsértő gyakorlat esetén a jóvátétel ne csak formális lezárás legyen, hanem ellenőrizhető közérdekű hatása is lehessen.</li>
+            <li>Minden lényeges lépés legyen időrendben visszakereshető, igazolható kézbesítéssel és érthető indokolással.</li>
+            <li>A határidők, iratátadások, képviseleti adatok és döntések egyetlen ügytörténetben jelenjenek meg.</li>
+            <li>Rendszerhiba vagy jogsértő gyakorlat esetén a jóvátétel közérdekű hatása is legyen ellenőrizhető.</li>
           </ul>
         </section>
 
         <section *ngSwitchCase="'Egészségügy'">
-          <h3>Miért kell krízishelyzeti moratórium?</h3>
+          <h3>Ügyintézési moratórium krízishelyzetben</h3>
           <p>
-            Betegség, műtét, baleset, pszichés krízis vagy gondnoksági helyzet esetén
-            előfordulhat, hogy valaki átmenetileg nem képes határidőket figyelni,
-            tárhelyet kezelni vagy hivatalos döntésekre reagálni.
+            Betegség, műtét, baleset, pszichés krízis vagy gondnokság esetén valaki
+            átmenetileg nem tudja figyelni a határidőket, kezelni a tárhelyét vagy
+            megválaszolni a hivatalos megkereséseket.
           </p>
           <p>
-            A hatóság saját oldalán ilyenkor sokszor csak lejárt határidőt vagy elmaradt
-            választ lát, nem magát az akadályoztatást. Ezért kell a krízishelyzetet
-            hivatalosan, időszakhoz kötötten láthatóvá tenni, hogy ne utólag kelljen
-            bizonygatni, miért nem tudott az érintett eljárni.
+            A hivatalosan rögzített akadályoztatás védje az érintettet az automatikus
+            jogkövetkezményektől.
           </p>
           <ul>
-            <li>Legyen hivatalos, időszakhoz kötött ügyintézési moratórium, amelyet erre jogosult személy rögzíthet.</li>
-            <li>Az EESZT-ben rögzített státusz a NAV és más hivatalok számára is jelezze, hogy határidő- vagy végrehajtási védelem szükséges.</li>
-            <li>A moratórium ne törölje az ügyet, hanem akadályozza meg, hogy a rendszer automatikusan büntesse az átmenetileg cselekvőképtelen ügyfelet.</li>
+            <li>Az arra jogosult személy időszakhoz kötött ügyintézési moratóriumot rögzíthessen.</li>
+            <li>Az EESZT-ben rögzített állapot jelezze a NAV-nak és más hivataloknak a szükséges határidő- vagy végrehajtási védelmet.</li>
+            <li>A moratórium ne törölje az ügyet, csak függessze fel az automatikus jogkövetkezményeket.</li>
           </ul>
         </section>
       </div>

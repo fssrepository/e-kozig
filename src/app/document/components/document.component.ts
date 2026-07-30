@@ -186,7 +186,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
   showDocSearchPanel = false;
   showDocDetailSearch = false;
   showDocContentPanel = false;
-  documentPanelTitle = 'Űrlap típus';
+  documentPanelTitle = 'Űrlaptípus';
   onyaTemplates: FormTemplate[] = [];
   onyaTemplate: FormTemplate | null = null;
   onyaPageIndex = 0;
@@ -496,7 +496,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onReply() {
-    this.alertService.open('Új üzenet küldése az ügyhöz! (pl. e-papir)');
+    this.alertService.open('Az e-Papír-üzenet küldése ebben a prototípusban nem érhető el.');
   }
 
   toggleCreateMenu() {
@@ -518,7 +518,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showCreateMenu = false;
     this.showDocContentPanel = false;
     this.showDocDetailSearch = false;
-    this.documentPanelTitle = 'Űrlap típus';
+    this.documentPanelTitle = 'Űrlaptípus';
     this.docSearchCtrl.setValue('');
     this.docSearchChips = [];
     this.docSearchResults = [];
@@ -535,7 +535,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showCreateMenu = false;
     const name = this.selectedItem?.name?.trim() || this.selectedItem?.ugyfel?.trim() || '';
     const ugyszam = this.selectedItem ? this.generateUgyszam(this.selectedItem) : '';
-    const formType = item.formName || item.type || 'Űrlap típus';
+    const formType = item.formName || item.type || 'Űrlaptípus';
     const parts = [name, ugyszam, formType].filter(Boolean);
     const label = parts.join(' - ');
     this.documentPanelTitle = label;
@@ -576,11 +576,11 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   onViewAttachment() {
-    this.alertService.open('Dokumentum megnyitasa Onya-ban (pl. javitasra, jovahagyasra)!');
+    this.alertService.open('A dokumentum megnyitása az ONYA-ban javításra vagy jóváhagyásra.');
   }
 
   onDownloadAttachment() {
-    this.alertService.open('A dokumentum letoltese! (pl. pdf fájl)');
+    this.alertService.open('A dokumentum letöltése ebben a prototípusban nem érhető el.');
   }
 
   filterBySearch() {
@@ -829,7 +829,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onUserSelect() {
-    this.alertService.open('Felhasználó választása.');
+    this.alertService.open('Felhasználó kiválasztása.');
   }
 
   toggleUnreadFilter() {
@@ -1266,7 +1266,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
 
   removeDocSearchChip(_: string): void {
     this.docSearchChips = [];
-    this.documentPanelTitle = 'Űrlap típus';
+    this.documentPanelTitle = 'Űrlaptípus';
     this.showDocContentPanel = false;
   }
 

@@ -5,10 +5,10 @@
       <mat-chip-set class="search-chips" *ngIf="searchTerms.length > 0">
         <mat-chip *ngFor="let term of searchTerms" removable (removed)="removeSearchTerm(term)">
           {{ term }}
-          <button matChipRemove aria-label="Remove search term">✕</button>
+          <button matChipRemove aria-label="Keresési feltétel eltávolítása">✕</button>
         </mat-chip>
       </mat-chip-set>
-      <input matInput [formControl]="searchCtrl" placeholder="Dokumentum keresés pl.: ügyszám, iktatószám, ügyfél, űrlap ..." (keydown.enter)="filterBySearch()">
+      <input matInput [formControl]="searchCtrl" placeholder="Keresés ügyszám, iktatószám, ügyfél vagy űrlap alapján" (keydown.enter)="filterBySearch()">
     </mat-form-field>
 
     <div class="search-panel" [class.open]="showSearchPanel" *ngIf="showSearchPanel">
@@ -17,8 +17,8 @@
         <div class="result-desc">{{ result.formName }}</div>
       </div>
       <div class="search-footer">
-        <span class="footer-left">all search result for "{{ searchCtrl.value }}"</span>
-        <span class="footer-right">Press ENTER</span>
+        <span class="footer-left">Találatok erre: „{{ searchCtrl.value }}”</span>
+        <span class="footer-right">Enter: keresés</span>
       </div>
     </div>
     </div>
@@ -34,14 +34,14 @@
 
       <div class="ugyfel-panel" [class.open]="showUgyfelPanel" *ngIf="showUgyfelPanel">
         <mat-form-field class="ugyfeld-search" appearance="outline">
-          <mat-chip-set #chipList aria-label="Selected ügyfél" class="chip-list">
+          <mat-chip-set #chipList aria-label="Kiválasztott ügyfelek" class="chip-list">
             <mat-chip *ngFor="let s of selectedFilters" removable (removed)="remove(s)">
               {{ s }}
-              <button matChipRemove aria-label="Remove">✕</button>
+              <button matChipRemove aria-label="Ügyfél eltávolítása">✕</button>
             </mat-chip>
           </mat-chip-set>
 
-          <input matInput [formControl]="ugyfelCtrl" [matAutocomplete]="uauto" placeholder="Ügyfél keresés (személy, EV stb.)">
+          <input matInput [formControl]="ugyfelCtrl" [matAutocomplete]="uauto" placeholder="Ügyfél keresése (magánszemély, egyéni vállalkozó stb.)">
 
           <mat-autocomplete #uauto="matAutocomplete" (optionSelected)="selectUgyfel($event.option.value)">
             <mat-option *ngFor="let option of filteredUgyfels$ | async" [value]="option">{{ option }}</mat-option>
@@ -59,27 +59,27 @@
 
       <div class="date-panel" [class.open]="showDatePanel" *ngIf="showDatePanel">
         <div class="date-chips" *ngIf="dateFromCtrl.value || dateToCtrl.value">
-          <mat-chip-set aria-label="Selected dates" class="chip-list">
+          <mat-chip-set aria-label="Kiválasztott dátumok" class="chip-list">
             <mat-chip *ngIf="dateFromCtrl.value" removable (removed)="removeDate('from')">
-              From: {{ formatShortDate(dateFromCtrl.value) }}
-              <button matChipRemove aria-label="Remove">✕</button>
+              Ettől: {{ formatShortDate(dateFromCtrl.value) }}
+              <button matChipRemove aria-label="Kezdő dátum eltávolítása">✕</button>
             </mat-chip>
             <mat-chip *ngIf="dateToCtrl.value" removable (removed)="removeDate('to')">
-              To: {{ formatShortDate(dateToCtrl.value) }}
-              <button matChipRemove aria-label="Remove">✕</button>
+              Eddig: {{ formatShortDate(dateToCtrl.value) }}
+              <button matChipRemove aria-label="Záró dátum eltávolítása">✕</button>
             </mat-chip>
           </mat-chip-set>
         </div>
 
         <div class="date-inputs">
           <mat-form-field appearance="outline">
-            <input matInput [matDatepicker]="fromPicker" placeholder="Tól" [formControl]="dateFromCtrl" (dateChange)="onDateChange()">
+            <input matInput [matDatepicker]="fromPicker" placeholder="Ettől" [formControl]="dateFromCtrl" (dateChange)="onDateChange()">
             <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
             <mat-datepicker #fromPicker xPosition="start" yPosition="below"></mat-datepicker>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <input matInput [matDatepicker]="toPicker" placeholder="Ig" [formControl]="dateToCtrl" (dateChange)="onDateChange()">
+            <input matInput [matDatepicker]="toPicker" placeholder="Eddig" [formControl]="dateToCtrl" (dateChange)="onDateChange()">
             <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
             <mat-datepicker #toPicker xPosition="start" yPosition="below"></mat-datepicker>
           </mat-form-field>
@@ -96,14 +96,14 @@
 
       <div class="form-panel" [class.open]="showFormPanel" *ngIf="showFormPanel">
         <mat-form-field class="form-search" appearance="outline">
-          <mat-chip-set aria-label="Selected forms" class="chip-list">
+          <mat-chip-set aria-label="Kiválasztott űrlapok" class="chip-list">
             <mat-chip *ngFor="let f of selectedForms" removable (removed)="removeForm(f)">
               {{ f }}
-              <button matChipRemove aria-label="Remove">✕</button>
+              <button matChipRemove aria-label="Űrlap eltávolítása">✕</button>
             </mat-chip>
           </mat-chip-set>
 
-          <input matInput [formControl]="formCtrl" [matAutocomplete]="fauto" placeholder="Űrlap keresés">
+          <input matInput [formControl]="formCtrl" [matAutocomplete]="fauto" placeholder="Űrlap keresése">
 
           <mat-autocomplete #fauto="matAutocomplete" (optionSelected)="selectForm($event.option.value)">
             <mat-option *ngFor="let option of filteredForms$ | async" [value]="option">{{ option }}</mat-option>
@@ -121,14 +121,14 @@
 
       <div class="status-panel" [class.open]="showStatusPanel" *ngIf="showStatusPanel">
         <mat-form-field class="status-search" appearance="outline">
-          <mat-chip-set aria-label="Selected statuses" class="chip-list">
+          <mat-chip-set aria-label="Kiválasztott státuszok" class="chip-list">
             <mat-chip *ngFor="let s of selectedStatuses" removable (removed)="removeStatus(s)">
               {{ s }}
-              <button matChipRemove aria-label="Remove">✕</button>
+              <button matChipRemove aria-label="Státusz eltávolítása">✕</button>
             </mat-chip>
           </mat-chip-set>
 
-          <input matInput [formControl]="statusCtrl" [matAutocomplete]="sauto" placeholder="Státusz keresés">
+          <input matInput [formControl]="statusCtrl" [matAutocomplete]="sauto" placeholder="Státusz keresése">
 
           <mat-autocomplete #sauto="matAutocomplete" (optionSelected)="selectStatus($event.option.value)">
             <mat-option *ngFor="let option of filteredStatuses$ | async" [value]="option">{{ option }}</mat-option>
@@ -147,7 +147,7 @@
 
   <div class="top-controls">
     <div class="left-controls">
-      <button mat-icon-button (click)="refresh()" aria-label="Refresh" [disabled]="loading">
+      <button mat-icon-button (click)="refresh()" aria-label="Frissítés" [disabled]="loading">
         <mat-icon *ngIf="!loading">refresh</mat-icon>
         <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
       </button>
@@ -263,7 +263,7 @@
           <mat-chip-set class="search-chips" *ngIf="emailSubjectChips.length > 0">
             <mat-chip *ngFor="let term of emailSubjectChips" removable (removed)="removeEmailSubjectChip(term)">
               {{ term }}
-              <button matChipRemove aria-label="Remove subject">✕</button>
+              <button matChipRemove aria-label="Tárgy eltávolítása">✕</button>
             </mat-chip>
           </mat-chip-set>
           <input matInput [formControl]="emailSubjectCtrl" placeholder="Tárgy" (keydown.enter)="addEmailSubjectChip()">
@@ -275,8 +275,8 @@
             <div class="result-desc">{{ result.formName }}</div>
           </div>
           <div class="search-footer">
-            <span class="footer-left">all search result for "{{ emailSubjectCtrl.value }}"</span>
-            <span class="footer-right">Press ENTER</span>
+            <span class="footer-left">Találatok erre: „{{ emailSubjectCtrl.value }}”</span>
+            <span class="footer-right">Enter: hozzáadás</span>
           </div>
         </div>
       </div>
@@ -293,13 +293,13 @@
           <mat-chip-set class="search-chips" *ngIf="docSearchChips.length > 0">
             <mat-chip *ngFor="let term of docSearchChips" removable (removed)="removeDocSearchChip(term)">
               {{ term }}
-              <button matChipRemove aria-label="Remove search term">✕</button>
+              <button matChipRemove aria-label="Keresési feltétel eltávolítása">✕</button>
             </mat-chip>
           </mat-chip-set>
           <input
             matInput
             [formControl]="docSearchCtrl"
-            placeholder="Űrlap keresés..."
+            placeholder="Űrlap keresése…"
             (keydown.enter)="selectFirstDocSearchResult()"
           >
           <button
@@ -322,7 +322,7 @@
       <div class="doc-search-panel search-panel" [class.open]="showDocSearchPanel" *ngIf="showDocSearchPanel">
         <div class="search-result" *ngFor="let result of docSearchResults" (click)="selectDocSearchResult(result)">
           <div class="result-ugyfel">{{ result.code }} - {{ result.title }}</div>
-          <div class="result-desc">Verziószám {{ result.version }} · Adóév {{ result.adoev }}</div>
+          <div class="result-desc">Verziószám: {{ result.version }} · Adóév: {{ result.adoev }}</div>
         </div>
       </div>
     </div>
@@ -557,7 +557,7 @@
           <div class="onya-surface-toolbar">
             <div>
               <div class="onya-surface-title">{{ formTemplate.name }}</div>
-              <div class="onya-surface-meta">{{ formTemplate.navCode }} · {{ onyaDataEditing ? 'Szerkesztés' : 'Csak olvasás' }}</div>
+              <div class="onya-surface-meta">{{ formTemplate.navCode }} · {{ onyaDataEditing ? 'Szerkeszthető' : 'Csak olvasható' }}</div>
             </div>
             <div class="onya-surface-actions">
               <button mat-icon-button type="button" (click)="toggleOnyaDataEditing()" aria-label="Adatok szerkesztése">
@@ -677,7 +677,7 @@
 <!-- Detail view -->
 <div class="detail-view" *ngIf="selectedItem">
   <div class="detail-header">
-    <button mat-icon-button (click)="closeDetailView()" aria-label="Back">
+    <button mat-icon-button (click)="closeDetailView()" aria-label="Vissza">
       <mat-icon>arrow_back</mat-icon>
     </button>
     <div class="detail-header-info">
@@ -711,20 +711,20 @@
           <div class="item-meta">
             <span>Státusz: {{ item.status }}</span>
             <span>Iktatószám: {{ item.iktatoszam }}</span>
-            <span>KR Érkeztetési szám: {{ item.krSzam }}</span>
-            <span *ngIf="hasFormTypeAttachment(item) && item.formName">Űrlap típus: {{ item.formName }}</span>
+            <span>KR-érkeztetési szám: {{ item.krSzam }}</span>
+            <span *ngIf="hasFormTypeAttachment(item) && item.formName">Űrlaptípus: {{ item.formName }}</span>
           </div>
           <div class="attachments-frame">
             <div class="attachments-title">Csatolmányok</div>
             <div class="attachment-row" *ngFor="let att of item.attachments">
               <div class="attachment-name">{{ att.name }}</div>
               <div class="attachment-actions">
-                <button mat-icon-button aria-label="Review attachment" (click)="openFormPopupFromItem(item)">
+                <button mat-icon-button aria-label="Csatolmány megtekintése" (click)="openFormPopupFromItem(item)">
                   <mat-icon [class.pending-action]="item.status === 'Elfogadásra vár'">
                     {{ item.status === 'Elfogadásra vár' ? 'grading' : 'visibility' }}
                   </mat-icon>
                 </button>
-                <button mat-icon-button aria-label="Download attachment" (click)="onDownloadAttachment()">
+                <button mat-icon-button aria-label="Csatolmány letöltése" (click)="onDownloadAttachment()">
                   <mat-icon>download</mat-icon>
                 </button>
               </div>
