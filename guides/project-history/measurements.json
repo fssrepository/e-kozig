@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "project_totals": {
-    "tasks": 15,
-    "tokens_estimate": 456250030,
-    "api_standard_usd_estimate": 257.62,
-    "allocated_hours_estimate": 9.362066046271059,
+    "tasks": 16,
+    "tokens_estimate": 457775073,
+    "api_standard_usd_estimate": 260.28,
+    "allocated_hours_estimate": 9.465966046286953,
     "manual_effort_unknown": false,
     "workstreams": {
       "Administration portal": {
@@ -16,13 +16,18 @@
         "tokens": 2665582,
         "api_equivalent_usd": 4.1,
         "hours": 0.16639174074596827
+      },
+      "Documentation (AI-assisted)": {
+        "tokens": 1525043,
+        "api_equivalent_usd": 2.66,
+        "hours": 0.10390000001589457
       }
     }
   },
   "account_control": {
     "account_tokens": 38488016278,
-    "allocated_tokens_estimate": 37993843589,
-    "unassigned_tokens": 494172689
+    "allocated_tokens_estimate": 37996385327,
+    "unassigned_tokens": 491630951
   },
   "valuation_date": "2026-10-01",
   "rates_per_million": {
@@ -525,6 +530,41 @@
           "tokens": 2665582.0,
           "api_equivalent_usd": 4.1
         }
+      }
+    },
+    {
+      "task_id": "EKO-16",
+      "tokens": 1525043,
+      "api_standard_usd_estimate": 2.66,
+      "active_hours": 0.10390000001589457,
+      "allocated_hours": 0.10390000001589457,
+      "manual_effort_unknown": false,
+      "token_basis": "Measured shared documentation-session tokens; estimated allocation 60% E-Kozig, 30% MyScoutee Old, 10% math",
+      "duration_basis": "Observed active session window, including tool waits; estimated project split, not human labor",
+      "allocated_time_basis": "Observed active session window, including tool waits; estimated project split, not human labor",
+      "models": {
+        "gpt-6-astra|high": {
+          "input_tokens": 1513987.8,
+          "cached_input_tokens": 1448448.0,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 11055.0,
+          "reasoning_output_tokens": 3825.0,
+          "total_tokens": 1525042.8
+        }
+      },
+      "repository_allocations": {
+        "e-kozig": {
+          "hours": 0.10390000001589457,
+          "tokens": 1525043,
+          "api_equivalent_usd": 2.66
+        }
+      },
+      "frozen_phase": {
+        "start_utc": "2026-09-30T23:34:24.557000+00:00",
+        "cutoff_utc": "2026-09-30T23:44:47.957000+00:00",
+        "shared_tokens": 2541738,
+        "shared_hours": 0.1731666666931576,
+        "allocation_share": 0.6
       }
     }
   ],

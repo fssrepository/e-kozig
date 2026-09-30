@@ -7,11 +7,11 @@
       "fssrepository/myscoutee-roadmap"
     ],
     "owner": "fssrepository",
-    "title": "e-kozig",
+    "title": "E-Kozig",
     "url": "https://github.com/users/fssrepository/projects/4",
     "public": true,
-    "shortDescription": "15 tasks \u00b7 456.3M tokens \u00b7 9.4h AI activity \u00b7 API equivalent $258 (estimates)",
-    "readme": "# e-kozig\n\n15 retrospective tasks. This Project is separate from the other portfolio Projects.\n\n[Complete Git backup](https://github.com/fssrepository/myscoutee-roadmap/tree/master/guides/project-history/e-kozig) \u00b7 [Measurement method](https://github.com/fssrepository/myscoutee-roadmap#measurement-method)\n\nEstimated task allocation: 0.456 B tokens, 9.4 h of activity after removing observed overlap, approximately $258 at Standard API rates. These are estimates, not human hours or an invoice.\n\n## Budget by workstream\n\n| Workstream | Tokens (M) | Allocated activity (h) | API equivalent (USD) |\n| --- | ---: | ---: | ---: |\n| Administration portal | 453.58 | 9.20 | $253.52 |\n| Project administration (AI-assisted) | 2.67 | 0.17 | $4.10 |\n\n## Repositories\n\n- [e-kozig](https://github.com/fssrepository/e-kozig)\n- [myscoutee-roadmap](https://github.com/fssrepository/myscoutee-roadmap)\n"
+    "shortDescription": "16 tasks \u00b7 457.8M tokens \u00b7 9.5h AI activity \u00b7 API equivalent $260 (estimates)",
+    "readme": "# E-Kozig\n\n16 retrospective tasks. This Project is separate from the other portfolio Projects.\n\n[Complete Git backup](https://github.com/fssrepository/myscoutee-roadmap/tree/master/guides/project-history/e-kozig) \u00b7 [Measurement method](https://github.com/fssrepository/myscoutee-roadmap#measurement-method)\n\nEstimated task allocation: 0.458 B tokens, 9.5 h of activity after removing observed overlap, approximately $260 at Standard API rates. These are estimates, not human hours or an invoice.\n\n## Budget by workstream\n\n| Workstream | Tokens (M) | Allocated activity (h) | API equivalent (USD) |\n| --- | ---: | ---: | ---: |\n| Administration portal | 453.58 | 9.20 | $253.52 |\n| Project administration (AI-assisted) | 2.67 | 0.17 | $4.10 |\n| Documentation (AI-assisted) | 1.53 | 0.10 | $2.66 |\n\n## Repositories\n\n- [e-kozig](https://github.com/fssrepository/e-kozig)\n- [myscoutee-roadmap](https://github.com/fssrepository/myscoutee-roadmap)\n"
   },
   "fields": [
     {
@@ -529,6 +529,33 @@
         "Models": "gpt-6-astra",
         "Reasoning": "high",
         "Evidence": "Measured run; estimated project split",
+        "Status": "Done"
+      }
+    },
+    {
+      "task_id": "EKO-16",
+      "title": "EKO-16: Publish a clear English introduction and process diagram",
+      "body": "Structure the English README, retain the Hungarian introduction and original assets, translate the editable process diagram, correct its SVG text positioning, capitalize the Project name, and publish a project-specific effort summary.\n\n| Metric | Value |\n| --- | ---: |\n| Allocated tokens | 1.525 M |\n| Allocated activity | 0.104 h |\n| Standard API equivalent | $2.66 USD |\n| Model / reasoning | gpt-6-astra / high |\n\nThe shared documentation window recorded 2,541,738 tokens from 2026-09-30T23:34:24.557000+00:00 to 2026-09-30T23:44:47.957000+00:00. Its effort is split once across EKO-16 (60%), OLD-6 (30%) and MATH-18 (10%); these are estimated shares of one measured session, not independent measurements. The bounded cutoff excludes the final publishing/accounting tail. Token components, model and reasoning come from the local session records. The allocation reserves part of the portfolio's previously unassigned allowance, without claiming exact reconciliation to the earlier account-wide daily snapshot. API equivalent is a list-price comparison, not an invoice or credits paid.\n\nValidation: documentation links, original Hungarian asset preservation, SVG text positions and PNG preview, and offline restore/checksum checks. No application behavior changed.\n\nProject: https://github.com/users/fssrepository/projects/4\n\nRelated documentation tasks (separately allocated effort):\n- [OLD-6](https://github.com/fssrepository/myscoutee-roadmap/issues/147)\n- [MATH-18](https://github.com/fssrepository/myscoutee-roadmap/issues/148)\n",
+      "state": "CLOSED",
+      "state_reason": "completed",
+      "issue": {
+        "repository": "fssrepository/myscoutee-roadmap",
+        "number": 146,
+        "url": "https://github.com/fssrepository/myscoutee-roadmap/issues/146",
+        "node_id": "I_kwDOU1_9-s8AAAABUQlOyg"
+      },
+      "values": {
+        "Task ID": "EKO-16",
+        "Workstream": "Documentation (AI-assisted)",
+        "Started": "2026-10-01",
+        "Finished": "2026-10-01",
+        "Tokens M": 1.525,
+        "API equiv USD": 2.66,
+        "Active h": 0.104,
+        "Allocated h": 0.104,
+        "Models": "gpt-6-astra",
+        "Reasoning": "high",
+        "Evidence": "Measured session; estimated project split",
         "Status": "Done"
       }
     }

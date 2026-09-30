@@ -208,5 +208,19 @@
     "models": "gpt-6-astra",
     "reasoning": "high",
     "evidence": "Measured maintenance-session tokens; estimated allocation by backup snapshot ownership (9:2:2:2 across four Projects)"
+  },
+  {
+    "task_id": "EKO-16",
+    "title": "Publish a clear English introduction and process diagram",
+    "workstream": "Documentation (AI-assisted)",
+    "started": "2026-10-01",
+    "finished": "2026-10-01",
+    "tokens_million": 1.53,
+    "api_equivalent_usd_estimate": 2.66,
+    "active_hours": 0.10390000001589457,
+    "allocated_hours": 0.1,
+    "models": "gpt-6-astra",
+    "reasoning": "high",
+    "evidence": "Measured shared documentation-session tokens; estimated allocation 60% E-Kozig, 30% MyScoutee Old, 10% math"
   }
 ]
