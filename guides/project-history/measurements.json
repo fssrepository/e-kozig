@@ -1,0 +1,556 @@
+{
+  "schema_version": 1,
+  "project_totals": {
+    "tasks": 15,
+    "tokens_estimate": 456250030,
+    "api_standard_usd_estimate": 257.62,
+    "allocated_hours_estimate": 9.362066046271059,
+    "manual_effort_unknown": false,
+    "workstreams": {
+      "Administration portal": {
+        "tokens": 453584448,
+        "api_equivalent_usd": 253.52,
+        "hours": 9.19567430552509
+      },
+      "Project administration (AI-assisted)": {
+        "tokens": 2665582,
+        "api_equivalent_usd": 4.1,
+        "hours": 0.16639174074596827
+      }
+    }
+  },
+  "account_control": {
+    "account_tokens": 38488016278,
+    "allocated_tokens_estimate": 37993843589,
+    "unassigned_tokens": 494172689
+  },
+  "valuation_date": "2026-10-01",
+  "rates_per_million": {
+    "gpt-5.2": [
+      1.75,
+      0.175,
+      14,
+      0
+    ],
+    "gpt-5.4": [
+      2.5,
+      0.25,
+      15,
+      0
+    ],
+    "gpt-5.5": [
+      5,
+      0.5,
+      30,
+      0
+    ],
+    "gpt-5.3-codex": [
+      1.75,
+      0.175,
+      14,
+      0
+    ],
+    "gpt-5.6-sol": [
+      4,
+      0.4,
+      20,
+      5
+    ],
+    "gpt-5.6-terra": [
+      2,
+      0.2,
+      12,
+      2.5
+    ],
+    "gpt-6-astra": [
+      10,
+      1,
+      50,
+      12.5
+    ],
+    "gpt-6-sol": [
+      2,
+      0.2,
+      10,
+      2.5
+    ],
+    "gpt-6-luna": [
+      0.1,
+      0.01,
+      0.5,
+      0.125
+    ]
+  },
+  "pricing_source": "https://developers.openai.com/api/docs/pricing",
+  "observed_token_mix": {
+    "input_tokens": 0.9963307585649178,
+    "cached_input_tokens": 0.9617906844276427,
+    "cache_write_input_tokens": 0.0,
+    "output_tokens": 0.0031954733323304777,
+    "reasoning_output_tokens": 0.0010898946512413721,
+    "total_tokens": 1.0
+  },
+  "tasks": [
+    {
+      "task_id": "EKO-1",
+      "tokens": 20000000,
+      "api_standard_usd_estimate": 5.47,
+      "active_hours": 0.4,
+      "allocated_hours": 0.4,
+      "manual_effort_unknown": false,
+      "token_basis": "Analogy estimate from comparable tasks; reserved from unassigned account balance, daily attribution unavailable",
+      "duration_basis": "Comparable-task estimate; historical timing not individually logged",
+      "allocated_time_basis": "Estimated task time; placement and overlap are unobserved",
+      "models": {
+        "gpt-5.2|estimated": {
+          "input_tokens": 19926615.171298355,
+          "cached_input_tokens": 19235813.688552853,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 63909.46664660955,
+          "reasoning_output_tokens": 21797.89302482744,
+          "total_tokens": 20000000.0
+        }
+      },
+      "repository_allocations": {
+        "e-kozig": {
+          "hours": 0.4,
+          "tokens": 20000000.0,
+          "api_equivalent_usd": 5.47
+        }
+      }
+    },
+    {
+      "task_id": "EKO-2",
+      "tokens": 20000000,
+      "api_standard_usd_estimate": 5.47,
+      "active_hours": 0.4,
+      "allocated_hours": 0.4,
+      "manual_effort_unknown": false,
+      "token_basis": "Analogy estimate from comparable tasks; reserved from unassigned account balance, daily attribution unavailable",
+      "duration_basis": "Comparable-task estimate; historical timing not individually logged",
+      "allocated_time_basis": "Estimated task time; placement and overlap are unobserved",
+      "models": {
+        "gpt-5.2|estimated": {
+          "input_tokens": 19926615.171298355,
+          "cached_input_tokens": 19235813.688552853,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 63909.46664660955,
+          "reasoning_output_tokens": 21797.89302482744,
+          "total_tokens": 20000000.0
+        }
+      },
+      "repository_allocations": {
+        "e-kozig": {
+          "hours": 0.4,
+          "tokens": 20000000.0,
+          "api_equivalent_usd": 5.47
+        }
+      }
+    },
+    {
+      "task_id": "EKO-3",
+      "tokens": 8234972,
+      "api_standard_usd_estimate": 2.25,
+      "active_hours": 0.2,
+      "allocated_hours": 0.2,
+      "manual_effort_unknown": false,
+      "token_basis": "Estimated task allocation of measured daily account totals",
+      "duration_basis": "Estimated from observed token-to-model-activity ratio; not human labor time",
+      "allocated_time_basis": "Estimated task time; placement and overlap are unobserved",
+      "models": {
+        "gpt-5.2|estimated": {
+          "total_tokens": 8234972,
+          "input_tokens": 8204755.899520858,
+          "cached_input_tokens": 7920319.356122473,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 26314.633418488178,
+          "reasoning_output_tokens": 8975.251935922464
+        }
+      },
+      "repository_allocations": {
+        "e-kozig": {
+          "hours": 0.2,
+          "tokens": 8234972.0,
+          "api_equivalent_usd": 2.25
+        }
+      }
+    },
+    {
+      "task_id": "EKO-4",
+      "tokens": 1515332,
+      "api_standard_usd_estimate": 0.41,
+      "active_hours": 0.0,
+      "allocated_hours": 0.0,
+      "manual_effort_unknown": false,
+      "token_basis": "Estimated task allocation of measured daily account totals",
+      "duration_basis": "Estimated from observed token-to-model-activity ratio; not human labor time",
+      "allocated_time_basis": "Estimated task time; placement and overlap are unobserved",
+      "models": {
+        "gpt-5.3-codex|estimated": {
+          "total_tokens": 1515332,
+          "input_tokens": 1509771.881037694,
+          "cached_input_tokens": 1457432.2014151087,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 4842.202995627007,
+          "reasoning_output_tokens": 1651.5522416548908
+        }
+      },
+      "repository_allocations": {
+        "e-kozig": {
+          "hours": 0.0,
+          "tokens": 1515332.0,
+          "api_equivalent_usd": 0.41
+        }
+      }
+    },
+    {
+      "task_id": "EKO-5",
+      "tokens": 2020443,
+      "api_standard_usd_estimate": 0.55,
+      "active_hours": 0.0,
+      "allocated_hours": 0.0,
+      "manual_effort_unknown": false,
+      "token_basis": "Estimated task allocation of measured daily account totals",
+      "duration_basis": "Estimated from observed token-to-model-activity ratio; not human labor time",
+      "allocated_time_basis": "Estimated task time; placement and overlap are unobserved",
+      "models": {
+        "gpt-5.3-codex|estimated": {
+          "total_tokens": 2020443,
+          "input_tokens": 2013029.5068271782,
+          "cached_input_tokens": 1943243.2558170396,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 6456.271725993787,
+          "reasoning_output_tokens": 2202.0700188380715
+        }
+      },
+      "repository_allocations": {
+        "e-kozig": {
+          "hours": 0.0,
+          "tokens": 2020443.0,
+          "api_equivalent_usd": 0.55
+        }
+      }
+    },
+    {
+      "task_id": "EKO-6",
+      "tokens": 20427621,
+      "api_standard_usd_estimate": 5.59,
+      "active_hours": 0.5,
+      "allocated_hours": 0.5,
+      "manual_effort_unknown": false,
+      "token_basis": "Estimated task allocation of measured daily account totals",
+      "duration_basis": "Estimated from observed token-to-model-activity ratio; not human labor time",
+      "allocated_time_basis": "Estimated task time; placement and overlap are unobserved",
+      "models": {
+        "gpt-5.3-codex|estimated": {
+          "total_tokens": 20427621,
+          "input_tokens": 20352667.126606647,
+          "cached_input_tokens": 19647095.582818486,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 65275.918148454046,
+          "reasoning_output_tokens": 22263.954865485928
+        }
+      },
+      "repository_allocations": {
+        "e-kozig": {
+          "hours": 0.5,
+          "tokens": 20427621.0,
+          "api_equivalent_usd": 5.59
+        }
+      }
+    },
+    {
+      "task_id": "EKO-7",
+      "tokens": 21889376,
+      "api_standard_usd_estimate": 5.99,
+      "active_hours": 0.5,
+      "allocated_hours": 0.5,
+      "manual_effort_unknown": false,
+      "token_basis": "Estimated task allocation of measured daily account totals",
+      "duration_basis": "Estimated from observed token-to-model-activity ratio; not human labor time",
+      "allocated_time_basis": "Estimated task time; placement and overlap are unobserved",
+      "models": {
+        "gpt-5.3-codex|estimated": {
+          "total_tokens": 21889376,
+          "input_tokens": 21809058.594592705,
+          "cached_input_tokens": 21052997.924734015,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 69946.91726935479,
+          "reasoning_output_tokens": 23857.11382141126
+        }
+      },
+      "repository_allocations": {
+        "e-kozig": {
+          "hours": 0.5,
+          "tokens": 21889376.0,
+          "api_equivalent_usd": 5.99
+        }
+      }
+    },
+    {
+      "task_id": "EKO-8",
+      "tokens": 21889373,
+      "api_standard_usd_estimate": 5.99,
+      "active_hours": 0.5,
+      "allocated_hours": 0.5,
+      "manual_effort_unknown": false,
+      "token_basis": "Estimated task allocation of measured daily account totals",
+      "duration_basis": "Estimated from observed token-to-model-activity ratio; not human labor time",
+      "allocated_time_basis": "Estimated task time; placement and overlap are unobserved",
+      "models": {
+        "gpt-5.3-codex|estimated": {
+          "total_tokens": 21889373,
+          "input_tokens": 21809055.60560043,
+          "cached_input_tokens": 21052995.03936196,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 69946.90768293479,
+          "reasoning_output_tokens": 23857.110551727306
+        }
+      },
+      "repository_allocations": {
+        "e-kozig": {
+          "hours": 0.5,
+          "tokens": 21889373.0,
+          "api_equivalent_usd": 5.99
+        }
+      }
+    },
+    {
+      "task_id": "EKO-9",
+      "tokens": 11368717,
+      "api_standard_usd_estimate": 3.11,
+      "active_hours": 0.3,
+      "allocated_hours": 0.3,
+      "manual_effort_unknown": false,
+      "token_basis": "Estimated task allocation of measured daily account totals",
+      "duration_basis": "Estimated from observed token-to-model-activity ratio; not human labor time",
+      "allocated_time_basis": "Estimated task time; placement and overlap are unobserved",
+      "models": {
+        "gpt-5.3-codex|estimated": {
+          "total_tokens": 11368717,
+          "input_tokens": 11327002.432519877,
+          "cached_input_tokens": 10934326.104494177,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 36328.43199631215,
+          "reasoning_output_tokens": 12390.703849776859
+        }
+      },
+      "repository_allocations": {
+        "e-kozig": {
+          "hours": 0.3,
+          "tokens": 11368717.0,
+          "api_equivalent_usd": 3.1100000000000003
+        }
+      }
+    },
+    {
+      "task_id": "EKO-10",
+      "tokens": 23582880,
+      "api_standard_usd_estimate": 6.45,
+      "active_hours": 0.5,
+      "allocated_hours": 0.5,
+      "manual_effort_unknown": false,
+      "token_basis": "Estimated task allocation of measured daily account totals",
+      "duration_basis": "Estimated from observed token-to-model-activity ratio; not human labor time",
+      "allocated_time_basis": "Estimated task time; placement and overlap are unobserved",
+      "models": {
+        "gpt-5.3-codex|estimated": {
+          "total_tokens": 23582880,
+          "input_tokens": 23496348.719545428,
+          "cached_input_tokens": 22681794.295974966,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 75358.46413954977,
+          "reasoning_output_tokens": 25702.85477286713
+        }
+      },
+      "repository_allocations": {
+        "e-kozig": {
+          "hours": 0.5,
+          "tokens": 23582880.0,
+          "api_equivalent_usd": 6.45
+        }
+      }
+    },
+    {
+      "task_id": "EKO-11",
+      "tokens": 12999395,
+      "api_standard_usd_estimate": 4.87,
+      "active_hours": 0.3,
+      "allocated_hours": 0.3,
+      "manual_effort_unknown": false,
+      "token_basis": "Analogy estimate from comparable tasks; reserved from unassigned account balance, daily attribution unavailable",
+      "duration_basis": "Comparable-task estimate; historical timing not individually logged",
+      "allocated_time_basis": "Estimated task time; placement and overlap are unobserved",
+      "models": {
+        "gpt-5.4|estimated": {
+          "input_tokens": 12951697.081234999,
+          "cached_input_tokens": 12502697.014195276,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 41539.22005893015,
+          "reasoning_output_tokens": 14167.971079873836,
+          "total_tokens": 12999395.0
+        }
+      },
+      "repository_allocations": {
+        "e-kozig": {
+          "hours": 0.3,
+          "tokens": 12999395.0,
+          "api_equivalent_usd": 4.87
+        }
+      }
+    },
+    {
+      "task_id": "EKO-12",
+      "tokens": 72121497,
+      "api_standard_usd_estimate": 54.05,
+      "active_hours": 1.6,
+      "allocated_hours": 1.6,
+      "manual_effort_unknown": false,
+      "token_basis": "Estimated task allocation of measured daily account totals",
+      "duration_basis": "Estimated from observed token-to-model-activity ratio; not human labor time",
+      "allocated_time_basis": "Estimated task time; placement and overlap are unobserved",
+      "models": {
+        "gpt-5.5|estimated": {
+          "total_tokens": 72121497,
+          "input_tokens": 71856865.81484744,
+          "cached_input_tokens": 69365783.96157618,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 230462.32035125254,
+          "reasoning_output_tokens": 78604.83381982066
+        }
+      },
+      "repository_allocations": {
+        "e-kozig": {
+          "hours": 1.6,
+          "tokens": 72121497.0,
+          "api_equivalent_usd": 54.05
+        }
+      }
+    },
+    {
+      "task_id": "EKO-13",
+      "tokens": 165480651,
+      "api_standard_usd_estimate": 124.02,
+      "active_hours": 3.7,
+      "allocated_hours": 3.7,
+      "manual_effort_unknown": false,
+      "token_basis": "Estimated task allocation of measured daily account totals",
+      "duration_basis": "Estimated from observed token-to-model-activity ratio; not human labor time",
+      "allocated_time_basis": "Estimated task time; placement and overlap are unobserved",
+      "models": {
+        "gpt-5.5|estimated": {
+          "total_tokens": 165480651,
+          "input_tokens": 164873462.53864643,
+          "cached_input_tokens": 159157748.58482188,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 528789.0072871868,
+          "reasoning_output_tokens": 180356.47640884022
+        }
+      },
+      "repository_allocations": {
+        "e-kozig": {
+          "hours": 3.7,
+          "tokens": 165480651.0,
+          "api_equivalent_usd": 124.02000000000001
+        }
+      }
+    },
+    {
+      "task_id": "EKO-14",
+      "tokens": 52054191,
+      "api_standard_usd_estimate": 29.3,
+      "active_hours": 0.6,
+      "allocated_hours": 0.29567430552509094,
+      "manual_effort_unknown": false,
+      "token_basis": "Estimated task allocation of measured daily account totals",
+      "duration_basis": "Union of recorded root task intervals; includes tool/network waits, not human labor time",
+      "allocated_time_basis": "Observed task intervals, overlap divided equally across concurrent tasks",
+      "models": {
+        "gpt-5.6-sol|medium": {
+          "input_tokens": 219119.30056116986,
+          "cached_input_tokens": 174593.73737992832,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 992.1772145725938,
+          "reasoning_output_tokens": 128.85418371072646,
+          "total_tokens": 220111.47777574247
+        },
+        "gpt-5.6-sol|unknown": {
+          "input_tokens": 207851.92258269334,
+          "cached_input_tokens": 189437.739343404,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 966.4063778304485,
+          "reasoning_output_tokens": 229.17636959979205,
+          "total_tokens": 220631.4964457179
+        },
+        "gpt-5.6-sol|ultra": {
+          "input_tokens": 51446265.24473603,
+          "cached_input_tokens": 50074709.09977313,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 167182.78104250855,
+          "reasoning_output_tokens": 76087.47509415747,
+          "total_tokens": 51613448.02577854
+        }
+      },
+      "repository_allocations": {
+        "e-kozig": {
+          "hours": 0.29567430552509094,
+          "tokens": 52054191.0,
+          "api_equivalent_usd": 29.3
+        }
+      }
+    },
+    {
+      "task_id": "EKO-15",
+      "tokens": 2665582,
+      "api_standard_usd_estimate": 4.1,
+      "active_hours": 0.166,
+      "allocated_hours": 0.16639174074596827,
+      "manual_effort_unknown": false,
+      "token_basis": "Measured maintenance-session tokens; estimated allocation by backup snapshot ownership (9:2:2:2 across four Projects)",
+      "duration_basis": "Measured active root intervals; same project allocation weights; includes tool/network waits, not human labor",
+      "allocated_time_basis": "Measured active root intervals; same project allocation weights; includes tool/network waits, not human labor",
+      "models": {
+        "gpt-6-astra|high": {
+          "input_tokens": 2649641.0666666664,
+          "cached_input_tokens": 2576571.7333333334,
+          "cache_write_input_tokens": 0.0,
+          "output_tokens": 15941.333333333334,
+          "reasoning_output_tokens": 4857.6,
+          "total_tokens": 2665582.4
+        }
+      },
+      "repository_allocations": {
+        "e-kozig": {
+          "hours": 0.16639174074596827,
+          "tokens": 2665582.0,
+          "api_equivalent_usd": 4.1
+        }
+      }
+    }
+  ],
+  "maintenance_run": {
+    "cutoff_utc": "2026-09-30T23:16:07.594000+00:00",
+    "measured_tokens": 19991868,
+    "measured_active_hours": 1.2479380555947621,
+    "project_weights": {
+      "myscoutee": 0.6,
+      "myscoutee-old": 0.13333333333333333,
+      "e-kozig": 0.13333333333333333,
+      "math": 0.13333333333333333
+    },
+    "previous_msc108_tokens_removed": 8473514,
+    "previous_msc108_hours_removed": 0.46417527781592477,
+    "net_additional_account_allocation": 11518354,
+    "daily_attribution": "Not individually reconciled; allocated against remaining account allowance",
+    "models": {
+      "gpt-6-astra|high": {
+        "input_tokens": 19872308,
+        "cached_input_tokens": 19324288,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 119560,
+        "reasoning_output_tokens": 36432,
+        "total_tokens": 19991868
+      }
+    }
+  }
+}

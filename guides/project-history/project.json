@@ -1,0 +1,536 @@
+{
+  "schema_version": 1,
+  "scope": "complete-project",
+  "project": {
+    "repositories": [
+      "fssrepository/e-kozig",
+      "fssrepository/myscoutee-roadmap"
+    ],
+    "owner": "fssrepository",
+    "title": "e-kozig",
+    "url": "https://github.com/users/fssrepository/projects/4",
+    "public": true,
+    "shortDescription": "15 tasks \u00b7 456.3M tokens \u00b7 9.4h AI activity \u00b7 API equivalent $258 (estimates)",
+    "readme": "# e-kozig\n\n15 retrospective tasks. This Project is separate from the other portfolio Projects.\n\n[Complete Git backup](https://github.com/fssrepository/myscoutee-roadmap/tree/master/guides/project-history/e-kozig) \u00b7 [Measurement method](https://github.com/fssrepository/myscoutee-roadmap#measurement-method)\n\nEstimated task allocation: 0.456 B tokens, 9.4 h of activity after removing observed overlap, approximately $258 at Standard API rates. These are estimates, not human hours or an invoice.\n\n## Budget by workstream\n\n| Workstream | Tokens (M) | Allocated activity (h) | API equivalent (USD) |\n| --- | ---: | ---: | ---: |\n| Administration portal | 453.58 | 9.20 | $253.52 |\n| Project administration (AI-assisted) | 2.67 | 0.17 | $4.10 |\n\n## Repositories\n\n- [e-kozig](https://github.com/fssrepository/e-kozig)\n- [myscoutee-roadmap](https://github.com/fssrepository/myscoutee-roadmap)\n"
+  },
+  "fields": [
+    {
+      "name": "Title",
+      "dataType": "TITLE",
+      "options": []
+    },
+    {
+      "name": "Status",
+      "dataType": "SINGLE_SELECT",
+      "options": [
+        {
+          "name": "Todo",
+          "color": "GRAY",
+          "description": ""
+        },
+        {
+          "name": "In Progress",
+          "color": "GRAY",
+          "description": ""
+        },
+        {
+          "name": "Done",
+          "color": "GRAY",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "Task ID",
+      "dataType": "TEXT",
+      "options": []
+    },
+    {
+      "name": "Workstream",
+      "dataType": "TEXT",
+      "options": []
+    },
+    {
+      "name": "Started",
+      "dataType": "DATE",
+      "options": []
+    },
+    {
+      "name": "Finished",
+      "dataType": "DATE",
+      "options": []
+    },
+    {
+      "name": "Tokens M",
+      "dataType": "NUMBER",
+      "options": []
+    },
+    {
+      "name": "API equiv USD",
+      "dataType": "NUMBER",
+      "options": []
+    },
+    {
+      "name": "Active h",
+      "dataType": "NUMBER",
+      "options": []
+    },
+    {
+      "name": "Allocated h",
+      "dataType": "NUMBER",
+      "options": []
+    },
+    {
+      "name": "Models",
+      "dataType": "TEXT",
+      "options": []
+    },
+    {
+      "name": "Reasoning",
+      "dataType": "TEXT",
+      "options": []
+    },
+    {
+      "name": "Evidence",
+      "dataType": "TEXT",
+      "options": []
+    }
+  ],
+  "views": [
+    {
+      "name": "Delivery history",
+      "layout": "TABLE_LAYOUT",
+      "visibleFields": [
+        "Task ID",
+        "Title",
+        "Workstream",
+        "Status",
+        "Started",
+        "Finished",
+        "Evidence"
+      ]
+    },
+    {
+      "name": "AI usage and effort",
+      "layout": "TABLE_LAYOUT",
+      "visibleFields": [
+        "Task ID",
+        "Title",
+        "Tokens M",
+        "API equiv USD",
+        "Active h",
+        "Allocated h",
+        "Models",
+        "Reasoning",
+        "Evidence"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "task_id": "EKO-1",
+      "title": "EKO-1: feat: establish the Angular administration portal and document module",
+      "body": "Retrospective record of **feat: establish the Angular administration portal and document module**.\n\nHistorical execution: **2026-02-02 \u2192 2026-02-02 (UTC dates)**. This issue was created retrospectively on 2026-10-01; its creation/closure time is not the historical execution time.\n\nWorkstream: **Administration portal**\n\n| Metric | Value |\n| --- | --- |\n| Tokens, including cached input | 20.00 M |\n| Standard API list-price equivalent | approximately $5 USD |\n| Active task time | approximately 0.4 h |\n| Model(s) | gpt-5.2 (est.) |\n| Reasoning effort | unrecorded |\n\nToken basis: Analogy estimate from comparable tasks; reserved from unassigned account balance, daily attribution unavailable.\nTime basis: Comparable-task estimate; historical timing not individually logged.\n\nThe USD figure is an estimate using the 2026-10-01 Standard short-context API rate card. It is not a subscription invoice or a verified payment. Missing model/mix data is estimated; quota-driven model switches may be unobserved. Image/video provider credits are separate.\n\n[Accounting method and limitations](https://github.com/fssrepository/myscoutee-roadmap#measurement-method)\n\nDelivery evidence:\n- e-kozig: [feat: establish the Angular administration portal and document module](https://github.com/fssrepository/e-kozig/commit/ecae8bd9ad98e3bec7e97e33692eaae391bb76a5)\n\nThe commits record delivered work. This retrospective does not claim a fresh test run. Some consolidated commits cover several tasks; the references preserve that relationship without splitting their code changes. Private source repositories retain their access restrictions.\n\nTime allocated to project totals after removing observed overlap: approximately **0.40 h**. Estimated task time; placement and overlap are unobserved.\n\nProject: https://github.com/users/fssrepository/projects/4\n",
+      "state": "CLOSED",
+      "state_reason": "completed",
+      "issue": {
+        "repository": "fssrepository/myscoutee-roadmap",
+        "number": 110,
+        "url": "https://github.com/fssrepository/myscoutee-roadmap/issues/110",
+        "node_id": "I_kwDOU1_9-s8AAAABUQMLEg"
+      },
+      "values": {
+        "Task ID": "EKO-1",
+        "Workstream": "Administration portal",
+        "Started": "2026-02-02",
+        "Finished": "2026-02-02",
+        "Tokens M": 20.0,
+        "API equiv USD": 5,
+        "Active h": 0.4,
+        "Models": "gpt-5.2 (est.)",
+        "Reasoning": "unrecorded",
+        "Evidence": "Estimated allocation",
+        "Allocated h": 0.4,
+        "Status": "Done"
+      }
+    },
+    {
+      "task_id": "EKO-2",
+      "title": "EKO-2: feat: add portal sections and document search filters",
+      "body": "Retrospective record of **feat: add portal sections and document search filters**.\n\nHistorical execution: **2026-02-02 \u2192 2026-02-02 (UTC dates)**. This issue was created retrospectively on 2026-10-01; its creation/closure time is not the historical execution time.\n\nWorkstream: **Administration portal**\n\n| Metric | Value |\n| --- | --- |\n| Tokens, including cached input | 20.00 M |\n| Standard API list-price equivalent | approximately $5 USD |\n| Active task time | approximately 0.4 h |\n| Model(s) | gpt-5.2 (est.) |\n| Reasoning effort | unrecorded |\n\nToken basis: Analogy estimate from comparable tasks; reserved from unassigned account balance, daily attribution unavailable.\nTime basis: Comparable-task estimate; historical timing not individually logged.\n\nThe USD figure is an estimate using the 2026-10-01 Standard short-context API rate card. It is not a subscription invoice or a verified payment. Missing model/mix data is estimated; quota-driven model switches may be unobserved. Image/video provider credits are separate.\n\n[Accounting method and limitations](https://github.com/fssrepository/myscoutee-roadmap#measurement-method)\n\nDelivery evidence:\n- e-kozig: [feat: add portal sections and document search filters](https://github.com/fssrepository/e-kozig/commit/8eb686e153ec153bacc67a79f67e0f104873c3b7)\n\nThe commits record delivered work. This retrospective does not claim a fresh test run. Some consolidated commits cover several tasks; the references preserve that relationship without splitting their code changes. Private source repositories retain their access restrictions.\n\nTime allocated to project totals after removing observed overlap: approximately **0.40 h**. Estimated task time; placement and overlap are unobserved.\n\nProject: https://github.com/users/fssrepository/projects/4\n",
+      "state": "CLOSED",
+      "state_reason": "completed",
+      "issue": {
+        "repository": "fssrepository/myscoutee-roadmap",
+        "number": 111,
+        "url": "https://github.com/fssrepository/myscoutee-roadmap/issues/111",
+        "node_id": "I_kwDOU1_9-s8AAAABUQMLYg"
+      },
+      "values": {
+        "Task ID": "EKO-2",
+        "Workstream": "Administration portal",
+        "Started": "2026-02-02",
+        "Finished": "2026-02-02",
+        "Tokens M": 20.0,
+        "API equiv USD": 5,
+        "Active h": 0.4,
+        "Models": "gpt-5.2 (est.)",
+        "Reasoning": "unrecorded",
+        "Evidence": "Estimated allocation",
+        "Allocated h": 0.4,
+        "Status": "Done"
+      }
+    },
+    {
+      "task_id": "EKO-3",
+      "title": "EKO-3: fix: refine document filtering and responsive layouts",
+      "body": "Retrospective record of **fix: refine document filtering and responsive layouts**.\n\nHistorical execution: **2026-02-03 \u2192 2026-02-04 (UTC dates)**. This issue was created retrospectively on 2026-10-01; its creation/closure time is not the historical execution time.\n\nWorkstream: **Administration portal**\n\n| Metric | Value |\n| --- | --- |\n| Tokens, including cached input | 8.23 M |\n| Standard API list-price equivalent | approximately $2 USD |\n| Active task time | approximately 0.2 h |\n| Model(s) | gpt-5.2 (est.) |\n| Reasoning effort | unrecorded |\n\nToken basis: Estimated task allocation of measured daily account totals.\nTime basis: Estimated from observed token-to-model-activity ratio; not human labor time.\n\nThe USD figure is an estimate using the 2026-10-01 Standard short-context API rate card. It is not a subscription invoice or a verified payment. Missing model/mix data is estimated; quota-driven model switches may be unobserved. Image/video provider credits are separate.\n\n[Accounting method and limitations](https://github.com/fssrepository/myscoutee-roadmap#measurement-method)\n\nDelivery evidence:\n- e-kozig: [fix: refine document filtering and responsive layouts](https://github.com/fssrepository/e-kozig/commit/155eaacefd87cb641bbaa79c8dc90bdb189ded12)\n\nThe commits record delivered work. This retrospective does not claim a fresh test run. Some consolidated commits cover several tasks; the references preserve that relationship without splitting their code changes. Private source repositories retain their access restrictions.\n\nTime allocated to project totals after removing observed overlap: approximately **0.20 h**. Estimated task time; placement and overlap are unobserved.\n\nProject: https://github.com/users/fssrepository/projects/4\n",
+      "state": "CLOSED",
+      "state_reason": "completed",
+      "issue": {
+        "repository": "fssrepository/myscoutee-roadmap",
+        "number": 112,
+        "url": "https://github.com/fssrepository/myscoutee-roadmap/issues/112",
+        "node_id": "I_kwDOU1_9-s8AAAABUQMLrg"
+      },
+      "values": {
+        "Task ID": "EKO-3",
+        "Workstream": "Administration portal",
+        "Started": "2026-02-03",
+        "Finished": "2026-02-04",
+        "Tokens M": 8.23,
+        "API equiv USD": 2,
+        "Active h": 0.2,
+        "Models": "gpt-5.2 (est.)",
+        "Reasoning": "unrecorded",
+        "Evidence": "Estimated allocation",
+        "Allocated h": 0.2,
+        "Status": "Done"
+      }
+    },
+    {
+      "task_id": "EKO-4",
+      "title": "EKO-4: docs: introduce e-kozig branding and process overview",
+      "body": "Retrospective record of **docs: introduce e-kozig branding and process overview**.\n\nHistorical execution: **2026-02-07 \u2192 2026-02-08 (UTC dates)**. This issue was created retrospectively on 2026-10-01; its creation/closure time is not the historical execution time.\n\nWorkstream: **Administration portal**\n\n| Metric | Value |\n| --- | --- |\n| Tokens, including cached input | 1.52 M |\n| Standard API list-price equivalent | approximately $0 USD |\n| Active task time | approximately 0.0 h |\n| Model(s) | gpt-5.3-codex (est.) |\n| Reasoning effort | unrecorded |\n\nToken basis: Estimated task allocation of measured daily account totals.\nTime basis: Estimated from observed token-to-model-activity ratio; not human labor time.\n\nThe USD figure is an estimate using the 2026-10-01 Standard short-context API rate card. It is not a subscription invoice or a verified payment. Missing model/mix data is estimated; quota-driven model switches may be unobserved. Image/video provider credits are separate.\n\n[Accounting method and limitations](https://github.com/fssrepository/myscoutee-roadmap#measurement-method)\n\nDelivery evidence:\n- e-kozig: [docs: introduce e-kozig branding and process overview](https://github.com/fssrepository/e-kozig/commit/3f16f8ddbe3d7121659f11c8903a59fb666181be)\n\nThe commits record delivered work. This retrospective does not claim a fresh test run. Some consolidated commits cover several tasks; the references preserve that relationship without splitting their code changes. Private source repositories retain their access restrictions.\n\nTime allocated to project totals after removing observed overlap: approximately **0.00 h**. Estimated task time; placement and overlap are unobserved.\n\nProject: https://github.com/users/fssrepository/projects/4\n",
+      "state": "CLOSED",
+      "state_reason": "completed",
+      "issue": {
+        "repository": "fssrepository/myscoutee-roadmap",
+        "number": 113,
+        "url": "https://github.com/fssrepository/myscoutee-roadmap/issues/113",
+        "node_id": "I_kwDOU1_9-s8AAAABUQML_A"
+      },
+      "values": {
+        "Task ID": "EKO-4",
+        "Workstream": "Administration portal",
+        "Started": "2026-02-07",
+        "Finished": "2026-02-08",
+        "Tokens M": 1.52,
+        "API equiv USD": 0,
+        "Active h": 0.0,
+        "Models": "gpt-5.3-codex (est.)",
+        "Reasoning": "unrecorded",
+        "Evidence": "Estimated allocation",
+        "Allocated h": 0.0,
+        "Status": "Done"
+      }
+    },
+    {
+      "task_id": "EKO-5",
+      "title": "EKO-5: feat: refine the home page and feature overview",
+      "body": "Retrospective record of **feat: refine the home page and feature overview**.\n\nHistorical execution: **2026-02-08 \u2192 2026-02-08 (UTC dates)**. This issue was created retrospectively on 2026-10-01; its creation/closure time is not the historical execution time.\n\nWorkstream: **Administration portal**\n\n| Metric | Value |\n| --- | --- |\n| Tokens, including cached input | 2.02 M |\n| Standard API list-price equivalent | approximately $1 USD |\n| Active task time | approximately 0.0 h |\n| Model(s) | gpt-5.3-codex (est.) |\n| Reasoning effort | unrecorded |\n\nToken basis: Estimated task allocation of measured daily account totals.\nTime basis: Estimated from observed token-to-model-activity ratio; not human labor time.\n\nThe USD figure is an estimate using the 2026-10-01 Standard short-context API rate card. It is not a subscription invoice or a verified payment. Missing model/mix data is estimated; quota-driven model switches may be unobserved. Image/video provider credits are separate.\n\n[Accounting method and limitations](https://github.com/fssrepository/myscoutee-roadmap#measurement-method)\n\nDelivery evidence:\n- e-kozig: [feat: refine the home page and feature overview](https://github.com/fssrepository/e-kozig/commit/1ee29bd9ce8bff41aea3d78004a6358a1cb5ff9d)\n\nThe commits record delivered work. This retrospective does not claim a fresh test run. Some consolidated commits cover several tasks; the references preserve that relationship without splitting their code changes. Private source repositories retain their access restrictions.\n\nTime allocated to project totals after removing observed overlap: approximately **0.00 h**. Estimated task time; placement and overlap are unobserved.\n\nProject: https://github.com/users/fssrepository/projects/4\n",
+      "state": "CLOSED",
+      "state_reason": "completed",
+      "issue": {
+        "repository": "fssrepository/myscoutee-roadmap",
+        "number": 114,
+        "url": "https://github.com/fssrepository/myscoutee-roadmap/issues/114",
+        "node_id": "I_kwDOU1_9-s8AAAABUQMMQA"
+      },
+      "values": {
+        "Task ID": "EKO-5",
+        "Workstream": "Administration portal",
+        "Started": "2026-02-08",
+        "Finished": "2026-02-08",
+        "Tokens M": 2.02,
+        "API equiv USD": 1,
+        "Active h": 0.0,
+        "Models": "gpt-5.3-codex (est.)",
+        "Reasoning": "unrecorded",
+        "Evidence": "Estimated allocation",
+        "Allocated h": 0.0,
+        "Status": "Done"
+      }
+    },
+    {
+      "task_id": "EKO-6",
+      "title": "EKO-6: fix: complete document statuses drafts and detail popups",
+      "body": "Retrospective record of **fix: complete document statuses drafts and detail popups**.\n\nHistorical execution: **2026-02-09 \u2192 2026-02-10 (UTC dates)**. This issue was created retrospectively on 2026-10-01; its creation/closure time is not the historical execution time.\n\nWorkstream: **Administration portal**\n\n| Metric | Value |\n| --- | --- |\n| Tokens, including cached input | 20.43 M |\n| Standard API list-price equivalent | approximately $6 USD |\n| Active task time | approximately 0.5 h |\n| Model(s) | gpt-5.3-codex (est.) |\n| Reasoning effort | unrecorded |\n\nToken basis: Estimated task allocation of measured daily account totals.\nTime basis: Estimated from observed token-to-model-activity ratio; not human labor time.\n\nThe USD figure is an estimate using the 2026-10-01 Standard short-context API rate card. It is not a subscription invoice or a verified payment. Missing model/mix data is estimated; quota-driven model switches may be unobserved. Image/video provider credits are separate.\n\n[Accounting method and limitations](https://github.com/fssrepository/myscoutee-roadmap#measurement-method)\n\nDelivery evidence:\n- e-kozig: [fix: complete document statuses drafts and detail popups](https://github.com/fssrepository/e-kozig/commit/e8c279dd2db7ae457b0c12fd0bb9666f3fa08974)\n\nThe commits record delivered work. This retrospective does not claim a fresh test run. Some consolidated commits cover several tasks; the references preserve that relationship without splitting their code changes. Private source repositories retain their access restrictions.\n\nTime allocated to project totals after removing observed overlap: approximately **0.50 h**. Estimated task time; placement and overlap are unobserved.\n\nProject: https://github.com/users/fssrepository/projects/4\n",
+      "state": "CLOSED",
+      "state_reason": "completed",
+      "issue": {
+        "repository": "fssrepository/myscoutee-roadmap",
+        "number": 115,
+        "url": "https://github.com/fssrepository/myscoutee-roadmap/issues/115",
+        "node_id": "I_kwDOU1_9-s8AAAABUQMMfQ"
+      },
+      "values": {
+        "Task ID": "EKO-6",
+        "Workstream": "Administration portal",
+        "Started": "2026-02-09",
+        "Finished": "2026-02-10",
+        "Tokens M": 20.43,
+        "API equiv USD": 6,
+        "Active h": 0.5,
+        "Models": "gpt-5.3-codex (est.)",
+        "Reasoning": "unrecorded",
+        "Evidence": "Estimated allocation",
+        "Allocated h": 0.5,
+        "Status": "Done"
+      }
+    },
+    {
+      "task_id": "EKO-7",
+      "title": "EKO-7: feat: implement invoice lists and period filtering",
+      "body": "Retrospective record of **feat: implement invoice lists and period filtering**.\n\nHistorical execution: **2026-02-10 \u2192 2026-02-10 (UTC dates)**. This issue was created retrospectively on 2026-10-01; its creation/closure time is not the historical execution time.\n\nWorkstream: **Administration portal**\n\n| Metric | Value |\n| --- | --- |\n| Tokens, including cached input | 21.89 M |\n| Standard API list-price equivalent | approximately $6 USD |\n| Active task time | approximately 0.5 h |\n| Model(s) | gpt-5.3-codex (est.) |\n| Reasoning effort | unrecorded |\n\nToken basis: Estimated task allocation of measured daily account totals.\nTime basis: Estimated from observed token-to-model-activity ratio; not human labor time.\n\nThe USD figure is an estimate using the 2026-10-01 Standard short-context API rate card. It is not a subscription invoice or a verified payment. Missing model/mix data is estimated; quota-driven model switches may be unobserved. Image/video provider credits are separate.\n\n[Accounting method and limitations](https://github.com/fssrepository/myscoutee-roadmap#measurement-method)\n\nDelivery evidence:\n- e-kozig: [feat: implement invoice lists and period filtering](https://github.com/fssrepository/e-kozig/commit/d8bb97c8d2fc7d8597e9d0a52df70840e1a6c782)\n\nThe commits record delivered work. This retrospective does not claim a fresh test run. Some consolidated commits cover several tasks; the references preserve that relationship without splitting their code changes. Private source repositories retain their access restrictions.\n\nTime allocated to project totals after removing observed overlap: approximately **0.50 h**. Estimated task time; placement and overlap are unobserved.\n\nProject: https://github.com/users/fssrepository/projects/4\n",
+      "state": "CLOSED",
+      "state_reason": "completed",
+      "issue": {
+        "repository": "fssrepository/myscoutee-roadmap",
+        "number": 116,
+        "url": "https://github.com/fssrepository/myscoutee-roadmap/issues/116",
+        "node_id": "I_kwDOU1_9-s8AAAABUQMM2Q"
+      },
+      "values": {
+        "Task ID": "EKO-7",
+        "Workstream": "Administration portal",
+        "Started": "2026-02-10",
+        "Finished": "2026-02-10",
+        "Tokens M": 21.89,
+        "API equiv USD": 6,
+        "Active h": 0.5,
+        "Models": "gpt-5.3-codex (est.)",
+        "Reasoning": "unrecorded",
+        "Evidence": "Estimated allocation",
+        "Allocated h": 0.5,
+        "Status": "Done"
+      }
+    },
+    {
+      "task_id": "EKO-8",
+      "title": "EKO-8: fix: refine case search and portal navigation",
+      "body": "Retrospective record of **fix: refine case search and portal navigation**.\n\nHistorical execution: **2026-02-10 \u2192 2026-02-10 (UTC dates)**. This issue was created retrospectively on 2026-10-01; its creation/closure time is not the historical execution time.\n\nWorkstream: **Administration portal**\n\n| Metric | Value |\n| --- | --- |\n| Tokens, including cached input | 21.89 M |\n| Standard API list-price equivalent | approximately $6 USD |\n| Active task time | approximately 0.5 h |\n| Model(s) | gpt-5.3-codex (est.) |\n| Reasoning effort | unrecorded |\n\nToken basis: Estimated task allocation of measured daily account totals.\nTime basis: Estimated from observed token-to-model-activity ratio; not human labor time.\n\nThe USD figure is an estimate using the 2026-10-01 Standard short-context API rate card. It is not a subscription invoice or a verified payment. Missing model/mix data is estimated; quota-driven model switches may be unobserved. Image/video provider credits are separate.\n\n[Accounting method and limitations](https://github.com/fssrepository/myscoutee-roadmap#measurement-method)\n\nDelivery evidence:\n- e-kozig: [fix: refine case search and portal navigation](https://github.com/fssrepository/e-kozig/commit/2c80e9266a33fd95cfb375dc9999d79469995a52)\n\nThe commits record delivered work. This retrospective does not claim a fresh test run. Some consolidated commits cover several tasks; the references preserve that relationship without splitting their code changes. Private source repositories retain their access restrictions.\n\nTime allocated to project totals after removing observed overlap: approximately **0.50 h**. Estimated task time; placement and overlap are unobserved.\n\nProject: https://github.com/users/fssrepository/projects/4\n",
+      "state": "CLOSED",
+      "state_reason": "completed",
+      "issue": {
+        "repository": "fssrepository/myscoutee-roadmap",
+        "number": 117,
+        "url": "https://github.com/fssrepository/myscoutee-roadmap/issues/117",
+        "node_id": "I_kwDOU1_9-s8AAAABUQMNGQ"
+      },
+      "values": {
+        "Task ID": "EKO-8",
+        "Workstream": "Administration portal",
+        "Started": "2026-02-10",
+        "Finished": "2026-02-10",
+        "Tokens M": 21.89,
+        "API equiv USD": 6,
+        "Active h": 0.5,
+        "Models": "gpt-5.3-codex (est.)",
+        "Reasoning": "unrecorded",
+        "Evidence": "Estimated allocation",
+        "Allocated h": 0.5,
+        "Status": "Done"
+      }
+    },
+    {
+      "task_id": "EKO-9",
+      "title": "EKO-9: feat: refine account selection and portal dialogs",
+      "body": "Retrospective record of **feat: refine account selection and portal dialogs**.\n\nHistorical execution: **2026-02-10 \u2192 2026-02-14 (UTC dates)**. This issue was created retrospectively on 2026-10-01; its creation/closure time is not the historical execution time.\n\nWorkstream: **Administration portal**\n\n| Metric | Value |\n| --- | --- |\n| Tokens, including cached input | 11.37 M |\n| Standard API list-price equivalent | approximately $3 USD |\n| Active task time | approximately 0.3 h |\n| Model(s) | gpt-5.3-codex (est.) |\n| Reasoning effort | unrecorded |\n\nToken basis: Estimated task allocation of measured daily account totals.\nTime basis: Estimated from observed token-to-model-activity ratio; not human labor time.\n\nThe USD figure is an estimate using the 2026-10-01 Standard short-context API rate card. It is not a subscription invoice or a verified payment. Missing model/mix data is estimated; quota-driven model switches may be unobserved. Image/video provider credits are separate.\n\n[Accounting method and limitations](https://github.com/fssrepository/myscoutee-roadmap#measurement-method)\n\nDelivery evidence:\n- e-kozig: [feat: refine account selection and portal dialogs](https://github.com/fssrepository/e-kozig/commit/b71ad5d0c1adf679ba123be13a3fc0cf6cf343c7)\n\nThe commits record delivered work. This retrospective does not claim a fresh test run. Some consolidated commits cover several tasks; the references preserve that relationship without splitting their code changes. Private source repositories retain their access restrictions.\n\nTime allocated to project totals after removing observed overlap: approximately **0.30 h**. Estimated task time; placement and overlap are unobserved.\n\nProject: https://github.com/users/fssrepository/projects/4\n",
+      "state": "CLOSED",
+      "state_reason": "completed",
+      "issue": {
+        "repository": "fssrepository/myscoutee-roadmap",
+        "number": 118,
+        "url": "https://github.com/fssrepository/myscoutee-roadmap/issues/118",
+        "node_id": "I_kwDOU1_9-s8AAAABUQMNlg"
+      },
+      "values": {
+        "Task ID": "EKO-9",
+        "Workstream": "Administration portal",
+        "Started": "2026-02-10",
+        "Finished": "2026-02-14",
+        "Tokens M": 11.37,
+        "API equiv USD": 3,
+        "Active h": 0.3,
+        "Models": "gpt-5.3-codex (est.)",
+        "Reasoning": "unrecorded",
+        "Evidence": "Estimated allocation",
+        "Allocated h": 0.3,
+        "Status": "Done"
+      }
+    },
+    {
+      "task_id": "EKO-10",
+      "title": "EKO-10: fix: improve responsive alignment and mobile popups",
+      "body": "Retrospective record of **fix: improve responsive alignment and mobile popups**.\n\nHistorical execution: **2026-02-20 \u2192 2026-02-20 (UTC dates)**. This issue was created retrospectively on 2026-10-01; its creation/closure time is not the historical execution time.\n\nWorkstream: **Administration portal**\n\n| Metric | Value |\n| --- | --- |\n| Tokens, including cached input | 23.58 M |\n| Standard API list-price equivalent | approximately $6 USD |\n| Active task time | approximately 0.5 h |\n| Model(s) | gpt-5.3-codex (est.) |\n| Reasoning effort | unrecorded |\n\nToken basis: Estimated task allocation of measured daily account totals.\nTime basis: Estimated from observed token-to-model-activity ratio; not human labor time.\n\nThe USD figure is an estimate using the 2026-10-01 Standard short-context API rate card. It is not a subscription invoice or a verified payment. Missing model/mix data is estimated; quota-driven model switches may be unobserved. Image/video provider credits are separate.\n\n[Accounting method and limitations](https://github.com/fssrepository/myscoutee-roadmap#measurement-method)\n\nDelivery evidence:\n- e-kozig: [fix: improve responsive alignment and mobile popups](https://github.com/fssrepository/e-kozig/commit/2594b561e65484f55319ab99a6834eafd00d620b)\n\nThe commits record delivered work. This retrospective does not claim a fresh test run. Some consolidated commits cover several tasks; the references preserve that relationship without splitting their code changes. Private source repositories retain their access restrictions.\n\nTime allocated to project totals after removing observed overlap: approximately **0.50 h**. Estimated task time; placement and overlap are unobserved.\n\nProject: https://github.com/users/fssrepository/projects/4\n",
+      "state": "CLOSED",
+      "state_reason": "completed",
+      "issue": {
+        "repository": "fssrepository/myscoutee-roadmap",
+        "number": 119,
+        "url": "https://github.com/fssrepository/myscoutee-roadmap/issues/119",
+        "node_id": "I_kwDOU1_9-s8AAAABUQMONw"
+      },
+      "values": {
+        "Task ID": "EKO-10",
+        "Workstream": "Administration portal",
+        "Started": "2026-02-20",
+        "Finished": "2026-02-20",
+        "Tokens M": 23.58,
+        "API equiv USD": 6,
+        "Active h": 0.5,
+        "Models": "gpt-5.3-codex (est.)",
+        "Reasoning": "unrecorded",
+        "Evidence": "Estimated allocation",
+        "Allocated h": 0.5,
+        "Status": "Done"
+      }
+    },
+    {
+      "task_id": "EKO-11",
+      "title": "EKO-11: fix: align document layouts and development build defaults",
+      "body": "Retrospective record of **fix: align document layouts and development build defaults**.\n\nHistorical execution: **2026-03-04 \u2192 2026-03-05 (UTC dates)**. This issue was created retrospectively on 2026-10-01; its creation/closure time is not the historical execution time.\n\nWorkstream: **Administration portal**\n\n| Metric | Value |\n| --- | --- |\n| Tokens, including cached input | 13.00 M |\n| Standard API list-price equivalent | approximately $5 USD |\n| Active task time | approximately 0.3 h |\n| Model(s) | gpt-5.4 (est.) |\n| Reasoning effort | unrecorded |\n\nToken basis: Analogy estimate from comparable tasks; reserved from unassigned account balance, daily attribution unavailable.\nTime basis: Comparable-task estimate; historical timing not individually logged.\n\nThe USD figure is an estimate using the 2026-10-01 Standard short-context API rate card. It is not a subscription invoice or a verified payment. Missing model/mix data is estimated; quota-driven model switches may be unobserved. Image/video provider credits are separate.\n\n[Accounting method and limitations](https://github.com/fssrepository/myscoutee-roadmap#measurement-method)\n\nDelivery evidence:\n- e-kozig: [fix: align document layouts and development build defaults](https://github.com/fssrepository/e-kozig/commit/047458828584aa668a34dcfe6f6fd88148548716)\n\nThe commits record delivered work. This retrospective does not claim a fresh test run. Some consolidated commits cover several tasks; the references preserve that relationship without splitting their code changes. Private source repositories retain their access restrictions.\n\nTime allocated to project totals after removing observed overlap: approximately **0.30 h**. Estimated task time; placement and overlap are unobserved.\n\nProject: https://github.com/users/fssrepository/projects/4\n",
+      "state": "CLOSED",
+      "state_reason": "completed",
+      "issue": {
+        "repository": "fssrepository/myscoutee-roadmap",
+        "number": 120,
+        "url": "https://github.com/fssrepository/myscoutee-roadmap/issues/120",
+        "node_id": "I_kwDOU1_9-s8AAAABUQMOqQ"
+      },
+      "values": {
+        "Task ID": "EKO-11",
+        "Workstream": "Administration portal",
+        "Started": "2026-03-04",
+        "Finished": "2026-03-05",
+        "Tokens M": 13.0,
+        "API equiv USD": 5,
+        "Active h": 0.3,
+        "Models": "gpt-5.4 (est.)",
+        "Reasoning": "unrecorded",
+        "Evidence": "Estimated allocation",
+        "Allocated h": 0.3,
+        "Status": "Done"
+      }
+    },
+    {
+      "task_id": "EKO-12",
+      "title": "EKO-12: feat: explain the administration and tax-system model",
+      "body": "Retrospective record of **feat: explain the administration and tax-system model**.\n\nHistorical execution: **2026-05-31 \u2192 2026-06-01 (UTC dates)**. This issue was created retrospectively on 2026-10-01; its creation/closure time is not the historical execution time.\n\nWorkstream: **Administration portal**\n\n| Metric | Value |\n| --- | --- |\n| Tokens, including cached input | 72.12 M |\n| Standard API list-price equivalent | approximately $54 USD |\n| Active task time | approximately 1.6 h |\n| Model(s) | gpt-5.5 (est.) |\n| Reasoning effort | unrecorded |\n\nToken basis: Estimated task allocation of measured daily account totals.\nTime basis: Estimated from observed token-to-model-activity ratio; not human labor time.\n\nThe USD figure is an estimate using the 2026-10-01 Standard short-context API rate card. It is not a subscription invoice or a verified payment. Missing model/mix data is estimated; quota-driven model switches may be unobserved. Image/video provider credits are separate.\n\n[Accounting method and limitations](https://github.com/fssrepository/myscoutee-roadmap#measurement-method)\n\nDelivery evidence:\n- e-kozig: [feat: explain the administration and tax-system model](https://github.com/fssrepository/e-kozig/commit/d68f4a986192e8f158432a582f7c8509c6022891)\n\nThe commits record delivered work. This retrospective does not claim a fresh test run. Some consolidated commits cover several tasks; the references preserve that relationship without splitting their code changes. Private source repositories retain their access restrictions.\n\nTime allocated to project totals after removing observed overlap: approximately **1.60 h**. Estimated task time; placement and overlap are unobserved.\n\nProject: https://github.com/users/fssrepository/projects/4\n",
+      "state": "CLOSED",
+      "state_reason": "completed",
+      "issue": {
+        "repository": "fssrepository/myscoutee-roadmap",
+        "number": 124,
+        "url": "https://github.com/fssrepository/myscoutee-roadmap/issues/124",
+        "node_id": "I_kwDOU1_9-s8AAAABUQMQHQ"
+      },
+      "values": {
+        "Task ID": "EKO-12",
+        "Workstream": "Administration portal",
+        "Started": "2026-05-31",
+        "Finished": "2026-06-01",
+        "Tokens M": 72.12,
+        "API equiv USD": 54,
+        "Active h": 1.6,
+        "Models": "gpt-5.5 (est.)",
+        "Reasoning": "unrecorded",
+        "Evidence": "Estimated allocation",
+        "Allocated h": 1.6,
+        "Status": "Done"
+      }
+    },
+    {
+      "task_id": "EKO-13",
+      "title": "EKO-13: feat: add the visual form editor",
+      "body": "Retrospective record of **feat: add the visual form editor**.\n\nHistorical execution: **2026-07-06 \u2192 2026-07-06 (UTC dates)**. This issue was created retrospectively on 2026-10-01; its creation/closure time is not the historical execution time.\n\nWorkstream: **Administration portal**\n\n| Metric | Value |\n| --- | --- |\n| Tokens, including cached input | 165.48 M |\n| Standard API list-price equivalent | approximately $124 USD |\n| Active task time | approximately 3.7 h |\n| Model(s) | gpt-5.5 (est.) |\n| Reasoning effort | unrecorded |\n\nToken basis: Estimated task allocation of measured daily account totals.\nTime basis: Estimated from observed token-to-model-activity ratio; not human labor time.\n\nThe USD figure is an estimate using the 2026-10-01 Standard short-context API rate card. It is not a subscription invoice or a verified payment. Missing model/mix data is estimated; quota-driven model switches may be unobserved. Image/video provider credits are separate.\n\n[Accounting method and limitations](https://github.com/fssrepository/myscoutee-roadmap#measurement-method)\n\nDelivery evidence:\n- e-kozig: [feat: add the visual form editor](https://github.com/fssrepository/e-kozig/commit/e832d3ae3dbf3c8c7d8aa5545c49c79efbe4d649)\n\nThe commits record delivered work. This retrospective does not claim a fresh test run. Some consolidated commits cover several tasks; the references preserve that relationship without splitting their code changes. Private source repositories retain their access restrictions.\n\nTime allocated to project totals after removing observed overlap: approximately **3.70 h**. Estimated task time; placement and overlap are unobserved.\n\nProject: https://github.com/users/fssrepository/projects/4\n",
+      "state": "CLOSED",
+      "state_reason": "completed",
+      "issue": {
+        "repository": "fssrepository/myscoutee-roadmap",
+        "number": 125,
+        "url": "https://github.com/fssrepository/myscoutee-roadmap/issues/125",
+        "node_id": "I_kwDOU1_9-s8AAAABUQMQcA"
+      },
+      "values": {
+        "Task ID": "EKO-13",
+        "Workstream": "Administration portal",
+        "Started": "2026-07-06",
+        "Finished": "2026-07-06",
+        "Tokens M": 165.48,
+        "API equiv USD": 124,
+        "Active h": 3.7,
+        "Models": "gpt-5.5 (est.)",
+        "Reasoning": "unrecorded",
+        "Evidence": "Estimated allocation",
+        "Allocated h": 3.7,
+        "Status": "Done"
+      }
+    },
+    {
+      "task_id": "EKO-14",
+      "title": "EKO-14: fix: finalize form-editor behavior and portal presentation",
+      "body": "Retrospective record of **fix: finalize form-editor behavior and portal presentation**.\n\nHistorical execution: **2026-07-30 \u2192 2026-07-30 (UTC dates)**. This issue was created retrospectively on 2026-10-01; its creation/closure time is not the historical execution time.\n\nWorkstream: **Administration portal**\n\n| Metric | Value |\n| --- | --- |\n| Tokens, including cached input | 52.05 M |\n| Standard API list-price equivalent | approximately $29 USD |\n| Active task time | approximately 0.6 h |\n| Model(s) | gpt-5.6-sol |\n| Reasoning effort | ultra; unknown; medium |\n\nToken basis: Estimated task allocation of measured daily account totals.\nTime basis: Union of recorded root task intervals; includes tool/network waits, not human labor time.\n\nThe USD figure is an estimate using the 2026-10-01 Standard short-context API rate card. It is not a subscription invoice or a verified payment. Missing model/mix data is estimated; quota-driven model switches may be unobserved. Image/video provider credits are separate.\n\n[Accounting method and limitations](https://github.com/fssrepository/myscoutee-roadmap#measurement-method)\n\nDelivery evidence:\n- e-kozig: [fix: finalize form-editor behavior and portal presentation](https://github.com/fssrepository/e-kozig/commit/6dda400c29a1d6d99dbaf44c1e5c1bb1641520ca)\n\nThe commits record delivered work. This retrospective does not claim a fresh test run. Some consolidated commits cover several tasks; the references preserve that relationship without splitting their code changes. Private source repositories retain their access restrictions.\n\nTime allocated to project totals after removing observed overlap: approximately **0.30 h**. Observed task intervals, overlap divided equally across concurrent tasks.\n\nProject: https://github.com/users/fssrepository/projects/4\n",
+      "state": "CLOSED",
+      "state_reason": "completed",
+      "issue": {
+        "repository": "fssrepository/myscoutee-roadmap",
+        "number": 126,
+        "url": "https://github.com/fssrepository/myscoutee-roadmap/issues/126",
+        "node_id": "I_kwDOU1_9-s8AAAABUQMQzw"
+      },
+      "values": {
+        "Task ID": "EKO-14",
+        "Workstream": "Administration portal",
+        "Started": "2026-07-30",
+        "Finished": "2026-07-30",
+        "Tokens M": 52.05,
+        "API equiv USD": 29,
+        "Active h": 0.6,
+        "Models": "gpt-5.6-sol",
+        "Reasoning": "ultra; unknown; medium",
+        "Evidence": "Estimated allocation",
+        "Allocated h": 0.3,
+        "Status": "Done"
+      }
+    },
+    {
+      "task_id": "EKO-15",
+      "title": "EKO-15: Reconstruct the Project and preserve restorable Git records",
+      "body": "Reconstruct and organize the **e-kozig** Project, recover historical tasks and model/token/time evidence, add task references to commit messages, and preserve a restorable Git snapshot under `guides/project-history/`. This is current AI-assisted administration, separate from the original development.\n\nExecution: September 30\u2013October 1, 2026 (Europe/Bratislava). Measurement closes at **2026-09-30T23:16:07.594000+00:00**. The final publication/accounting tail after that cutoff is deliberately excluded to avoid recursive self-accounting.\n\n| Metric | Value |\n| --- | --- |\n| Tokens allocated to this Project | 2.666 M |\n| Active/allocated task time | 0.166 h |\n| Standard API equivalent | $4.10 USD |\n| Model | gpt-6-astra |\n| Reasoning | high |\n\nThe complete shared maintenance run recorded 19,991,868 local tokens and 1.248 active hours. These totals are partitioned once by the 15 retained backup snapshots: nine MyScoutee snapshots and two for each other Project. The per-Project split is an estimate, not four independent measurements. The model and whole-run token count come from the session log. Previously assigned overlap was removed from MSC-108; the remaining allocation uses the previously unassigned account allowance and has no exact daily billing reconciliation. USD is an API list-price equivalent, not credits paid or a subscription invoice.\n\nValidation: offline snapshot/checksum restoration checks, source-tree comparison and preservation of release-tag targets. Application code was not rebuilt or retested.\n\n[Restorable snapshot](https://github.com/fssrepository/myscoutee-roadmap/tree/master/guides/project-history/e-kozig)\n\nRelated administration tasks with separately allocated effort:\n- [MSC-110](https://github.com/fssrepository/myscoutee-roadmap/issues/142)\n- [OLD-5](https://github.com/fssrepository/myscoutee-roadmap/issues/143)\n- [MATH-17](https://github.com/fssrepository/myscoutee-roadmap/issues/145)\n\nProject: https://github.com/users/fssrepository/projects/4\n",
+      "state": "CLOSED",
+      "state_reason": "completed",
+      "issue": {
+        "repository": "fssrepository/myscoutee-roadmap",
+        "number": 144,
+        "url": "https://github.com/fssrepository/myscoutee-roadmap/issues/144",
+        "node_id": "I_kwDOU1_9-s8AAAABUQVXng"
+      },
+      "values": {
+        "Task ID": "EKO-15",
+        "Workstream": "Project administration (AI-assisted)",
+        "Started": "2026-09-30",
+        "Finished": "2026-10-01",
+        "Tokens M": 2.666,
+        "API equiv USD": 4.1,
+        "Active h": 0.166,
+        "Allocated h": 0.166,
+        "Models": "gpt-6-astra",
+        "Reasoning": "high",
+        "Evidence": "Measured run; estimated project split",
+        "Status": "Done"
+      }
+    }
+  ]
+}

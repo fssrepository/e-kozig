@@ -1,0 +1,170 @@
+[
+  {
+    "repository": "e-kozig",
+    "original_commit": "823c2945db1cdbc4a1f77ed330f7b6d12ddec4a4",
+    "task_commit": "ecae8bd9ad98e3bec7e97e33692eaae391bb76a5",
+    "task_ids": [
+      "EKO-1"
+    ],
+    "original_source_tree": "305ede0e72cd6a94e74dccd793caf55ceeaf1bd1",
+    "original_execution_start": "2026-02-02T03:45:20+01:00",
+    "original_execution_end": "2026-02-02T08:27:59+01:00",
+    "original_commit_count": 16
+  },
+  {
+    "repository": "e-kozig",
+    "original_commit": "99599eea8b746939ad987ec0984b16629c2e4f6c",
+    "task_commit": "8eb686e153ec153bacc67a79f67e0f104873c3b7",
+    "task_ids": [
+      "EKO-2"
+    ],
+    "original_source_tree": "27b69bc4e3d28bc9882c02467e3e158c74070d49",
+    "original_execution_start": "2026-02-02T09:51:15+01:00",
+    "original_execution_end": "2026-02-02T16:05:35+01:00",
+    "original_commit_count": 14
+  },
+  {
+    "repository": "e-kozig",
+    "original_commit": "177d3f6ed33472e20424dd8ad07e82b6aa61daf6",
+    "task_commit": "155eaacefd87cb641bbaa79c8dc90bdb189ded12",
+    "task_ids": [
+      "EKO-3"
+    ],
+    "original_source_tree": "246c6f38acb3560aa5e89c7c243f15c731df3c98",
+    "original_execution_start": "2026-02-03T16:02:49+01:00",
+    "original_execution_end": "2026-02-04T21:32:48+01:00",
+    "original_commit_count": 10
+  },
+  {
+    "repository": "e-kozig",
+    "original_commit": "115b3fe2063a59b7bdd2916ac15462ef458eed20",
+    "task_commit": "3f16f8ddbe3d7121659f11c8903a59fb666181be",
+    "task_ids": [
+      "EKO-4"
+    ],
+    "original_source_tree": "6538cd7944425dc24df98adebbee323f8c5df3c7",
+    "original_execution_start": "2026-02-07T15:55:35+01:00",
+    "original_execution_end": "2026-02-08T09:51:49+01:00",
+    "original_commit_count": 21
+  },
+  {
+    "repository": "e-kozig",
+    "original_commit": "0f8639a7e35d83004e90f20dfe06e055485389ad",
+    "task_commit": "1ee29bd9ce8bff41aea3d78004a6358a1cb5ff9d",
+    "task_ids": [
+      "EKO-5"
+    ],
+    "original_source_tree": "dcfae95498dafacc6a66e70f508952c6790d2ca3",
+    "original_execution_start": "2026-02-08T14:10:05+01:00",
+    "original_execution_end": "2026-02-08T23:05:28+01:00",
+    "original_commit_count": 14
+  },
+  {
+    "repository": "e-kozig",
+    "original_commit": "c53bac6c86ee81ff258073885075d97c27ede4f3",
+    "task_commit": "e8c279dd2db7ae457b0c12fd0bb9666f3fa08974",
+    "task_ids": [
+      "EKO-6"
+    ],
+    "original_source_tree": "6e34bfb912e9d3e1c605bb81fe71980a50f8fbc3",
+    "original_execution_start": "2026-02-09T14:39:45+01:00",
+    "original_execution_end": "2026-02-10T06:00:26+01:00",
+    "original_commit_count": 11
+  },
+  {
+    "repository": "e-kozig",
+    "original_commit": "fc4a461e8798cd198c9c926995df0dd54f11c8aa",
+    "task_commit": "d8bb97c8d2fc7d8597e9d0a52df70840e1a6c782",
+    "task_ids": [
+      "EKO-7"
+    ],
+    "original_source_tree": "26a89bef8dc00b79b195bb3628833403e48d2652",
+    "original_execution_start": "2026-02-10T10:38:12+01:00",
+    "original_execution_end": "2026-02-10T11:53:24+01:00",
+    "original_commit_count": 10
+  },
+  {
+    "repository": "e-kozig",
+    "original_commit": "9a611f7807c7f99e334bc91c727e8520dee4a728",
+    "task_commit": "2c80e9266a33fd95cfb375dc9999d79469995a52",
+    "task_ids": [
+      "EKO-8"
+    ],
+    "original_source_tree": "497202e6843d32909a1f21639a860bcde6931394",
+    "original_execution_start": "2026-02-10T11:58:23+01:00",
+    "original_execution_end": "2026-02-10T15:21:19+01:00",
+    "original_commit_count": 10
+  },
+  {
+    "repository": "e-kozig",
+    "original_commit": "37bde3d73b122db2743b25b3523a806f3f9d291b",
+    "task_commit": "b71ad5d0c1adf679ba123be13a3fc0cf6cf343c7",
+    "task_ids": [
+      "EKO-9"
+    ],
+    "original_source_tree": "e959977abf83656b4bcc3a9abd07e518a717ad8b",
+    "original_execution_start": "2026-02-10T16:35:00+01:00",
+    "original_execution_end": "2026-02-14T16:06:49+01:00",
+    "original_commit_count": 21
+  },
+  {
+    "repository": "e-kozig",
+    "original_commit": "8e6214bd619bc2538ab761129d433e84125a8bf5",
+    "task_commit": "2594b561e65484f55319ab99a6834eafd00d620b",
+    "task_ids": [
+      "EKO-10"
+    ],
+    "original_source_tree": "ebd5b155da428ef6247ee439ee54dbf58c2fd01b",
+    "original_execution_start": "2026-02-20T18:52:35+01:00",
+    "original_execution_end": "2026-02-20T20:38:57+01:00",
+    "original_commit_count": 12
+  },
+  {
+    "repository": "e-kozig",
+    "original_commit": "d3d52011996bbc8d5b6bee9a8591f6d6d01eb466",
+    "task_commit": "047458828584aa668a34dcfe6f6fd88148548716",
+    "task_ids": [
+      "EKO-11"
+    ],
+    "original_source_tree": "4f15773dec0e6af79ff7ccc745dc7332dd71287a",
+    "original_execution_start": "2026-03-04T22:48:33+01:00",
+    "original_execution_end": "2026-03-05T02:24:49+01:00",
+    "original_commit_count": 7
+  },
+  {
+    "repository": "e-kozig",
+    "original_commit": "fce964b05db636a89eaef19504636aeff4610f46",
+    "task_commit": "d68f4a986192e8f158432a582f7c8509c6022891",
+    "task_ids": [
+      "EKO-12"
+    ],
+    "original_source_tree": "bc9dd1b648d7e213666647d9f16b8b5bc5fe7016",
+    "original_execution_start": "2026-05-31T08:06:42+02:00",
+    "original_execution_end": "2026-06-01T11:12:38+02:00",
+    "original_commit_count": 8
+  },
+  {
+    "repository": "e-kozig",
+    "original_commit": "8a0c8062549d950e150fcd5c60c3343eee53f84c",
+    "task_commit": "e832d3ae3dbf3c8c7d8aa5545c49c79efbe4d649",
+    "task_ids": [
+      "EKO-13"
+    ],
+    "original_source_tree": "2e6be4d1d810256cc6bf472567243ff492aa3cc7",
+    "original_execution_start": "2026-07-06T13:39:00+02:00",
+    "original_execution_end": "2026-07-06T18:49:34+02:00",
+    "original_commit_count": 40
+  },
+  {
+    "repository": "e-kozig",
+    "original_commit": "6892f4e1aaac02257e01c8cc6625297a4b193b17",
+    "task_commit": "6dda400c29a1d6d99dbaf44c1e5c1bb1641520ca",
+    "task_ids": [
+      "EKO-14"
+    ],
+    "original_source_tree": "bb55c23129463b8945bf83241275ba8633062585",
+    "original_execution_start": "2026-07-30T03:55:02+02:00",
+    "original_execution_end": "2026-07-30T04:04:56+02:00",
+    "original_commit_count": 2
+  }
+]
