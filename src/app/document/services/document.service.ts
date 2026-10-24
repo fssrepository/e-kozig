@@ -101,505 +101,86 @@ export class DocumentService {
     "TBSZ", "TENIKO_2597", "TMUNK"
   ];
 
-  private documents: DocumentItem[] = [
-    {
-      icon: 'description',
-      status: 'Elfogadásra vár',
-      ugyfel: 'Kovács János',
-      formName: '2608INT',
-      datetime: '2026-02-02 10:00',
-      unread: true,
-      searchKey: 'kovács jános ikt-2026-000123 kr-450021 2601 ikt-2026-000124 kr-450022 2608 ikt-2026-000125 kr-450023 2608int',
-      items: [
-        {
-          type: '2601',
-          formName: '2601',
-          status: 'Beküldve',
-          datetime: '2026-01-31 10:00',
-          iktatoszam: 'IKT-2026-000123',
-          krSzam: 'KR-450021',
-          attachments: [
-            { name: '2601.pdf' },
-            { name: 'Kiegészítés 1.pdf' }
-          ]
-        },
-        {
-          type: '2608',
-          formName: '2608',
-          status: 'Iktatva',
-          datetime: '2026-02-01 10:00',
-          iktatoszam: 'IKT-2026-000124',
-          krSzam: 'KR-450022',
-          attachments: [
-            { name: '2608.pdf' },
-            { name: 'Kiegészítés 2.pdf' },
-            { name: 'Kiegészítés 3.pdf' }
-          ]
-        },
-        {
-          type: '2608INT',
-          formName: '2608INT',
-          status: 'Elfogadásra vár',
-          datetime: '2026-02-02 10:00',
-          iktatoszam: 'IKT-2026-000125',
-          krSzam: 'KR-450023',
-          attachments: [
-            { name: '2608INT.pdf' }
-          ]
-        }
-      ]
-    },
-    {
-      icon: 'insert_drive_file',
-      status: 'Lezárva',
-      ugyfel: 'Nagy Péter',
-      formName: '2620',
-      datetime: '2026-01-24 14:30',
-      unread: false,
-      searchKey: 'nagy péter ikt-2026-000200 kr-450101 2611 ikt-2026-000201 kr-450102 26110 ikt-2026-000202 kr-450103 2620',
-      items: [
-        {
-          type: '2611',
-          formName: '2611',
-          status: 'Beküldve',
-          datetime: '2026-01-22 14:30',
-          iktatoszam: 'IKT-2026-000200',
-          krSzam: 'KR-450101',
-          attachments: [
-            { name: '2611.pdf' },
-            { name: 'Kiegészítés 1.pdf' }
-          ]
-        },
-        {
-          type: '26110',
-          formName: '26110',
-          status: 'Iktatva',
-          datetime: '2026-01-23 14:30',
-          iktatoszam: 'IKT-2026-000201',
-          krSzam: 'KR-450102',
-          attachments: [
-            { name: '26110.pdf' }
-          ]
-        },
-        {
-          type: '2620',
-          formName: '2620',
-          status: 'Lezárva',
-          datetime: '2026-01-24 14:30',
-          iktatoszam: 'IKT-2026-000202',
-          krSzam: 'KR-450103',
-          attachments: [
-            { name: '2620.pdf' }
-          ]
-        }
-      ]
-    },
-    {
-      icon: 'description',
-      status: 'Hiba',
-      ugyfel: 'Szabó Anna',
-      formName: '2643TAO',
-      datetime: '2025-12-12 09:15',
-      unread: false,
-      searchKey: 'szabó anna ikt-2025-000987 kr-440310 26251 ikt-2025-000988 kr-440311 ikt-2025-000989 kr-440312',
-      items: [
-        {
-          type: '26251',
-          formName: '26251',
-          status: 'Beküldve',
-          datetime: '2025-12-10 09:15',
-          iktatoszam: 'IKT-2025-000987',
-          krSzam: 'KR-440310',
-          attachments: [
-            { name: '26251.pdf' },
-            { name: 'Kiegészítés 4.pdf' }
-          ]
-        },
-        {
-          type: '2629EUD',
-          formName: '2629EUD',
-          status: 'Iktatva',
-          datetime: '2025-12-11 09:15',
-          iktatoszam: 'IKT-2025-000988',
-          krSzam: 'KR-440311',
-          attachments: [
-            { name: '2629EUD.pdf' }
-          ]
-        },
-        {
-          type: '2643TAO',
-          formName: '2643TAO',
-          status: 'Hiba',
-          datetime: '2025-12-12 09:15',
-          iktatoszam: 'IKT-2025-000989',
-          krSzam: 'KR-440312',
-          attachments: [
-            { name: '2643TAO.pdf' }
-          ]
-        }
-      ]
-    },
-    {
-      icon: 'insert_drive_file',
-      status: 'Lezárva',
-      ugyfel: 'Tóth Éva',
-      formName: '2649',
-      datetime: '2026-02-02 11:05',
-      unread: true,
-      searchKey: 'tóth éva ikt-2026-000300 kr-450201 2629eud ikt-2026-000301 kr-450202 2643tao ikt-2026-000302 kr-450203 2649',
-      items: [
-        {
-          type: '2629EUD',
-          formName: '2629EUD',
-          status: 'Beküldve',
-          datetime: '2026-01-31 11:05',
-          iktatoszam: 'IKT-2026-000300',
-          krSzam: 'KR-450201',
-          attachments: [
-            { name: '2629EUD.pdf' }
-          ]
-        },
-        {
-          type: '2643TAO',
-          formName: '2643TAO',
-          status: 'Iktatva',
-          datetime: '2026-02-01 11:05',
-          iktatoszam: 'IKT-2026-000301',
-          krSzam: 'KR-450202',
-          attachments: [
-            { name: '2643TAO.pdf' },
-            { name: 'Kiegészítés 5.pdf' }
-          ]
-        },
-        {
-          type: '2649',
-          formName: '2649',
-          status: 'Lezárva',
-          datetime: '2026-02-02 11:05',
-          iktatoszam: 'IKT-2026-000302',
-          krSzam: 'KR-450203',
-          attachments: [
-            { name: '2649.pdf' }
-          ]
-        }
-      ]
-    },
-    {
-      icon: 'description',
-      status: 'Elfogadásra vár',
-      ugyfel: 'Varga László',
-      formName: '2658',
-      datetime: '2026-02-02 16:20',
-      unread: false,
-      searchKey: 'varga lászló ikt-2026-000400 kr-450301 2650 ikt-2026-000401 kr-450302 2651 ikt-2026-000402 kr-450303 2658',
-      items: [
-        {
-          type: '2650',
-          formName: '2650',
-          status: 'Beküldve',
-          datetime: '2026-01-31 16:20',
-          iktatoszam: 'IKT-2026-000400',
-          krSzam: 'KR-450301',
-          attachments: [
-            { name: '2650.pdf' }
-          ]
-        },
-        {
-          type: '2651',
-          formName: '2651',
-          status: 'Iktatva',
-          datetime: '2026-02-01 16:20',
-          iktatoszam: 'IKT-2026-000401',
-          krSzam: 'KR-450302',
-          attachments: [
-            { name: '2651.pdf' }
-          ]
-        },
-        {
-          type: '2658',
-          formName: '2658',
-          status: 'Elfogadásra vár',
-          datetime: '2026-02-02 16:20',
-          iktatoszam: 'IKT-2026-000402',
-          krSzam: 'KR-450303',
-          attachments: [
-            { name: '2658.pdf' }
-          ]
-        }
-      ]
-    },
-    {
-      icon: 'description',
-      ugyfel: 'Kiss Katalin',
-      formName: '2620',
-      datetime: '2025-11-03 08:30',
-      unread: false,
-      searchKey: 'kiss katalin ikt-2025-000654 kr-430118 ikt-2025-000655 kr-430119 ikt-2025-000656 kr-430120',
-      items: [
-        {
-          formName: '2620',
-          datetime: '2025-11-03 08:30',
-          iktatoszam: 'IKT-2025-000654',
-          krSzam: 'KR-430118',
-          attachments: [
-            { name: '2620.pdf' }
-          ]
-        },
-        {
-          formName: '2620',
-          datetime: '2025-11-04 08:30',
-          iktatoszam: 'IKT-2025-000655',
-          krSzam: 'KR-430119',
-          attachments: [
-            { name: 'Kiegészítés 6.pdf' }
-          ]
-        },
-        {
-          formName: '2620',
-          datetime: '2025-11-05 08:30',
-          iktatoszam: 'IKT-2025-000656',
-          krSzam: 'KR-430120',
-          attachments: [
-            { name: 'Kiegészítés 7.pdf' }
-          ]
-        }
-      ]
-    },
-    {
-      icon: 'insert_drive_file',
-      ugyfel: 'Molnár Gábor',
-      formName: '26251',
-      datetime: '2026-01-05 12:00',
-      unread: true,
-      searchKey: 'molnár gábor ikt-2026-000505 kr-450505 ikt-2026-000506 kr-450506 ikt-2026-000507 kr-450507',
-      items: [
-        {
-          formName: '26251',
-          datetime: '2026-01-05 12:00',
-          iktatoszam: 'IKT-2026-000505',
-          krSzam: 'KR-450505',
-          attachments: [
-            { name: '26251.pdf' }
-          ]
-        },
-        {
-          formName: '26251',
-          datetime: '2026-01-06 12:00',
-          iktatoszam: 'IKT-2026-000506',
-          krSzam: 'KR-450506',
-          attachments: [
-            { name: 'Kiegészítés 8.pdf' }
-          ]
-        },
-        {
-          formName: '26251',
-          datetime: '2026-01-07 12:00',
-          iktatoszam: 'IKT-2026-000507',
-          krSzam: 'KR-450507',
-          attachments: [
-            { name: 'Kiegészítés 9.pdf' }
-          ]
-        }
-      ]
-    },
-    {
-      icon: 'description',
-      ugyfel: 'Horváth Zsuzsanna',
-      formName: '2629EUD',
-      datetime: '2026-01-30 09:45',
-      unread: false,
-      searchKey: 'horváth zsuzsanna ikt-2026-000608 kr-450608 ikt-2026-000609 kr-450609',
-      items: [
-        {
-          formName: '2629EUD',
-          datetime: '2026-01-30 09:45',
-          iktatoszam: 'IKT-2026-000608',
-          krSzam: 'KR-450608',
-          attachments: [
-            { name: '2629EUD.pdf' }
-          ]
-        },
-        {
-          formName: '2629EUD',
-          datetime: '2026-01-31 09:45',
-          iktatoszam: 'IKT-2026-000609',
-          krSzam: 'KR-450609',
-          attachments: [
-            { name: 'Kiegészítés 1.pdf' }
-          ]
-        }
-      ]
-    },
-    {
-      icon: 'insert_drive_file',
-      ugyfel: 'Balogh István',
-      formName: '2643TAO',
-      datetime: '2026-02-02 09:20',
-      unread: true,
-      searchKey: 'balogh istván ikt-2026-000709 kr-450709 ikt-2026-000710 kr-450710',
-      items: [
-        {
-          formName: '2643TAO',
-          datetime: '2026-02-01 09:20',
-          iktatoszam: 'IKT-2026-000709',
-          krSzam: 'KR-450709',
-          attachments: [
-            { name: '2643TAO.pdf' }
-          ]
-        },
-        {
-          formName: '2643TAO',
-          datetime: '2026-02-02 09:20',
-          iktatoszam: 'IKT-2026-000710',
-          krSzam: 'KR-450710',
-          attachments: [
-            { name: 'Kiegészítés 2.pdf' }
-          ]
-        }
-      ]
-    },
-    {
-      icon: 'description',
-      ugyfel: 'Papp Mária',
-      formName: '2649',
-      datetime: '2026-01-15 15:00',
-      unread: false,
-      searchKey: 'papp mária ikt-2026-000811 kr-450811 ikt-2026-000812 kr-450812',
-      items: [
-        {
-          formName: '2649',
-          datetime: '2026-01-15 15:00',
-          iktatoszam: 'IKT-2026-000811',
-          krSzam: 'KR-450811',
-          attachments: [
-            { name: '2649.pdf' }
-          ]
-        },
-        {
-          formName: '2649',
-          datetime: '2026-01-16 15:00',
-          iktatoszam: 'IKT-2026-000812',
-          krSzam: 'KR-450812',
-          attachments: [
-            { name: 'Kiegészítés 3.pdf' }
-          ]
-        }
-      ]
-    },
-    {
-      icon: 'insert_drive_file',
-      ugyfel: 'Farkas Tamás',
-      formName: '2650',
-      datetime: '2026-01-28 11:10',
-      unread: false,
-      searchKey: 'farkas tamás ikt-2026-000913 kr-450913',
-      items: [
-        {
-          formName: '2650',
-          datetime: '2026-01-28 11:10',
-          iktatoszam: 'IKT-2026-000913',
-          krSzam: 'KR-450913',
-          attachments: [
-            { name: '2650.pdf' }
-          ]
-        }
-      ]
-    },
-    {
-      icon: 'description',
-      ugyfel: 'Simon Andrea',
-      formName: '2651',
-      datetime: '2024-06-20 10:00',
-      unread: false,
-      searchKey: 'simon andrea ikt-2024-000045 kr-410220',
-      items: [
-        {
-          formName: '2651',
-          datetime: '2024-06-20 10:00',
-          iktatoszam: 'IKT-2024-000045',
-          krSzam: 'KR-410220',
-          attachments: [
-            { name: '2651.pdf' },
-            { name: 'Kiegészítés 4.pdf' }
-          ]
-        }
-      ]
-    },
-    {
-      icon: 'insert_drive_file',
-      status: 'Beküldve',
-      ugyfel: 'Kovács János',
-      formName: '2665',
-      datetime: '2025-08-15 14:20',
-      unread: true,
-      searchKey: 'kovács jános ikt-2025-001234 kr-445678 2665',
-      items: [
-        {
-          formName: '2665',
-          status: 'Beküldve',
-          datetime: '2025-08-15 14:20',
-          iktatoszam: 'IKT-2025-001234',
-          krSzam: 'KR-445678',
-          attachments: [
-            { name: '2665.pdf' }
-          ]
-        }
-      ]
-    },
-    {
-      icon: 'description',
-      status: 'Iktatva',
-      ugyfel: 'Nagy Péter',
-      formName: '2671',
-      datetime: '2025-09-10 09:30',
-      unread: false,
-      searchKey: 'nagy péter ikt-2025-001456 kr-446789 2671',
-      items: [
-        {
-          formName: '2671',
-          status: 'Iktatva',
-          datetime: '2025-09-10 09:30',
-          iktatoszam: 'IKT-2025-001456',
-          krSzam: 'KR-446789',
-          attachments: [
-            { name: '2671.pdf' },
-            { name: 'Kiegészítés 1.pdf' }
-          ]
-        }
-      ]
-    },
-    {
-      icon: 'insert_drive_file',
-      status: 'Hiba',
-      ugyfel: 'Molnár Gábor',
-      formName: '2678',
-      datetime: '2025-10-05 16:45',
-      unread: true,
-      searchKey: 'molnár gábor ikt-2025-001567 kr-447890 2678 ikt-2025-001568 kr-447891',
-      items: [
-        {
-          formName: '2678',
-          status: 'Beküldve',
-          datetime: '2025-10-05 16:45',
-          iktatoszam: 'IKT-2025-001567',
-          krSzam: 'KR-447890',
-          attachments: [
-            { name: '2678.pdf' }
-          ]
-        },
-        {
-          formName: '2678',
-          status: 'Hiba',
-          datetime: '2025-10-06 16:45',
-          iktatoszam: 'IKT-2025-001568',
-          krSzam: 'KR-447891',
-          attachments: [
-            { name: 'Kiegészítés 5.pdf' }
-          ]
-        }
-      ]
-    }
-  ];
+  private documents: DocumentItem[] = this.createDocuments([
+    ["description", "Elfogadásra vár", "Kovács János", "2608INT", "2026-02-02 10:00", true, "kovács jános ikt-2026-000123 kr-450021 2601 ikt-2026-000124 kr-450022 2608 ikt-2026-000125 kr-450023 2608int", [
+      ["2601", "2026-01-31 10:00", "IKT-2026-000123", "KR-450021", ["2601.pdf","Kiegészítés 1.pdf"], "Beküldve", "2601"],
+      ["2608", "2026-02-01 10:00", "IKT-2026-000124", "KR-450022", ["2608.pdf","Kiegészítés 2.pdf","Kiegészítés 3.pdf"], "Iktatva", "2608"],
+      ["2608INT", "2026-02-02 10:00", "IKT-2026-000125", "KR-450023", ["2608INT.pdf"], "Elfogadásra vár", "2608INT"]
+    ]],
+    ["insert_drive_file", "Lezárva", "Nagy Péter", "2620", "2026-01-24 14:30", false, "nagy péter ikt-2026-000200 kr-450101 2611 ikt-2026-000201 kr-450102 26110 ikt-2026-000202 kr-450103 2620", [
+      ["2611", "2026-01-22 14:30", "IKT-2026-000200", "KR-450101", ["2611.pdf","Kiegészítés 1.pdf"], "Beküldve", "2611"],
+      ["26110", "2026-01-23 14:30", "IKT-2026-000201", "KR-450102", ["26110.pdf"], "Iktatva", "26110"],
+      ["2620", "2026-01-24 14:30", "IKT-2026-000202", "KR-450103", ["2620.pdf"], "Lezárva", "2620"]
+    ]],
+    ["description", "Hiba", "Szabó Anna", "2643TAO", "2025-12-12 09:15", false, "szabó anna ikt-2025-000987 kr-440310 26251 ikt-2025-000988 kr-440311 ikt-2025-000989 kr-440312", [
+      ["26251", "2025-12-10 09:15", "IKT-2025-000987", "KR-440310", ["26251.pdf","Kiegészítés 4.pdf"], "Beküldve", "26251"],
+      ["2629EUD", "2025-12-11 09:15", "IKT-2025-000988", "KR-440311", ["2629EUD.pdf"], "Iktatva", "2629EUD"],
+      ["2643TAO", "2025-12-12 09:15", "IKT-2025-000989", "KR-440312", ["2643TAO.pdf"], "Hiba", "2643TAO"]
+    ]],
+    ["insert_drive_file", "Lezárva", "Tóth Éva", "2649", "2026-02-02 11:05", true, "tóth éva ikt-2026-000300 kr-450201 2629eud ikt-2026-000301 kr-450202 2643tao ikt-2026-000302 kr-450203 2649", [
+      ["2629EUD", "2026-01-31 11:05", "IKT-2026-000300", "KR-450201", ["2629EUD.pdf"], "Beküldve", "2629EUD"],
+      ["2643TAO", "2026-02-01 11:05", "IKT-2026-000301", "KR-450202", ["2643TAO.pdf","Kiegészítés 5.pdf"], "Iktatva", "2643TAO"],
+      ["2649", "2026-02-02 11:05", "IKT-2026-000302", "KR-450203", ["2649.pdf"], "Lezárva", "2649"]
+    ]],
+    ["description", "Elfogadásra vár", "Varga László", "2658", "2026-02-02 16:20", false, "varga lászló ikt-2026-000400 kr-450301 2650 ikt-2026-000401 kr-450302 2651 ikt-2026-000402 kr-450303 2658", [
+      ["2650", "2026-01-31 16:20", "IKT-2026-000400", "KR-450301", ["2650.pdf"], "Beküldve", "2650"],
+      ["2651", "2026-02-01 16:20", "IKT-2026-000401", "KR-450302", ["2651.pdf"], "Iktatva", "2651"],
+      ["2658", "2026-02-02 16:20", "IKT-2026-000402", "KR-450303", ["2658.pdf"], "Elfogadásra vár", "2658"]
+    ]],
+    ["description", undefined, "Kiss Katalin", "2620", "2025-11-03 08:30", false, "kiss katalin ikt-2025-000654 kr-430118 ikt-2025-000655 kr-430119 ikt-2025-000656 kr-430120", [
+      ["2620", "2025-11-03 08:30", "IKT-2025-000654", "KR-430118", ["2620.pdf"], undefined, undefined],
+      ["2620", "2025-11-04 08:30", "IKT-2025-000655", "KR-430119", ["Kiegészítés 6.pdf"], undefined, undefined],
+      ["2620", "2025-11-05 08:30", "IKT-2025-000656", "KR-430120", ["Kiegészítés 7.pdf"], undefined, undefined]
+    ]],
+    ["insert_drive_file", undefined, "Molnár Gábor", "26251", "2026-01-05 12:00", true, "molnár gábor ikt-2026-000505 kr-450505 ikt-2026-000506 kr-450506 ikt-2026-000507 kr-450507", [
+      ["26251", "2026-01-05 12:00", "IKT-2026-000505", "KR-450505", ["26251.pdf"], undefined, undefined],
+      ["26251", "2026-01-06 12:00", "IKT-2026-000506", "KR-450506", ["Kiegészítés 8.pdf"], undefined, undefined],
+      ["26251", "2026-01-07 12:00", "IKT-2026-000507", "KR-450507", ["Kiegészítés 9.pdf"], undefined, undefined]
+    ]],
+    ["description", undefined, "Horváth Zsuzsanna", "2629EUD", "2026-01-30 09:45", false, "horváth zsuzsanna ikt-2026-000608 kr-450608 ikt-2026-000609 kr-450609", [
+      ["2629EUD", "2026-01-30 09:45", "IKT-2026-000608", "KR-450608", ["2629EUD.pdf"], undefined, undefined],
+      ["2629EUD", "2026-01-31 09:45", "IKT-2026-000609", "KR-450609", ["Kiegészítés 1.pdf"], undefined, undefined]
+    ]],
+    ["insert_drive_file", undefined, "Balogh István", "2643TAO", "2026-02-02 09:20", true, "balogh istván ikt-2026-000709 kr-450709 ikt-2026-000710 kr-450710", [
+      ["2643TAO", "2026-02-01 09:20", "IKT-2026-000709", "KR-450709", ["2643TAO.pdf"], undefined, undefined],
+      ["2643TAO", "2026-02-02 09:20", "IKT-2026-000710", "KR-450710", ["Kiegészítés 2.pdf"], undefined, undefined]
+    ]],
+    ["description", undefined, "Papp Mária", "2649", "2026-01-15 15:00", false, "papp mária ikt-2026-000811 kr-450811 ikt-2026-000812 kr-450812", [
+      ["2649", "2026-01-15 15:00", "IKT-2026-000811", "KR-450811", ["2649.pdf"], undefined, undefined],
+      ["2649", "2026-01-16 15:00", "IKT-2026-000812", "KR-450812", ["Kiegészítés 3.pdf"], undefined, undefined]
+    ]],
+    ["insert_drive_file", undefined, "Farkas Tamás", "2650", "2026-01-28 11:10", false, "farkas tamás ikt-2026-000913 kr-450913", [
+      ["2650", "2026-01-28 11:10", "IKT-2026-000913", "KR-450913", ["2650.pdf"], undefined, undefined]
+    ]],
+    ["description", undefined, "Simon Andrea", "2651", "2024-06-20 10:00", false, "simon andrea ikt-2024-000045 kr-410220", [
+      ["2651", "2024-06-20 10:00", "IKT-2024-000045", "KR-410220", ["2651.pdf","Kiegészítés 4.pdf"], undefined, undefined]
+    ]],
+    ["insert_drive_file", "Beküldve", "Kovács János", "2665", "2025-08-15 14:20", true, "kovács jános ikt-2025-001234 kr-445678 2665", [
+      ["2665", "2025-08-15 14:20", "IKT-2025-001234", "KR-445678", ["2665.pdf"], "Beküldve", undefined]
+    ]],
+    ["description", "Iktatva", "Nagy Péter", "2671", "2025-09-10 09:30", false, "nagy péter ikt-2025-001456 kr-446789 2671", [
+      ["2671", "2025-09-10 09:30", "IKT-2025-001456", "KR-446789", ["2671.pdf","Kiegészítés 1.pdf"], "Iktatva", undefined]
+    ]],
+    ["insert_drive_file", "Hiba", "Molnár Gábor", "2678", "2025-10-05 16:45", true, "molnár gábor ikt-2025-001567 kr-447890 2678 ikt-2025-001568 kr-447891", [
+      ["2678", "2025-10-05 16:45", "IKT-2025-001567", "KR-447890", ["2678.pdf"], "Beküldve", undefined],
+      ["2678", "2025-10-06 16:45", "IKT-2025-001568", "KR-447891", ["Kiegészítés 5.pdf"], "Hiba", undefined]
+    ]]
+  ]);
+
+  private createDocuments(seeds: Array<[
+    icon: string, status: string | undefined, ugyfel: string, formName: string,
+    datetime: string, unread: boolean, searchKey: string,
+    items: Array<[formName: string, datetime: string, iktatoszam: string, krSzam: string,
+      attachments: string[], status: string | undefined, type: string | undefined]>
+  ]>): DocumentItem[] {
+    return seeds.map(([icon, status, ugyfel, formName, datetime, unread, searchKey, items]) => ({
+      icon, ...(status === undefined ? {} : { status }), ugyfel, formName, datetime, unread, searchKey,
+      items: items.map(([formName, datetime, iktatoszam, krSzam, attachments, status, type]) => ({
+        formName, datetime, iktatoszam, krSzam, attachments: attachments.map(name => ({ name })),
+        ...(status === undefined ? {} : { status }), ...(type === undefined ? {} : { type })
+      }))
+    }));
+  }
 
   getDocuments(): Observable<DocumentItem[]> {
     return of(this.documents);

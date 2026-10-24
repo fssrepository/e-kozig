@@ -150,7 +150,7 @@ export class FormEditorStoreService {
       const store = transaction.objectStore(storeName);
       const request = store.getAll();
       request.onsuccess = () => resolve(request.result as T[]);
-      request.onerror = () => reject(request.error);
+      request.onerror = () => reject(request.error ?? new Error('IndexedDB request failed.'));
     });
   }
 
@@ -167,7 +167,7 @@ export class FormEditorStoreService {
       const store = transaction.objectStore(TABLE_STORE);
       const request = store.get(tableName);
       request.onsuccess = () => resolve(this.normalizeTable<T>(request.result));
-      request.onerror = () => reject(request.error);
+      request.onerror = () => reject(request.error ?? new Error('IndexedDB request failed.'));
     });
   }
 
@@ -181,8 +181,8 @@ export class FormEditorStoreService {
       const store = transaction.objectStore(TABLE_STORE);
       store.put(table, tableName);
       transaction.oncomplete = () => resolve();
-      transaction.onerror = () => reject(transaction.error);
-      transaction.onabort = () => reject(transaction.error);
+      transaction.onerror = () => reject(transaction.error ?? new Error('IndexedDB transaction failed.'));
+      transaction.onabort = () => reject(transaction.error ?? new Error('IndexedDB transaction failed.'));
     });
   }
 

@@ -1,3 +1,15 @@
+import { ListLoadingComponent } from '../../ui/components/list-loading.component';
+import { createLocalId } from '../../ui/local-id';
+import { stripMenuLabel } from '../../ui/menu-label';
+import { NyomtatvanyEntry, NyomtatvanyGroup } from '../models/form-entry.interface';
+import { FormEntryListComponent } from '../../ui/components/form-entry-list.component';
+import { RecordTableComponent } from '../../ui/components/record-table.component';
+import { DetailHeaderComponent } from '../../ui/components/detail-header.component';
+import { ListControlsComponent } from '../../ui/components/list-controls.component';
+import { DateRangeComponent } from '../../ui/components/date-range.component';
+import { ChoiceFilterComponent } from '../../ui/components/choice-filter.component';
+import { ListViewport } from '../../ui/components/list-viewport/list-viewport';
+import { smoothScroll, lockFiltersScroll, formatDate, formatShortDate, parseDateTime } from '../../ui/list-utils';
 import { Component, OnInit, ViewChild, AfterViewInit, HostListener, inject, ChangeDetectorRef, ElementRef, OnDestroy, ChangeDetectionStrategy, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -28,20 +40,6 @@ import {
   FormTemplatePage
 } from '../../admin/models/form-editor.model';
 import { FormEditorStoreService } from '../../admin/services/form-editor-store.service';
-
-interface NyomtatvanyEntry {
-  code: string;
-  title: string;
-  version: string;
-  adoev: string;
-  adoevSort: number;
-}
-
-interface NyomtatvanyGroup {
-  key: string;
-  latest: NyomtatvanyEntry;
-  entries: NyomtatvanyEntry[];
-}
 
 interface DocMenuSubmenu {
   title: string;
@@ -74,6 +72,9 @@ interface DraftItem {
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ListLoadingComponent,
+    FormEntryListComponent,
+    ChoiceFilterComponent, DateRangeComponent, ListControlsComponent, DetailHeaderComponent, RecordTableComponent,
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
@@ -92,43 +93,24 @@ interface DraftItem {
     MatCheckboxModule,
     MatSelectModule
   ],
-  styleUrls: ['../../../_styles/_document.scss'],
   templateUrl: './document.component.html',
 
 })
-export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
+export class DocumentComponent extends ListViewport<DocumentItem> implements OnInit, AfterViewInit, OnDestroy {
+  protected override readonly mobileLoadDelay = 1200;
+  protected override readonly checkVisibleSentinel = true;
+
   private documentService = inject(DocumentService);
   private alertService = inject(AlertService);
   private formStore = inject(FormEditorStoreService);
-  private cdr = inject(ChangeDetectorRef);
-  private zone = inject(NgZone);
+
   private filtersScrollLeft = 0;
   private scrollLockInterval: any = null;
-  private intersectionObserver: IntersectionObserver | null = null;
-  private mobilePageSize = 10;
-  private mobileVisibleCount = 10;
-  private mobileFilteredDocuments: DocumentItem[] = [];
-  private lastFilteredDocuments: DocumentItem[] = [];
-  private resizeHandler?: () => void;
-  private pullStartY = 0;
-  private pullDistanceInternal = 0;
-  private pullEligible = false;
-  private pullTouchMoveHandler?: (event: TouchEvent) => void;
-  private pullTouchStartHandler?: (event: TouchEvent) => void;
-  private pullTouchEndHandler?: () => void;
-  private readonly pullThreshold = 64;
-  private readonly pullMax = 120;
-  private readonly pullStartThreshold = 8;
+
   private filterUpdateTimer: number | null = null;
 
-  isMobileView = window.innerWidth <= 768;
-  mobileLoadingMore = false;
-  pullActive = false;
-  pullRefreshing = false;
-
-  searchCtrl = new FormControl('');
   searchResults: DocumentItem[] = [];
-  showSearchPanel = false;
+
   userBadgeCount = 1;
 
   // Ugyfél dropdown controls
@@ -161,14 +143,11 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedFilters: string[] = [];
 
   // Search chips for AND filtering
-  searchTerms: string[] = [];
 
   documents: DocumentItem[] = [];
 
-  dataSource = new MatTableDataSource<DocumentItem>(this.documents);
   displayedColumns: string[] = ['icon', 'name', 'ugyszam', 'description', 'status', 'datetime'];
 
-  loading = false;
   selectedItem: DocumentItem | null = null;
   expandedItemIds: Set<string> = new Set();
   showCreateMenu = false;
@@ -230,17 +209,13 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
   showDraftDeleteConfirm = false;
   draftToDelete: DraftItem | null = null;
 
-  @ViewChild('paginator') paginator!: MatPaginator;
-  @ViewChild('tableScrollSentinel') tableScrollSentinel!: ElementRef<HTMLElement>;
-  @ViewChild('tableContainer') tableContainer!: ElementRef<HTMLElement>;
-
   ngOnInit(): void {
     // Load documents from service
     this.documentService.getDocuments().subscribe(docs => {
       const forms = this.documentService.getFormNames();
       const names = this.documentService.getNames();
       const statuses = this.documentService.getStatuses();
-      
+
       this.documents = docs.map((doc, index) => {
         const items = (doc.items || []).map((item, i) => ({
           ...item,
@@ -253,10 +228,10 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
           const db = this.parseDateTime(b.datetime);
           return db.getTime() - da.getTime();
         });
-        
+
         // Latest item is first (items are sorted descending)
         const latestItem = items[0];
-        
+
         const processed = {
           ...doc,
           id: `doc-${index}`,
@@ -396,10 +371,10 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     // Close search panel and find the processed version from this.documents
     this.showSearchPanel = false;
     this.searchCtrl.setValue('', { emitEvent: false });
-    
+
     // Find the matching document from the processed list using ugyfel as the unique key
     const processedDoc = this.documents.find(d => d.ugyfel === doc.ugyfel);
-    
+
     if (processedDoc) {
       // Use selectTableRow to ensure consistent processing
       this.selectTableRow(processedDoc);
@@ -475,22 +450,21 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
       .replace(/\s+/g, '-');
   }
 
-
   hasKiegeszitesAttachment(item: DocumentItemDetail): boolean {
-    return !!(item.attachments && item.attachments.length > 0 && 
+    return !!(item.attachments && item.attachments.length > 0 &&
       item.attachments.some(att => att.name && typeof att.name === 'string' && att.name.toLowerCase().includes('kiegészítés')));
   }
 
   getKiegeszitesName(item: DocumentItemDetail): string {
-    const kiegeszites = item.attachments?.find(att => 
+    const kiegeszites = item.attachments?.find(att =>
       att.name && typeof att.name === 'string' && att.name.toLowerCase().includes('kiegészítés')
     );
     return kiegeszites?.name || '';
   }
 
   hasFormTypeAttachment(item: DocumentItemDetail): boolean {
-    return !!(item.attachments && item.attachments.length > 0 && 
-      item.attachments.some(att => 
+    return !!(item.attachments && item.attachments.length > 0 &&
+      item.attachments.some(att =>
         att.name && typeof att.name === 'string' && !att.name.toLowerCase().includes('kiegészítés')
       ));
   }
@@ -574,38 +548,12 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showEmailSubjectPanel = false;
   }
 
-
   onViewAttachment() {
     this.alertService.open('A dokumentum megnyitása az ONYA-ban javításra vagy jóváhagyásra.');
   }
 
   onDownloadAttachment() {
     this.alertService.open('A dokumentum letöltése ebben a prototípusban nem érhető el.');
-  }
-
-  filterBySearch() {
-    const query = (this.searchCtrl.value || '').trim();
-    if (!query) return;
-
-    // Add as search chip if not already present
-    if (!this.searchTerms.includes(query)) {
-      this.searchTerms.push(query);
-    }
-
-    // Clear input and close search panel
-    this.searchCtrl.setValue('', { emitEvent: false });
-    this.showSearchPanel = false;
-
-    // Apply filter with all search terms
-    this.applyFilter();
-  }
-
-  removeSearchTerm(term: string) {
-    const i = this.searchTerms.indexOf(term);
-    if (i >= 0) {
-      this.searchTerms.splice(i, 1);
-      this.applyFilter();
-    }
   }
 
   addChip(value: string) {
@@ -631,47 +579,20 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.applyFilter();
   }
 
-  private smoothScroll(container: HTMLElement, target: number, duration = 240) {
-    const start = container.scrollLeft;
-    const delta = target - start;
-    const startTime = performance.now();
-    const ease = (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
+  private readonly smoothScroll = smoothScroll;
 
-    const step = (now: number) => {
-      const progress = Math.min(1, (now - startTime) / duration);
-      container.scrollLeft = start + delta * ease(progress);
-      if (progress < 1) {
-        requestAnimationFrame(step);
-      }
-    };
-
-    requestAnimationFrame(step);
-  }
-
-  private lockFiltersScroll(container: HTMLElement, target: number) {
-    let frames = 0;
-    const lock = () => {
-      container.scrollLeft = target;
-      if (frames++ < 8) {
-        requestAnimationFrame(lock);
-      }
-    };
-    lock();
-    setTimeout(() => (container.scrollLeft = target), 100);
-    setTimeout(() => (container.scrollLeft = target), 200);
-    setTimeout(() => (container.scrollLeft = target), 350);
-  }
+  private readonly lockFiltersScroll = lockFiltersScroll;
 
   private startScrollLock() {
     const container = document.querySelector('.filters') as HTMLElement | null;
     if (!container) return;
     const target = this.filtersScrollLeft;
-    
+
     // Clear any existing lock
     if (this.scrollLockInterval) {
       clearInterval(this.scrollLockInterval);
     }
-    
+
     // Continuously lock scroll position while panel is open
     this.scrollLockInterval = setInterval(() => {
       if (container.scrollLeft !== target) {
@@ -700,7 +621,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
   private positionPanel(btnSelector: string, panelSelector: string) {
     // Only position panels on mobile (width <= 768px)
     if (window.innerWidth > 768) return;
-    
+
     const btn = document.querySelector(btnSelector) as HTMLElement | null;
     const panel = document.querySelector(panelSelector) as HTMLElement | null;
     if (!btn || !panel) return;
@@ -770,10 +691,10 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
     const target = event.target as HTMLElement;
-    
+
     // Check if click is inside a Material datepicker overlay
     const isDatepickerClick = target.closest('.mat-datepicker-popup, .mat-datepicker-content, .mat-calendar');
-    
+
     const ugyfelWrapper = document.querySelector('.ugyfel-wrapper');
     if (this.showUgyfelPanel && ugyfelWrapper && !ugyfelWrapper.contains(target)) {
       this.showUgyfelPanel = false;
@@ -946,15 +867,15 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
       }
 
       if (this.selectedForms.length > 0) {
-        filtered = filtered.filter(d => 
-          d.items && d.items.some(item => 
+        filtered = filtered.filter(d =>
+          d.items && d.items.some(item =>
             item.formName && this.selectedForms.includes(item.formName)
           )
         );
       }
 
       if (this.selectedStatuses.length > 0) {
-        filtered = filtered.filter(d => 
+        filtered = filtered.filter(d =>
           this.selectedStatuses.includes(d.status || '')
         );
       }
@@ -976,7 +897,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
 
-      this.lastFilteredDocuments = filtered;
+      this.lastFilteredItems = filtered;
       this.updateTableData(filtered);
       this.refreshMobileObserver();
       this.loading = false;
@@ -987,243 +908,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filterUpdateTimer = window.setTimeout(update, 400);
   }
 
-  private setupResizeListener() {
-    this.teardownResizeListener();
-    this.resizeHandler = () => this.updateViewMode(window.innerWidth);
-    window.addEventListener('resize', this.resizeHandler, { passive: true });
-  }
-
-  private teardownResizeListener() {
-    if (this.resizeHandler) {
-      window.removeEventListener('resize', this.resizeHandler);
-    }
-    this.resizeHandler = undefined;
-  }
-
-  private updateViewMode(width: number) {
-    const nextIsMobile = width <= 768;
-    if (nextIsMobile === this.isMobileView) return;
-
-    this.isMobileView = nextIsMobile;
-    this.updatePaginatorMode();
-    if (this.lastFilteredDocuments.length > 0) {
-      this.updateTableData(this.lastFilteredDocuments);
-    }
-    this.refreshMobileObserver();
-    if (!this.isMobileView) {
-      this.resetPullState();
-    }
-    this.cdr.markForCheck();
-  }
-
-  refresh() {
-    // Simulate reloading table content without mutating item timestamps
-    this.loading = true;
-    setTimeout(() => {
-      // Reapply sort & filters to refresh the table view
-      this.sortDocuments();
-      this.applyFilter();
-      this.loading = false;
-      this.pullRefreshing = false;
-      this.resetPullState();
-      this.cdr.markForCheck();
-    }, 500);
-  }
-
-  get pullDistance(): number {
-    return this.pullRefreshing ? this.pullThreshold : this.pullDistanceInternal;
-  }
-
-  get pullProgress(): number {
-    if (this.pullRefreshing) return 100;
-    return Math.min(100, Math.round((this.pullDistanceInternal / this.pullThreshold) * 100));
-  }
-
-  private setupPullToRefresh() {
-    if (!this.tableContainer) return;
-    this.teardownPullToRefresh();
-
-    const container = this.tableContainer.nativeElement;
-    this.pullTouchStartHandler = (event: TouchEvent) => {
-      if (!this.isMobileView || this.loading || this.mobileLoadingMore || this.pullRefreshing) return;
-      this.pullEligible = container.scrollTop === 0;
-      this.pullStartY = event.touches[0]?.clientY ?? 0;
-      this.pullDistanceInternal = 0;
-      this.cdr.markForCheck();
-    };
-
-    this.pullTouchMoveHandler = (event: TouchEvent) => {
-      if (!this.pullEligible || this.pullRefreshing) return;
-      if (container.scrollTop > 0) {
-        this.resetPullState();
-        return;
-      }
-      const currentY = event.touches[0]?.clientY ?? 0;
-      const delta = currentY - this.pullStartY;
-      if (delta <= 0) {
-        if (this.pullActive) {
-          this.resetPullState();
-        }
-        return;
-      }
-
-      if (!this.pullActive && delta < this.pullStartThreshold) {
-        return;
-      }
-
-      this.pullActive = true;
-      this.pullDistanceInternal = Math.min(this.pullMax, delta);
-      if (this.pullDistanceInternal > 0) {
-        event.preventDefault();
-      }
-      this.cdr.markForCheck();
-    };
-
-    this.pullTouchEndHandler = () => {
-      if (!this.pullActive) {
-        this.pullEligible = false;
-        return;
-      }
-      if (this.pullDistanceInternal >= this.pullThreshold) {
-        this.pullRefreshing = true;
-        this.cdr.markForCheck();
-        this.refresh();
-      } else {
-        this.resetPullState();
-      }
-      this.pullEligible = false;
-      this.cdr.markForCheck();
-    };
-
-    container.addEventListener('touchstart', this.pullTouchStartHandler, { passive: true });
-    container.addEventListener('touchmove', this.pullTouchMoveHandler, { passive: false });
-    container.addEventListener('touchend', this.pullTouchEndHandler, { passive: true });
-    container.addEventListener('touchcancel', this.pullTouchEndHandler, { passive: true });
-  }
-
-  private teardownPullToRefresh() {
-    if (!this.tableContainer) return;
-    const container = this.tableContainer.nativeElement;
-    if (this.pullTouchStartHandler) {
-      container.removeEventListener('touchstart', this.pullTouchStartHandler);
-    }
-    if (this.pullTouchMoveHandler) {
-      container.removeEventListener('touchmove', this.pullTouchMoveHandler);
-    }
-    if (this.pullTouchEndHandler) {
-      container.removeEventListener('touchend', this.pullTouchEndHandler);
-      container.removeEventListener('touchcancel', this.pullTouchEndHandler);
-    }
-    this.pullTouchStartHandler = undefined;
-    this.pullTouchMoveHandler = undefined;
-    this.pullTouchEndHandler = undefined;
-  }
-
-  private resetPullState() {
-    this.pullActive = false;
-    this.pullDistanceInternal = 0;
-    this.pullEligible = false;
-  }
-
-  private updateTableData(filtered: DocumentItem[]) {
-    if (this.isMobileView) {
-      this.mobileFilteredDocuments = filtered;
-      this.mobileVisibleCount = Math.min(this.mobilePageSize, filtered.length);
-      this.dataSource.data = filtered.slice(0, this.mobileVisibleCount);
-    } else {
-      this.dataSource.data = filtered;
-      if (this.paginator) this.paginator.firstPage();
-    }
-  }
-
-  private refreshMobileObserver() {
-    if (!this.isMobileView || !this.tableScrollSentinel || !this.tableContainer) return;
-    if (!this.intersectionObserver) {
-      this.setupMobileIntersectionObserver();
-      return;
-    }
-
-    const sentinel = this.tableScrollSentinel.nativeElement;
-    this.intersectionObserver.unobserve(sentinel);
-    this.intersectionObserver.observe(sentinel);
-
-    const root = this.tableContainer.nativeElement;
-    const sentinelRect = sentinel.getBoundingClientRect();
-    const rootRect = root.getBoundingClientRect();
-    const isVisible = sentinelRect.top <= rootRect.bottom && sentinelRect.bottom >= rootRect.top;
-    if (isVisible) {
-      this.loadMoreMobileItems();
-    }
-  }
-
-  private updatePaginatorMode() {
-    if (this.isMobileView) {
-      this.dataSource.paginator = null;
-    } else if (this.paginator) {
-      this.dataSource.paginator = this.paginator;
-    }
-  }
-
-  private setupMobileIntersectionObserver() {
-    if (!this.isMobileView || !this.tableScrollSentinel || !this.tableContainer) return;
-    this.teardownMobileIntersectionObserver();
-
-    const root = this.tableContainer.nativeElement;
-    this.intersectionObserver = new IntersectionObserver(
-      entries => {
-        if (entries.some(entry => entry.isIntersecting)) {
-          this.loadMoreMobileItems();
-        }
-      },
-      { root, rootMargin: '0px 0px 200px 0px', threshold: 0.01 }
-    );
-
-    this.intersectionObserver.observe(this.tableScrollSentinel.nativeElement);
-  }
-
-  private teardownMobileIntersectionObserver() {
-    if (this.intersectionObserver) {
-      this.intersectionObserver.disconnect();
-      this.intersectionObserver = null;
-    }
-  }
-
-  private loadMoreMobileItems() {
-    console.log("load items 1");
-    if (!this.isMobileView || this.loading || this.mobileLoadingMore) return;
-    console.log("load items 2");
-    if (this.mobileVisibleCount >= this.mobileFilteredDocuments.length) return;
-    console.log("load items 3");
-
-    this.zone.run(() => {
-      console.log("load items 33");
-      console.debug('[documents] loadMoreMobileItems start', {
-        visible: this.mobileVisibleCount,
-        total: this.mobileFilteredDocuments.length
-      });
-      this.mobileLoadingMore = true;
-      this.cdr.markForCheck();
-    });
-
-    console.log("load items 4");
-
-    const nextCount = Math.min(this.mobileVisibleCount + this.mobilePageSize, this.mobileFilteredDocuments.length);
-
-    setTimeout(() => {
-      console.log("load items 5");
-      this.zone.run(() => {
-        console.debug('[documents] loadMoreMobileItems apply', {
-          nextVisible: nextCount,
-          total: this.mobileFilteredDocuments.length
-        });
-        this.mobileVisibleCount = nextCount;
-        this.dataSource.data = this.mobileFilteredDocuments.slice(0, this.mobileVisibleCount);
-        this.mobileLoadingMore = false;
-        this.refreshMobileObserver();
-        this.cdr.markForCheck();
-      });
-    }, 1200);
-  }
+  refresh() { this.refreshList(() => this.sortDocuments()); }
 
   private sortDocuments() {
     this.documents.sort((a, b) => {
@@ -1233,26 +918,9 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  formatDate(s: string): string {
-    if (!s) return '';
-    const d = this.parseDateTime(s);
-    if (isNaN(d.getTime())) return s;
-    const now = new Date();
-    const sameDay = d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
-    if (sameDay) {
-      return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-    }
-    const sameYear = d.getFullYear() === now.getFullYear();
-    if (sameYear) {
-      const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      return `${String(d.getDate()).padStart(2,'0')} ${monthNames[d.getMonth()]}`;
-    }
-    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
-  }
+  readonly formatDate = formatDate;
 
-  formatShortDate(d: Date): string {
-    return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
-  }
+  readonly formatShortDate = formatShortDate;
 
   toggleDocDetailSearch(): void {
     this.showDocDetailSearch = !this.showDocDetailSearch;
@@ -1414,12 +1082,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
-  private createLocalId(prefix: string): string {
-    const random = typeof crypto !== 'undefined' && 'randomUUID' in crypto
-      ? crypto.randomUUID()
-      : `${Date.now()}-${Math.round(Math.random() * 100000)}`;
-    return `${prefix}-${random}`;
-  }
+  private readonly createLocalId = createLocalId;
 
   private getOnyaFieldLayout(field: FormFieldDefinition): { col?: number; row?: number; colSpan: number; rowSpan: number } {
     const fallback = this.getOnyaDefaultFieldLayout(field.type);
@@ -1457,21 +1120,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     return JSON.parse(JSON.stringify(value));
   }
 
-  private parseDateTime(s: string): Date {
-    // expected format: YYYY-MM-DD HH:mm or variants
-    const parts = s.trim().split(' ');
-    if (parts.length >= 2) {
-      const datePart = parts[0];
-      const timePart = parts[1];
-      const [y, m, d] = datePart.split('-').map(n => Number(n));
-      const [hh, mm] = timePart.split(':').map(n => Number(n));
-      if (!Number.isNaN(y) && !Number.isNaN(m) && !Number.isNaN(d)) {
-        return new Date(y, m-1, d, hh || 0, mm || 0);
-      }
-    }
-    const dt = new Date(s);
-    return dt;
-  }
+  private readonly parseDateTime = parseDateTime;
 
   private normalizeSearch(value: string): string {
     return value
@@ -1769,9 +1418,7 @@ export class DocumentComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.stripMenuSuffix(label);
   }
 
-  private stripMenuSuffix(value: string): string {
-    return value.replace(/\s*\(.*?\)\s*/g, '').replace(/\s+menu item$/i, '').trim();
-  }
+  private readonly stripMenuSuffix = stripMenuLabel;
 
   private updateActiveEntryGroups(): void {
     this.activeEntryGroups = this.groupEntries(this.getActiveEntries());

@@ -5,9 +5,10 @@
     "ng": "ng",
     "build": "ng build --configuration development",
     "build:prod": "ng build --configuration production",
-    "build:github": "ng build --configuration production --base-href /e-kozig/",
+    "build:github": "ng build --configuration production --base-href /e-kozig/ && touch docs/.nojekyll",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:coverage": "ng test --watch=false --coverage"
   },
   "prettier": {
     "printWidth": 100,
@@ -40,8 +41,10 @@
     "@angular/cli": "^21.1.2",
     "@angular/compiler-cli": "^21.1.0",
     "@angular/material": "^21.1.2",
+    "@vitest/coverage-v8": "4.0.18",
     "jsdom": "^27.1.0",
     "typescript": "~5.9.2",
-    "vitest": "^4.0.8"
+    "vitest": "^4.0.8",
+    "vitest-sonar-reporter": "3.0.0"
   }
 }

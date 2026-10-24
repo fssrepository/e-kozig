@@ -1,0 +1,31 @@
+<mat-accordion *ngIf="groups.length > 0">
+              <ng-container *ngFor="let group of groups">
+                <mat-expansion-panel *ngIf="group.entries.length > 1; else singleFormItem">
+                  <mat-expansion-panel-header class="form-accordion-header">
+                    <mat-panel-title>
+                      <ng-container *ngTemplateOutlet="entrySummary; context: { $implicit: group.latest }"></ng-container>
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <button class="panel-item" type="button" *ngFor="let entry of group.entries" (click)="selected.emit(entry)">
+                    <ng-container *ngTemplateOutlet="entrySummary; context: { $implicit: entry }"></ng-container>
+                  </button>
+                </mat-expansion-panel>
+                <ng-template #singleFormItem>
+                  <button class="panel-item" type="button" (click)="selected.emit(group.latest)">
+                    <ng-container *ngTemplateOutlet="entrySummary; context: { $implicit: group.latest }"></ng-container>
+                  </button>
+                </ng-template>
+              </ng-container>
+            </mat-accordion>
+<ng-template #entrySummary let-entry>
+<div class="form-item-title">
+                        <div class="form-item-name">{{ entry.title }}</div>
+                        <div class="form-item-code">{{ entry.code }}</div>
+                        <div class="form-item-meta">
+                          <span class="label">Verziószám</span>
+                          <span>{{ entry.version }}</span>
+                          <span class="label">Adóév</span>
+                          <span>{{ entry.adoev }}</span>
+                        </div>
+                      </div>
+</ng-template>

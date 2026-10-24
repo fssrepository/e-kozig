@@ -1,6 +1,6 @@
 # Restorable Project history
 
-Complete Project; 16 tasks. [Live Project](https://github.com/users/fssrepository/projects/4) · [Canonical complete backup](https://github.com/fssrepository/myscoutee-roadmap/tree/master/guides/project-history/e-kozig).
+Complete Project; 16 tasks. [Live Project](https://github.com/users/fssrepository/projects/4) · [Canonical complete backup](https://github.com/fssrepository/myscoutee-roadmap/tree/master/guides/statistics/e-kozig).
 
 `project.json` preserves full issue bodies, statuses, typed field values and views. `measurements.json` preserves model/token/cost/time components and assumptions. `commit-map.json` links original and task-prefixed commit IDs. CSV/JSON provide convenient presentation exports. Recorded root intervals are retained in compressed JSON for timing reconstruction; there are no private chat texts.
 
@@ -9,7 +9,7 @@ Complete Project; 16 tasks. [Live Project](https://github.com/users/fssrepositor
 Run from the repository root:
 
 ```bash
-python3 guides/project-history/restore_project.py
+python3 guides/statistics/restore_project.py
 ```
 
 This validates all SHA256SUMS files and snapshot structure without network access.

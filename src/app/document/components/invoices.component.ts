@@ -1,3 +1,11 @@
+import { ListLoadingComponent } from '../../ui/components/list-loading.component';
+import { RecordTableComponent } from '../../ui/components/record-table.component';
+import { DetailHeaderComponent } from '../../ui/components/detail-header.component';
+import { ListControlsComponent } from '../../ui/components/list-controls.component';
+import { DateRangeComponent } from '../../ui/components/date-range.component';
+import { ChoiceFilterComponent } from '../../ui/components/choice-filter.component';
+import { ListViewport } from '../../ui/components/list-viewport/list-viewport';
+import { smoothScroll, lockFiltersScroll, formatDate, formatShortDate, parseDateTime } from '../../ui/list-utils';
 import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, HostListener, NgZone, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -30,6 +38,8 @@ interface AfaCodeOption {
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ListLoadingComponent,
+    ChoiceFilterComponent, DateRangeComponent, ListControlsComponent, DetailHeaderComponent, RecordTableComponent,
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
@@ -47,45 +57,20 @@ interface AfaCodeOption {
     MatProgressSpinnerModule,
     MatSelectModule
   ],
-  styleUrls: ['../../../_styles/_document.scss'],
   templateUrl: './invoices.component.html'
 })
-export class InvoicesComponent implements OnInit, AfterViewInit, OnDestroy {
+export class InvoicesComponent extends ListViewport<InvoiceItem> implements OnInit, AfterViewInit, OnDestroy {
   private invoiceService = inject(InvoiceService);
   private alertService = inject(AlertService);
-  private cdr = inject(ChangeDetectorRef);
-  private zone = inject(NgZone);
+
   private invoiceFiltersScrollLeft = 0;
   private periodFiltersScrollLeft = 0;
   private invoiceScrollLockInterval: any = null;
   private periodScrollLockInterval: any = null;
-  private intersectionObserver: IntersectionObserver | null = null;
-  private resizeHandler?: () => void;
-  private pullStartY = 0;
-  private pullDistanceInternal = 0;
-  private pullEligible = false;
-  private pullTouchMoveHandler?: (event: TouchEvent) => void;
-  private pullTouchStartHandler?: (event: TouchEvent) => void;
-  private pullTouchEndHandler?: () => void;
-  private readonly pullThreshold = 64;
-  private readonly pullMax = 120;
-  private readonly pullStartThreshold = 8;
+
   private filterUpdateTimer: number | null = null;
-  private mobilePageSize = 10;
-  private mobileVisibleCount = 10;
-  private mobileFilteredInvoices: InvoiceItem[] = [];
-  private lastFilteredInvoices: InvoiceItem[] = [];
 
-  isMobileView = window.innerWidth <= 768;
-  mobileLoadingMore = false;
-  pullActive = false;
-  pullRefreshing = false;
-  loading = false;
-
-  searchCtrl = new FormControl('');
   searchResults: InvoiceItem[] = [];
-  showSearchPanel = false;
-  searchTerms: string[] = [];
 
   ugyfelCtrl = new FormControl('');
   filteredUgyfels$!: Observable<string[]>;
@@ -112,7 +97,7 @@ export class InvoicesComponent implements OnInit, AfterViewInit, OnDestroy {
   showDatePanel = false;
 
   invoices: InvoiceItem[] = [];
-  dataSource = new MatTableDataSource<InvoiceItem>([]);
+
   displayedColumns: string[] = ['name', 'bizonylat', 'type', 'status', 'datetime'];
 
   selectedItem: InvoiceItem | null = null;
@@ -182,7 +167,6 @@ export class InvoicesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   paymentMethods = ['Készpénz', 'Átutalás', 'Utánvét', 'Bankkártya', 'SZÉP kártya'];
 
-  @ViewChild('paginator') paginator!: MatPaginator;
   private periodPaginatorRef?: MatPaginator;
   @ViewChild('periodPaginator')
   set periodPaginator(paginator: MatPaginator | undefined) {
@@ -191,8 +175,7 @@ export class InvoicesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.periodDataSource.paginator = paginator;
     this.cdr.markForCheck();
   }
-  @ViewChild('tableContainer') tableContainer!: ElementRef<HTMLElement>;
-  @ViewChild('tableScrollSentinel') tableScrollSentinel!: ElementRef<HTMLElement>;
+
   @ViewChild('invoiceFilters') invoiceFiltersRef!: ElementRef<HTMLElement>;
   @ViewChild('periodFilters') periodFiltersRef!: ElementRef<HTMLElement>;
 
@@ -307,25 +290,6 @@ export class InvoicesComponent implements OnInit, AfterViewInit, OnDestroy {
     const fromText = from ? this.formatShortDate(from) : '...';
     const toText = to ? this.formatShortDate(to) : '...';
     return `${fromText} - ${toText}`;
-  }
-
-  filterBySearch() {
-    const query = (this.searchCtrl.value || '').trim();
-    if (!query) return;
-    if (!this.searchTerms.includes(query)) {
-      this.searchTerms.push(query);
-    }
-    this.searchCtrl.setValue('', { emitEvent: false });
-    this.showSearchPanel = false;
-    this.applyFilter();
-  }
-
-  removeSearchTerm(term: string) {
-    const i = this.searchTerms.indexOf(term);
-    if (i >= 0) {
-      this.searchTerms.splice(i, 1);
-      this.applyFilter();
-    }
   }
 
   selectSearchResult(item: InvoiceItem) {
@@ -566,7 +530,7 @@ export class InvoicesComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
 
-      this.lastFilteredInvoices = filtered;
+      this.lastFilteredItems = filtered;
       this.updateTableData(filtered);
       this.refreshMobileObserver();
       this.loading = false;
@@ -757,238 +721,11 @@ export class InvoicesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.periodDataSource.data = filtered;
   }
 
-  refresh() {
-    this.loading = true;
-    setTimeout(() => {
-      this.applyFilter();
-      this.loading = false;
-      this.pullRefreshing = false;
-      this.resetPullState();
-      this.cdr.markForCheck();
-    }, 500);
-  }
+  refresh() { this.refreshList(); }
 
-  get pullDistance(): number {
-    return this.pullRefreshing ? this.pullThreshold : this.pullDistanceInternal;
-  }
+  readonly formatDate = formatDate;
 
-  get pullProgress(): number {
-    if (this.pullRefreshing) return 100;
-    return Math.min(100, Math.round((this.pullDistanceInternal / this.pullThreshold) * 100));
-  }
-
-  private setupResizeListener() {
-    this.teardownResizeListener();
-    this.resizeHandler = () => this.updateViewMode(window.innerWidth);
-    window.addEventListener('resize', this.resizeHandler, { passive: true });
-  }
-
-  private teardownResizeListener() {
-    if (this.resizeHandler) {
-      window.removeEventListener('resize', this.resizeHandler);
-    }
-    this.resizeHandler = undefined;
-  }
-
-  private updateViewMode(width: number) {
-    const nextIsMobile = width <= 768;
-    if (nextIsMobile === this.isMobileView) return;
-
-    this.isMobileView = nextIsMobile;
-    this.updatePaginatorMode();
-    if (this.lastFilteredInvoices.length > 0) {
-      this.updateTableData(this.lastFilteredInvoices);
-    }
-    this.refreshMobileObserver();
-    if (!this.isMobileView) {
-      this.resetPullState();
-    }
-    this.cdr.markForCheck();
-  }
-
-  private updatePaginatorMode() {
-    if (this.isMobileView) {
-      this.dataSource.paginator = null;
-    } else if (this.paginator) {
-      this.dataSource.paginator = this.paginator;
-    }
-  }
-
-  private updateTableData(filtered: InvoiceItem[]) {
-    if (this.isMobileView) {
-      this.mobileFilteredInvoices = filtered;
-      this.mobileVisibleCount = Math.min(this.mobilePageSize, filtered.length);
-      this.dataSource.data = filtered.slice(0, this.mobileVisibleCount);
-    } else {
-      this.dataSource.data = filtered;
-      if (this.paginator) this.paginator.firstPage();
-    }
-  }
-
-  private refreshMobileObserver() {
-    if (!this.isMobileView || !this.tableScrollSentinel || !this.tableContainer) return;
-    if (!this.intersectionObserver) {
-      this.setupMobileIntersectionObserver();
-      return;
-    }
-
-    const sentinel = this.tableScrollSentinel.nativeElement;
-    this.intersectionObserver.unobserve(sentinel);
-    this.intersectionObserver.observe(sentinel);
-  }
-
-  private setupMobileIntersectionObserver() {
-    if (!this.isMobileView || !this.tableScrollSentinel || !this.tableContainer) return;
-    this.teardownMobileIntersectionObserver();
-
-    const root = this.tableContainer.nativeElement;
-    this.intersectionObserver = new IntersectionObserver(
-      entries => {
-        if (entries.some(entry => entry.isIntersecting)) {
-          this.loadMoreMobileItems();
-        }
-      },
-      { root, rootMargin: '0px 0px 200px 0px', threshold: 0.01 }
-    );
-
-    this.intersectionObserver.observe(this.tableScrollSentinel.nativeElement);
-  }
-
-  private teardownMobileIntersectionObserver() {
-    if (this.intersectionObserver) {
-      this.intersectionObserver.disconnect();
-      this.intersectionObserver = null;
-    }
-  }
-
-  private loadMoreMobileItems() {
-    if (!this.isMobileView || this.loading || this.mobileLoadingMore) return;
-    if (this.mobileVisibleCount >= this.mobileFilteredInvoices.length) return;
-
-    this.zone.run(() => {
-      this.mobileLoadingMore = true;
-      this.cdr.markForCheck();
-    });
-
-    const nextCount = Math.min(this.mobileVisibleCount + this.mobilePageSize, this.mobileFilteredInvoices.length);
-
-    setTimeout(() => {
-      this.zone.run(() => {
-        this.mobileVisibleCount = nextCount;
-        this.dataSource.data = this.mobileFilteredInvoices.slice(0, this.mobileVisibleCount);
-        this.mobileLoadingMore = false;
-        this.refreshMobileObserver();
-        this.cdr.markForCheck();
-      });
-    }, 800);
-  }
-
-  private setupPullToRefresh() {
-    if (!this.tableContainer) return;
-    this.teardownPullToRefresh();
-
-    const container = this.tableContainer.nativeElement;
-    this.pullTouchStartHandler = (event: TouchEvent) => {
-      if (!this.isMobileView || this.loading || this.mobileLoadingMore || this.pullRefreshing) return;
-      this.pullEligible = container.scrollTop === 0;
-      this.pullStartY = event.touches[0]?.clientY ?? 0;
-      this.pullDistanceInternal = 0;
-      this.cdr.markForCheck();
-    };
-
-    this.pullTouchMoveHandler = (event: TouchEvent) => {
-      if (!this.pullEligible || this.pullRefreshing) return;
-      if (container.scrollTop > 0) {
-        this.resetPullState();
-        return;
-      }
-      const currentY = event.touches[0]?.clientY ?? 0;
-      const delta = currentY - this.pullStartY;
-      if (delta <= 0) {
-        if (this.pullActive) {
-          this.resetPullState();
-        }
-        return;
-      }
-
-      if (!this.pullActive && delta < this.pullStartThreshold) {
-        return;
-      }
-
-      this.pullActive = true;
-      this.pullDistanceInternal = Math.min(this.pullMax, delta);
-      if (this.pullDistanceInternal > 0) {
-        event.preventDefault();
-      }
-      this.cdr.markForCheck();
-    };
-
-    this.pullTouchEndHandler = () => {
-      if (!this.pullActive) {
-        this.pullEligible = false;
-        return;
-      }
-      if (this.pullDistanceInternal >= this.pullThreshold) {
-        this.pullRefreshing = true;
-        this.cdr.markForCheck();
-        this.refresh();
-      } else {
-        this.resetPullState();
-      }
-      this.pullEligible = false;
-      this.cdr.markForCheck();
-    };
-
-    container.addEventListener('touchstart', this.pullTouchStartHandler, { passive: true });
-    container.addEventListener('touchmove', this.pullTouchMoveHandler, { passive: false });
-    container.addEventListener('touchend', this.pullTouchEndHandler, { passive: true });
-    container.addEventListener('touchcancel', this.pullTouchEndHandler, { passive: true });
-  }
-
-  private teardownPullToRefresh() {
-    if (!this.tableContainer) return;
-    const container = this.tableContainer.nativeElement;
-    if (this.pullTouchStartHandler) {
-      container.removeEventListener('touchstart', this.pullTouchStartHandler);
-    }
-    if (this.pullTouchMoveHandler) {
-      container.removeEventListener('touchmove', this.pullTouchMoveHandler);
-    }
-    if (this.pullTouchEndHandler) {
-      container.removeEventListener('touchend', this.pullTouchEndHandler);
-      container.removeEventListener('touchcancel', this.pullTouchEndHandler);
-    }
-    this.pullTouchStartHandler = undefined;
-    this.pullTouchMoveHandler = undefined;
-    this.pullTouchEndHandler = undefined;
-  }
-
-  private resetPullState() {
-    this.pullActive = false;
-    this.pullDistanceInternal = 0;
-    this.pullEligible = false;
-  }
-
-  formatDate(s: string): string {
-    if (!s) return '';
-    const d = this.parseDateTime(s);
-    if (isNaN(d.getTime())) return s;
-    const now = new Date();
-    const sameDay = d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
-    if (sameDay) {
-      return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-    }
-    const sameYear = d.getFullYear() === now.getFullYear();
-    if (sameYear) {
-      const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      return `${String(d.getDate()).padStart(2,'0')} ${monthNames[d.getMonth()]}`;
-    }
-    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
-  }
-
-  formatShortDate(d: Date): string {
-    return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
-  }
+  readonly formatShortDate = formatShortDate;
 
   getStatusClass(status: string): string {
     switch (status) {
@@ -1134,36 +871,9 @@ export class InvoicesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showPeriodStatusPanel = active === 'status' ? this.showPeriodStatusPanel : false;
   }
 
-  private smoothScroll(container: HTMLElement, target: number, duration = 240) {
-    const start = container.scrollLeft;
-    const delta = target - start;
-    const startTime = performance.now();
-    const ease = (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
+  private readonly smoothScroll = smoothScroll;
 
-    const step = (now: number) => {
-      const progress = Math.min(1, (now - startTime) / duration);
-      container.scrollLeft = start + delta * ease(progress);
-      if (progress < 1) {
-        requestAnimationFrame(step);
-      }
-    };
-
-    requestAnimationFrame(step);
-  }
-
-  private lockFiltersScroll(container: HTMLElement, target: number) {
-    let frames = 0;
-    const lock = () => {
-      container.scrollLeft = target;
-      if (frames++ < 8) {
-        requestAnimationFrame(lock);
-      }
-    };
-    lock();
-    setTimeout(() => (container.scrollLeft = target), 100);
-    setTimeout(() => (container.scrollLeft = target), 200);
-    setTimeout(() => (container.scrollLeft = target), 350);
-  }
+  private readonly lockFiltersScroll = lockFiltersScroll;
 
   private startScrollLock(kind: 'invoice' | 'period', container: HTMLElement, target: number) {
     this.stopScrollLock(kind);
@@ -1294,19 +1004,7 @@ export class InvoicesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private parseDateTime(s: string): Date {
-    const parts = s.trim().split(' ');
-    if (parts.length >= 2) {
-      const datePart = parts[0];
-      const timePart = parts[1];
-      const [y, m, d] = datePart.split('-').map(n => Number(n));
-      const [hh, mm] = timePart.split(':').map(n => Number(n));
-      if (!Number.isNaN(y) && !Number.isNaN(m) && !Number.isNaN(d)) {
-        return new Date(y, m - 1, d, hh || 0, mm || 0);
-      }
-    }
-    return new Date(s);
-  }
+  private readonly parseDateTime = parseDateTime;
 
   private parseDate(s: string): Date {
     const [y, m, d] = s.split('-').map(n => Number(n));

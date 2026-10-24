@@ -1,3 +1,4 @@
+import { createLocalId } from '../../../ui/local-id';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -206,9 +207,9 @@ export class FormEditorComponent implements OnInit {
   private fieldDragState: FieldDragState | null = null;
   private suppressNextTabActivation = false;
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     this.syncViewportFromScreen();
-    await this.loadEditorData();
+    void this.loadEditorData();
   }
 
   @HostListener('window:resize')
@@ -1075,7 +1076,7 @@ export class FormEditorComponent implements OnInit {
     const suffix = this.createShortId();
     const fieldLayout = this.getDefaultFieldLayout(type);
     const colSpan = this.clamp(placement.colSpan ?? fieldLayout.colSpan, 2, this.gridColumns);
-    const rowSpan = this.clamp(placement.rowSpan ?? (type === 'header' ? 1 : 1), 1, this.gridRows);
+    const rowSpan = this.clamp(placement.rowSpan ?? 1, 1, this.gridRows);
     const section: FormSectionDefinition = {
       id: `${this.slugify(label)}-elem-${suffix}`,
       title: label,
@@ -1488,17 +1489,7 @@ export class FormEditorComponent implements OnInit {
   }
 
   updateTemplateFieldType(field: FormFieldDefinition): void {
-    const currentLayout = this.normalizeFieldLayout(field);
-    field.layout = {
-      ...this.getDefaultFieldLayout(field.type),
-      col: currentLayout.col,
-      row: currentLayout.row
-    };
-    this.applyFieldTypeOptions(field);
-    if (field.type === 'select') {
-      field.options = field.options?.length ? field.options : this.parseOptions(this.microFieldOptions);
-      this.fieldOptionDrafts[field.id] = field.options.map(option => option.label).join('\n');
-    }
+    this.resetFieldType(field);
     this.settleTemplateField(field.id);
     this.upsertActiveSectionTemplate();
   }
@@ -1726,7 +1717,7 @@ export class FormEditorComponent implements OnInit {
     this.closeFormFieldSettings();
   }
 
-  updateFormFieldType(field: FormFieldDefinition): void {
+  private resetFieldType(field: FormFieldDefinition): void {
     const currentLayout = this.normalizeFieldLayout(field);
     field.layout = {
       ...this.getDefaultFieldLayout(field.type),
@@ -1738,6 +1729,10 @@ export class FormEditorComponent implements OnInit {
       field.options = field.options?.length ? field.options : this.parseOptions(this.microFieldOptions);
       this.fieldOptionDrafts[field.id] = field.options.map(option => option.label).join('\n');
     }
+  }
+
+  updateFormFieldType(field: FormFieldDefinition): void {
+    this.resetFieldType(field);
     this.initializeFieldValue(field);
     this.syncTemplateSections();
   }
@@ -3093,46 +3088,24 @@ export class FormEditorComponent implements OnInit {
   }
 
   private getFormDropLayout(event: DragEvent, section: FormSectionDefinition): Partial<FormSectionLayout> {
-    const canvas = this.formCanvas?.nativeElement ?? (event.currentTarget as HTMLElement);
-    const rect = canvas.getBoundingClientRect();
     const layout = section.layout ?? { col: 1, row: 1, colSpan: 4, rowSpan: 1 };
-    const colSpan = this.clamp(layout.colSpan, 2, this.gridColumns);
-    const rowSpan = this.clamp(layout.rowSpan, 1, this.gridRows);
-    const columnWidth = rect.width / this.gridColumns;
-    const x = this.clamp(event.clientX - rect.left, 0, rect.width);
-    const y = Math.max(0, event.clientY - rect.top + canvas.scrollTop);
-
-    return {
-      col: this.clamp(Math.floor(x / columnWidth) + 1, 1, Math.max(1, this.gridColumns - colSpan + 1)),
-      row: this.clamp(Math.floor(y / 66) + 1, 1, Math.max(1, 24 - rowSpan + 1)),
-      colSpan,
-      rowSpan
-    };
+    return this.getCanvasDropLayout(event,
+      this.clamp(layout.colSpan, 2, this.gridColumns),
+      this.clamp(layout.rowSpan, 1, this.gridRows));
   }
 
   private getPageDropLayout(event: DragEvent): Partial<FormSectionLayout> {
-    const canvas = this.formCanvas?.nativeElement ?? (event.currentTarget as HTMLElement);
-    const rect = canvas.getBoundingClientRect();
-    const colSpan = 2;
-    const rowSpan = 1;
-    const columnWidth = rect.width / this.gridColumns;
-    const x = this.clamp(event.clientX - rect.left, 0, rect.width);
-    const y = Math.max(0, event.clientY - rect.top + canvas.scrollTop);
-
-    return {
-      col: this.clamp(Math.floor(x / columnWidth) + 1, 1, Math.max(1, this.gridColumns - colSpan + 1)),
-      row: this.clamp(Math.floor(y / 66) + 1, 1, Math.max(1, 24 - rowSpan + 1)),
-      colSpan,
-      rowSpan
-    };
+    return this.getCanvasDropLayout(event, 2, 1);
   }
 
   private getFormFieldDropLayout(event: DragEvent, type: FormFieldType): Partial<FormSectionLayout> {
+    const layout = this.getDefaultFieldLayout(type);
+    return this.getCanvasDropLayout(event, this.clamp(layout.colSpan, 2, this.gridColumns), 1);
+  }
+
+  private getCanvasDropLayout(event: DragEvent, colSpan: number, rowSpan: number): Partial<FormSectionLayout> {
     const canvas = this.formCanvas?.nativeElement ?? (event.currentTarget as HTMLElement);
     const rect = canvas.getBoundingClientRect();
-    const fieldLayout = this.getDefaultFieldLayout(type);
-    const colSpan = this.clamp(fieldLayout.colSpan, 2, this.gridColumns);
-    const rowSpan = type === 'header' ? 1 : 1;
     const columnWidth = rect.width / this.gridColumns;
     const x = this.clamp(event.clientX - rect.left, 0, rect.width);
     const y = Math.max(0, event.clientY - rect.top + canvas.scrollTop);
@@ -3246,12 +3219,7 @@ export class FormEditorComponent implements OnInit {
       .replace(/^-|-$/g, '') || 'mezo';
   }
 
-  private createId(prefix: string): string {
-    const random = typeof crypto !== 'undefined' && 'randomUUID' in crypto
-      ? crypto.randomUUID()
-      : `${Date.now()}-${Math.round(Math.random() * 100000)}`;
-    return `${prefix}-${random}`;
-  }
+  private readonly createId = createLocalId;
 
   private createShortId(): string {
     return this.createId('section').replace(/[^a-z0-9]/gi, '').slice(-8).toLowerCase();

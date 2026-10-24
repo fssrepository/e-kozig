@@ -1,3 +1,4 @@
+import { stripMenuItemSuffix } from '../../ui/menu-label';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -193,9 +194,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     return this.stripMenuItemSuffix(label);
   }
 
-  private stripMenuItemSuffix(value: string): string {
-    return value.replace(/\s+menu item$/i, '');
-  }
+  private readonly stripMenuItemSuffix = stripMenuItemSuffix;
 
   private scheduleSearchMetricsUpdate(): void {
     requestAnimationFrame(() => {

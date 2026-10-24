@@ -54,9 +54,36 @@ Feedback from both service users and domain specialists is welcome.
 ## Source and diagrams
 
 - `src/` contains the Angular prototype; `docs/` contains the GitHub Pages build.
-- English diagram: [PNG](guides/media/process-en.png) · [editable SVG](plans/process.en.svg).
-- Original Hungarian diagram: [PNG](src/assets/img/process.png) · [editable SVG](plans/process.svg).
-- [Restorable Project history and measurement notes](guides/project-history/README.md).
+- English diagram: [PNG](guides/media/process-en.png) · [editable SVG](guides/media/process.en.svg).
+- Original Hungarian diagram: [PNG](src/assets/img/process.png) · [editable SVG](guides/media/process.svg).
+- [Restorable Project history and measurement notes](guides/statistics/README.md).
+
+## Local code analysis
+
+The shared [SonarQube runner](https://github.com/fssrepository/myscoutee-sonarqube)
+uses this repository's `config/sonarqube/project.json` and `frontend.properties`.
+The `frontend` module scans `src/` from the repository root, classifies `*.spec.ts`
+as tests and leaves generated Pages files and static assets out of source analysis.
+Shared UI views live in `src/app/ui/components/`.
+
+With the runner checked out beside this repository, run from the e-kozig root:
+
+```sh
+npm ci
+npm run test:coverage
+../myscoutee-sonarqube/run.sh . check
+../myscoutee-sonarqube/run.sh . up
+../myscoutee-sonarqube/run.sh . scan frontend
+```
+
+Results: [local e-kozig dashboard](http://localhost:9000/dashboard?id=e-kozig).
+The runner keeps the shared server credentials in its ignored `.state/` directory.
+`angular.json` configures `vitest-sonar-reporter` to write `test-results/sonar.xml`;
+the Sonar properties import its test counts, durations and failures. Generate a
+fresh report before scanning. `npm run test:coverage` also generates
+`coverage/e-kozig/lcov.info` using Vitest's V8 coverage provider; the Sonar
+properties import that measured coverage separately from test execution results.
+Run `npm run build:github` to rebuild `docs/` for GitHub Pages.
 
 <!-- project-effort-summary -->
 
@@ -64,7 +91,7 @@ Feedback from both service users and domain specialists is welcome.
 
 ## Project effort and delivery
 
-[View tasks and AI usage](https://github.com/users/fssrepository/projects/4) · [Restorable records and methodology](guides/project-history/README.md)
+[View tasks and AI usage](https://github.com/users/fssrepository/projects/4) · [Restorable records and methodology](guides/statistics/README.md)
 
 | Measure | This project |
 | --- | ---: |

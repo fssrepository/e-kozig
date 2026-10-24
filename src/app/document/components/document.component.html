@@ -8,7 +8,7 @@
           <button matChipRemove aria-label="Keresési feltétel eltávolítása">✕</button>
         </mat-chip>
       </mat-chip-set>
-      <input matInput [formControl]="searchCtrl" placeholder="Keresés ügyszám, iktatószám, ügyfél vagy űrlap alapján" (keydown.enter)="filterBySearch()">
+      <input aria-label="Keresés ügyszám, iktatószám, ügyfél vagy űrlap alapján" matInput [formControl]="searchCtrl" placeholder="Keresés ügyszám, iktatószám, ügyfél vagy űrlap alapján" (keydown.enter)="filterBySearch()">
     </mat-form-field>
 
     <div class="search-panel" [class.open]="showSearchPanel" *ngIf="showSearchPanel">
@@ -32,22 +32,7 @@
         <mat-icon class="arrow" [class.open]="showUgyfelPanel">expand_more</mat-icon>
       </button>
 
-      <div class="ugyfel-panel" [class.open]="showUgyfelPanel" *ngIf="showUgyfelPanel">
-        <mat-form-field class="ugyfeld-search" appearance="outline">
-          <mat-chip-set #chipList aria-label="Kiválasztott ügyfelek" class="chip-list">
-            <mat-chip *ngFor="let s of selectedFilters" removable (removed)="remove(s)">
-              {{ s }}
-              <button matChipRemove aria-label="Ügyfél eltávolítása">✕</button>
-            </mat-chip>
-          </mat-chip-set>
-
-          <input matInput [formControl]="ugyfelCtrl" [matAutocomplete]="uauto" placeholder="Ügyfél keresése (magánszemély, egyéni vállalkozó stb.)">
-
-          <mat-autocomplete #uauto="matAutocomplete" (optionSelected)="selectUgyfel($event.option.value)">
-            <mat-option *ngFor="let option of filteredUgyfels$ | async" [value]="option">{{ option }}</mat-option>
-          </mat-autocomplete>
-        </mat-form-field>
-      </div>
+      <div class="ugyfel-panel" [class.open]="showUgyfelPanel" *ngIf="showUgyfelPanel" appChoiceFilter [control]="ugyfelCtrl" [options]="filteredUgyfels$" [selected]="selectedFilters" fieldClass="ugyfeld-search" placeholder="Ügyfél keresése (magánszemély, egyéni vállalkozó stb.)" selectionLabel="Kiválasztott ügyfelek" removeLabel="Ügyfél eltávolítása" (removed)="remove($event)" (chosen)="selectUgyfel($event)"></div>
     </div>
 
     <div class="date-wrapper">
@@ -57,34 +42,7 @@
         <mat-icon class="arrow" [class.open]="showDatePanel">expand_more</mat-icon>
       </button>
 
-      <div class="date-panel" [class.open]="showDatePanel" *ngIf="showDatePanel">
-        <div class="date-chips" *ngIf="dateFromCtrl.value || dateToCtrl.value">
-          <mat-chip-set aria-label="Kiválasztott dátumok" class="chip-list">
-            <mat-chip *ngIf="dateFromCtrl.value" removable (removed)="removeDate('from')">
-              Ettől: {{ formatShortDate(dateFromCtrl.value) }}
-              <button matChipRemove aria-label="Kezdő dátum eltávolítása">✕</button>
-            </mat-chip>
-            <mat-chip *ngIf="dateToCtrl.value" removable (removed)="removeDate('to')">
-              Eddig: {{ formatShortDate(dateToCtrl.value) }}
-              <button matChipRemove aria-label="Záró dátum eltávolítása">✕</button>
-            </mat-chip>
-          </mat-chip-set>
-        </div>
-
-        <div class="date-inputs">
-          <mat-form-field appearance="outline">
-            <input matInput [matDatepicker]="fromPicker" placeholder="Ettől" [formControl]="dateFromCtrl" (dateChange)="onDateChange()">
-            <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
-            <mat-datepicker #fromPicker xPosition="start" yPosition="below"></mat-datepicker>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <input matInput [matDatepicker]="toPicker" placeholder="Eddig" [formControl]="dateToCtrl" (dateChange)="onDateChange()">
-            <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
-            <mat-datepicker #toPicker xPosition="start" yPosition="below"></mat-datepicker>
-          </mat-form-field>
-        </div>
-      </div>
+      <div class="date-panel" [class.open]="showDatePanel" *ngIf="showDatePanel" appDateRange [from]="dateFromCtrl" [to]="dateToCtrl" (changed)="onDateChange()" (removed)="removeDate($event)"></div>
     </div>
 
     <div class="form-wrapper">
@@ -94,22 +52,7 @@
         <mat-icon class="arrow" [class.open]="showFormPanel">expand_more</mat-icon>
       </button>
 
-      <div class="form-panel" [class.open]="showFormPanel" *ngIf="showFormPanel">
-        <mat-form-field class="form-search" appearance="outline">
-          <mat-chip-set aria-label="Kiválasztott űrlapok" class="chip-list">
-            <mat-chip *ngFor="let f of selectedForms" removable (removed)="removeForm(f)">
-              {{ f }}
-              <button matChipRemove aria-label="Űrlap eltávolítása">✕</button>
-            </mat-chip>
-          </mat-chip-set>
-
-          <input matInput [formControl]="formCtrl" [matAutocomplete]="fauto" placeholder="Űrlap keresése">
-
-          <mat-autocomplete #fauto="matAutocomplete" (optionSelected)="selectForm($event.option.value)">
-            <mat-option *ngFor="let option of filteredForms$ | async" [value]="option">{{ option }}</mat-option>
-          </mat-autocomplete>
-        </mat-form-field>
-      </div>
+      <div class="form-panel" [class.open]="showFormPanel" *ngIf="showFormPanel" appChoiceFilter [control]="formCtrl" [options]="filteredForms$" [selected]="selectedForms" fieldClass="form-search" placeholder="Űrlap keresése" selectionLabel="Kiválasztott űrlapok" removeLabel="Űrlap eltávolítása" (removed)="removeForm($event)" (chosen)="selectForm($event)"></div>
     </div>
 
     <div class="status-wrapper">
@@ -119,22 +62,7 @@
         <mat-icon class="arrow" [class.open]="showStatusPanel">expand_more</mat-icon>
       </button>
 
-      <div class="status-panel" [class.open]="showStatusPanel" *ngIf="showStatusPanel">
-        <mat-form-field class="status-search" appearance="outline">
-          <mat-chip-set aria-label="Kiválasztott státuszok" class="chip-list">
-            <mat-chip *ngFor="let s of selectedStatuses" removable (removed)="removeStatus(s)">
-              {{ s }}
-              <button matChipRemove aria-label="Státusz eltávolítása">✕</button>
-            </mat-chip>
-          </mat-chip-set>
-
-          <input matInput [formControl]="statusCtrl" [matAutocomplete]="sauto" placeholder="Státusz keresése">
-
-          <mat-autocomplete #sauto="matAutocomplete" (optionSelected)="selectStatus($event.option.value)">
-            <mat-option *ngFor="let option of filteredStatuses$ | async" [value]="option">{{ option }}</mat-option>
-          </mat-autocomplete>
-        </mat-form-field>
-      </div>
+      <div class="status-panel" [class.open]="showStatusPanel" *ngIf="showStatusPanel" appChoiceFilter [control]="statusCtrl" [options]="filteredStatuses$" [selected]="selectedStatuses" fieldClass="status-search" placeholder="Státusz keresése" selectionLabel="Kiválasztott státuszok" removeLabel="Státusz eltávolítása" (removed)="removeStatus($event)" (chosen)="selectStatus($event)"></div>
     </div>
 
     <div class="unread-wrapper">
@@ -145,82 +73,13 @@
     </div>
   </div>
 
-  <div class="top-controls">
-    <div class="left-controls">
-      <button mat-icon-button (click)="refresh()" aria-label="Frissítés" [disabled]="loading">
-        <mat-icon *ngIf="!loading">refresh</mat-icon>
-        <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
-      </button>
-    </div>
-    <div class="right-controls">
+  <div class="top-controls" appListControls [loading]="loading" (refresh)="refresh()">
       <mat-paginator #paginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons></mat-paginator>
     </div>
-  </div>
 
-  <div class="page-loading-overlay" *ngIf="loading">
-    <mat-progress-spinner diameter="48" mode="indeterminate"></mat-progress-spinner>
-  </div>
-
-  <div class="table-stack">
-    <div class="pull-indicator" *ngIf="isMobileView && (pullActive || pullRefreshing)">
-      <mat-progress-spinner
-        [mode]="pullRefreshing ? 'indeterminate' : 'determinate'"
-        [value]="pullProgress"
-        diameter="20">
-      </mat-progress-spinner>
-    </div>
-    <div class="table-container" #tableContainer>
-      <div class="table-overlay" *ngIf="loading">
-        <mat-progress-spinner diameter="48" mode="indeterminate"></mat-progress-spinner>
-      </div>
-      <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
-
-      <ng-container matColumnDef="icon">
-        <td mat-cell *matCellDef="let element">
-          <mat-icon aria-hidden="true" [class]="'status-icon status-' + getStatusClass(element.status)">{{getStatusIcon(element.status || '')}}</mat-icon>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="name">
-        <td mat-cell *matCellDef="let element" class="col-name">
-          <div class="name-primary">{{ element.name }}</div>
-          <div class="mobile-meta">
-            <span class="mobile-form">{{ element.formName }}</span>
-            <span class="mobile-status">{{ element.status }}</span>
-          </div>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="ugyszam">
-        <td mat-cell *matCellDef="let element" class="col-ugyszam">{{ generateUgyszam(element) }}</td>
-      </ng-container>
-
-      <ng-container matColumnDef="description">
-        <td mat-cell *matCellDef="let element" class="col-form">{{ element.formName }}</td>
-      </ng-container>
-
-      <ng-container matColumnDef="status">
-        <td mat-cell *matCellDef="let element" class="col-status">{{ element.status }}</td>
-      </ng-container>
-
-      <ng-container matColumnDef="datetime">
-        <td mat-cell *matCellDef="let element" class="datetime-cell">{{ formatDate(element.datetime) }}</td>
-      </ng-container>
-
-      <tr
-        mat-row
-        class="row-link"
-        *matRowDef="let row; columns: displayedColumns;"
-        [class.unread]="row.unread"
-        [class.read]="!row.unread"
-        (click)="selectTableRow(row)"
-      ></tr>
-      </table>
-      <div class="mobile-load-indicator" *ngIf="mobileLoadingMore">
-        <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
-      </div>
-      <div #tableScrollSentinel class="table-sentinel" aria-hidden="true"></div>
-    </div>
+  <div class="table-stack" appListLoading [loading]="loading" [loadingMore]="mobileLoadingMore"
+    [mobile]="isMobileView" [active]="pullActive" [refreshing]="pullRefreshing" [progress]="pullProgress">
+    <app-record-table [dataSource]="dataSource" [columns]="displayedColumns" kind="document" [statusClass]="getStatusClass" [statusIcon]="getStatusIcon" [documentNumber]="generateUgyszam" (selected)="selectTableRow($event)"></app-record-table>
   </div>
 
   <div class="documents-fab">
@@ -266,7 +125,7 @@
               <button matChipRemove aria-label="Tárgy eltávolítása">✕</button>
             </mat-chip>
           </mat-chip-set>
-          <input matInput [formControl]="emailSubjectCtrl" placeholder="Tárgy" (keydown.enter)="addEmailSubjectChip()">
+          <input aria-label="Tárgy" matInput [formControl]="emailSubjectCtrl" placeholder="Tárgy" (keydown.enter)="addEmailSubjectChip()">
         </mat-form-field>
 
         <div class="search-panel" [class.open]="showEmailSubjectPanel" *ngIf="showEmailSubjectPanel">
@@ -281,7 +140,7 @@
         </div>
       </div>
       <mat-form-field appearance="outline" class="popup-field">
-        <textarea matInput rows="10" [formControl]="emailContentCtrl" placeholder="Üzenet tartalma"></textarea>
+        <textarea aria-label="Üzenet tartalma" matInput rows="10" [formControl]="emailContentCtrl" placeholder="Üzenet tartalma"></textarea>
       </mat-form-field>
     </div>
   </div>
@@ -296,7 +155,7 @@
               <button matChipRemove aria-label="Keresési feltétel eltávolítása">✕</button>
             </mat-chip>
           </mat-chip-set>
-          <input
+          <input aria-label="Űrlap keresése…"
             matInput
             [formControl]="docSearchCtrl"
             placeholder="Űrlap keresése…"
@@ -363,52 +222,7 @@
               </div>
               <mat-icon>chevron_right</mat-icon>
             </button>
-            <mat-accordion *ngIf="activeEntryGroups.length > 0">
-              <ng-container *ngFor="let group of activeEntryGroups">
-                <mat-expansion-panel *ngIf="group.entries.length > 1; else singleFormItem">
-                  <mat-expansion-panel-header class="form-accordion-header">
-                    <mat-panel-title>
-                      <div class="form-item-title">
-                        <div class="form-item-name">{{ group.latest.title }}</div>
-                        <div class="form-item-code">{{ group.latest.code }}</div>
-                        <div class="form-item-meta">
-                          <span class="label">Verziószám</span>
-                          <span>{{ group.latest.version }}</span>
-                          <span class="label">Adóév</span>
-                          <span>{{ group.latest.adoev }}</span>
-                        </div>
-                      </div>
-                    </mat-panel-title>
-                  </mat-expansion-panel-header>
-                  <button class="panel-item" type="button" *ngFor="let entry of group.entries" (click)="selectFormEntry(entry)">
-                    <div class="form-item-title">
-                      <div class="form-item-name">{{ entry.title }}</div>
-                      <div class="form-item-code">{{ entry.code }}</div>
-                      <div class="form-item-meta">
-                        <span class="label">Verziószám</span>
-                        <span>{{ entry.version }}</span>
-                        <span class="label">Adóév</span>
-                        <span>{{ entry.adoev }}</span>
-                      </div>
-                    </div>
-                  </button>
-                </mat-expansion-panel>
-                <ng-template #singleFormItem>
-                  <button class="panel-item" type="button" (click)="selectFormEntry(group.latest)">
-                    <div class="form-item-title">
-                      <div class="form-item-name">{{ group.latest.title }}</div>
-                      <div class="form-item-code">{{ group.latest.code }}</div>
-                      <div class="form-item-meta">
-                        <span class="label">Verziószám</span>
-                        <span>{{ group.latest.version }}</span>
-                        <span class="label">Adóév</span>
-                        <span>{{ group.latest.adoev }}</span>
-                      </div>
-                    </div>
-                  </button>
-                </ng-template>
-              </ng-container>
-            </mat-accordion>
+            <app-form-entry-list [groups]="activeEntryGroups" (selected)="selectFormEntry($event)"></app-form-entry-list>
           </div>
 
           <div class="panel-list" *ngIf="currentDocMenu && currentDocSubmenu && !currentDocSubSubmenu">
@@ -424,130 +238,14 @@
               <mat-icon>chevron_right</mat-icon>
             </button>
 
-            <ng-container *ngIf="isDraftMenuActive()">
-              <button class="panel-item draft-item" type="button" *ngFor="let draft of getDraftsForCurrentSubmenu()" (click)="selectDraftItem(draft)">
-                <div class="draft-left">
-                  <div class="form-item-name">{{ draft.name }}</div>
-                  <div class="form-item-code">{{ draft.ugyszam }} - {{ draft.formType }}</div>
-                </div>
-                <div class="draft-right">
-                  <div class="draft-date">{{ formatDate(draft.datetime) }}</div>
-                  <button mat-icon-button class="draft-delete" aria-label="Törlés" (click)="onDraftDeleteClick(draft, $event)">
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </div>
-              </button>
-            </ng-container>
+            <ng-container *ngIf="isDraftMenuActive()" [ngTemplateOutlet]="draftEntries"></ng-container>
 
-            <mat-accordion *ngIf="activeEntryGroups.length > 0">
-              <ng-container *ngFor="let group of activeEntryGroups">
-                <mat-expansion-panel *ngIf="group.entries.length > 1; else singleFormItem2">
-                  <mat-expansion-panel-header class="form-accordion-header">
-                    <mat-panel-title>
-                      <div class="form-item-title">
-                        <div class="form-item-name">{{ group.latest.title }}</div>
-                        <div class="form-item-code">{{ group.latest.code }}</div>
-                        <div class="form-item-meta">
-                          <span class="label">Verziószám</span>
-                          <span>{{ group.latest.version }}</span>
-                          <span class="label">Adóév</span>
-                          <span>{{ group.latest.adoev }}</span>
-                        </div>
-                      </div>
-                    </mat-panel-title>
-                  </mat-expansion-panel-header>
-                  <button class="panel-item" type="button" *ngFor="let entry of group.entries" (click)="selectFormEntry(entry)">
-                    <div class="form-item-title">
-                      <div class="form-item-name">{{ entry.title }}</div>
-                      <div class="form-item-code">{{ entry.code }}</div>
-                      <div class="form-item-meta">
-                        <span class="label">Verziószám</span>
-                        <span>{{ entry.version }}</span>
-                        <span class="label">Adóév</span>
-                        <span>{{ entry.adoev }}</span>
-                      </div>
-                    </div>
-                  </button>
-                </mat-expansion-panel>
-                <ng-template #singleFormItem2>
-                  <button class="panel-item" type="button" (click)="selectFormEntry(group.latest)">
-                    <div class="form-item-title">
-                      <div class="form-item-name">{{ group.latest.title }}</div>
-                      <div class="form-item-code">{{ group.latest.code }}</div>
-                      <div class="form-item-meta">
-                        <span class="label">Verziószám</span>
-                        <span>{{ group.latest.version }}</span>
-                        <span class="label">Adóév</span>
-                        <span>{{ group.latest.adoev }}</span>
-                      </div>
-                    </div>
-                  </button>
-                </ng-template>
-              </ng-container>
-            </mat-accordion>
+            <app-form-entry-list [groups]="activeEntryGroups" (selected)="selectFormEntry($event)"></app-form-entry-list>
           </div>
 
           <div class="panel-list" *ngIf="currentDocMenu && currentDocSubmenu && currentDocSubSubmenu">
-            <ng-container *ngIf="isDraftMenuActive()">
-              <button class="panel-item draft-item" type="button" *ngFor="let draft of getDraftsForCurrentSubmenu()" (click)="selectDraftItem(draft)">
-                <div class="draft-left">
-                  <div class="form-item-name">{{ draft.name }}</div>
-                  <div class="form-item-code">{{ draft.ugyszam }} - {{ draft.formType }}</div>
-                </div>
-                <div class="draft-right">
-                  <div class="draft-date">{{ formatDate(draft.datetime) }}</div>
-                  <button mat-icon-button class="draft-delete" aria-label="Törlés" (click)="onDraftDeleteClick(draft, $event)">
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </div>
-              </button>
-            </ng-container>
-            <mat-accordion *ngIf="activeEntryGroups.length > 0">
-              <ng-container *ngFor="let group of activeEntryGroups">
-                <mat-expansion-panel *ngIf="group.entries.length > 1; else singleFormItem3">
-                  <mat-expansion-panel-header class="form-accordion-header">
-                    <mat-panel-title>
-                      <div class="form-item-title">
-                        <div class="form-item-name">{{ group.latest.title }}</div>
-                        <div class="form-item-code">{{ group.latest.code }}</div>
-                        <div class="form-item-meta">
-                          <span class="label">Verziószám</span>
-                          <span>{{ group.latest.version }}</span>
-                          <span class="label">Adóév</span>
-                          <span>{{ group.latest.adoev }}</span>
-                        </div>
-                      </div>
-                    </mat-panel-title>
-                  </mat-expansion-panel-header>
-                  <button class="panel-item" type="button" *ngFor="let entry of group.entries" (click)="selectFormEntry(entry)">
-                    <div class="form-item-title">
-                      <div class="form-item-name">{{ entry.title }}</div>
-                      <div class="form-item-code">{{ entry.code }}</div>
-                      <div class="form-item-meta">
-                        <span class="label">Verziószám</span>
-                        <span>{{ entry.version }}</span>
-                        <span class="label">Adóév</span>
-                        <span>{{ entry.adoev }}</span>
-                      </div>
-                    </div>
-                  </button>
-                </mat-expansion-panel>
-                <ng-template #singleFormItem3>
-                  <button class="panel-item" type="button" (click)="selectFormEntry(group.latest)">
-                    <div class="form-item-title">
-                      <div class="form-item-name">{{ group.latest.title }}</div>
-                      <div class="form-item-code">{{ group.latest.code }}</div>
-                      <div class="form-item-meta">
-                        <span class="label">Verziószám</span>
-                        <span>{{ group.latest.version }}</span>
-                        <span class="label">Adóév</span>
-                        <span>{{ group.latest.adoev }}</span>
-                      </div>
-                    </div>
-                  </button>
-                </ng-template>
-              </ng-container>
-            </mat-accordion>
+            <ng-container *ngIf="isDraftMenuActive()" [ngTemplateOutlet]="draftEntries"></ng-container>
+            <app-form-entry-list [groups]="activeEntryGroups" (selected)="selectFormEntry($event)"></app-form-entry-list>
           </div>
         </div>
       </div>
@@ -602,10 +300,10 @@
                   [style.grid-column]="getOnyaFieldGridColumn(field)"
                   [style.grid-row]="getOnyaFieldGridRow(field)"
                 >
-                  <label class="onya-field-label" *ngIf="field.type !== 'header'">
+                  <span class="onya-field-label" *ngIf="field.type !== 'header'">
                     {{ field.label }}
                     <span *ngIf="field.required">*</span>
-                  </label>
+                  </span>
 
                   <div class="onya-field-header" *ngIf="field.type === 'header'; else onyaFieldBody">{{ field.label }}</div>
 
@@ -621,7 +319,7 @@
 
                     <ng-template #onyaNotCheckbox>
                     <mat-form-field appearance="outline" class="onya-input" *ngIf="field.type !== 'select' && field.type !== 'textarea'">
-                      <input
+                      <input [attr.aria-label]="field.label"
                         matInput
                         [type]="getOnyaInputType(field)"
                         [(ngModel)]="onyaFieldValues[field.id]"
@@ -631,7 +329,7 @@
                     </mat-form-field>
 
                     <mat-form-field appearance="outline" class="onya-input" *ngIf="field.type === 'textarea'">
-                      <textarea
+                      <textarea [attr.aria-label]="field.label"
                         matInput
                         rows="3"
                         [(ngModel)]="onyaFieldValues[field.id]"
@@ -676,23 +374,7 @@
 
 <!-- Detail view -->
 <div class="detail-view" *ngIf="selectedItem">
-  <div class="detail-header">
-    <button mat-icon-button (click)="closeDetailView()" aria-label="Vissza">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <div class="detail-header-info">
-      <div class="detail-header-text">
-        <div class="detail-ugyfel">{{ selectedItem.name }}</div>
-        <div class="detail-meta">{{ generateUgyszam(selectedItem) }}</div>
-      </div>
-    </div>
-    <span
-      class="status-icon-button detail-header-status detail-status-badge"
-      [class]="'status-' + getStatusClass(selectedItem.status)">
-      <span class="status-label">{{ selectedItem.status }}</span>
-      <mat-icon>{{ getStatusIcon(selectedItem.status || '') }}</mat-icon>
-    </span>
-  </div>
+  <div class="detail-header" appDetailHeader [title]="selectedItem.name || ''" [subtitle]="generateUgyszam(selectedItem)" [status]="selectedItem.status || ''" [statusClass]="'status-' + getStatusClass(selectedItem.status)" [statusIcon]="getStatusIcon(selectedItem.status || '')" (closed)="closeDetailView()"></div>
 
   <div class="detail-panel">
     <div class="detail-accordion">
@@ -736,3 +418,20 @@
     </div>
   </div>
 </div>
+
+<ng-template #draftEntries>
+
+              <button class="panel-item draft-item" type="button" *ngFor="let draft of getDraftsForCurrentSubmenu()" (click)="selectDraftItem(draft)">
+                <div class="draft-left">
+                  <div class="form-item-name">{{ draft.name }}</div>
+                  <div class="form-item-code">{{ draft.ugyszam }} - {{ draft.formType }}</div>
+                </div>
+                <div class="draft-right">
+                  <div class="draft-date">{{ formatDate(draft.datetime) }}</div>
+                  <button mat-icon-button class="draft-delete" aria-label="Törlés" (click)="onDraftDeleteClick(draft, $event)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </button>
+
+</ng-template>

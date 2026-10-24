@@ -186,16 +186,11 @@ export const SECTION_LIBRARY: FormSectionDefinition[] = [
     fields: [
       { id: 'representativeName', label: 'Képviselő neve', type: 'text', placeholder: 'Könyvelő / iroda' },
       { id: 'representativeTaxId', label: 'Képviselő adóazonosítója', type: 'text' },
-      {
-        id: 'representativeRole',
-        label: 'Jogosultság',
-        type: 'select',
-        options: [
-          { label: 'Megtekintés', value: 'read' },
-          { label: 'Beadás', value: 'submit' },
-          { label: 'Teljes körű', value: 'full' }
-        ]
-      }
+      choiceField('representativeRole', 'Jogosultság', [
+          ['Megtekintés', 'read'],
+          ['Beadás', 'submit'],
+          ['Teljes körű', 'full']
+        ])
     ]
   },
   {
@@ -208,16 +203,11 @@ export const SECTION_LIBRARY: FormSectionDefinition[] = [
       { id: 'onyaAccess', label: 'ONYA-űrlapkitöltés', type: 'checkbox' },
       { id: 'hipaAccess', label: 'HIPA-ügyintézés', type: 'checkbox' },
       { id: 'documentAccess', label: 'Dokumentumok olvasása', type: 'checkbox' },
-      {
-        id: 'approvalMode',
-        label: 'Jóváhagyás',
-        type: 'select',
-        options: [
-          { label: 'Mindig szükséges', value: 'always' },
-          { label: 'Csak kritikus műveletnél', value: 'critical' },
-          { label: '30 nap után automatikus', value: 'auto30' }
-        ]
-      }
+      choiceField('approvalMode', 'Jóváhagyás', [
+          ['Mindig szükséges', 'always'],
+          ['Csak kritikus műveletnél', 'critical'],
+          ['30 nap után automatikus', 'auto30']
+        ])
     ]
   },
   {
@@ -230,16 +220,11 @@ export const SECTION_LIBRARY: FormSectionDefinition[] = [
       { id: 'businessName', label: 'Vállalkozás neve', type: 'text' },
       { id: 'businessTaxNumber', label: 'Adószám', type: 'text' },
       { id: 'businessActivity', label: 'Főtevékenység', type: 'text' },
-      {
-        id: 'taxMode',
-        label: 'Adózási mód',
-        type: 'select',
-        options: [
-          { label: 'Átalányadó', value: 'atalany' },
-          { label: 'VSZJA', value: 'vszja' },
-          { label: 'Társasági adó', value: 'tao' }
-        ]
-      }
+      choiceField('taxMode', 'Adózási mód', [
+          ['Átalányadó', 'atalany'],
+          ['VSZJA', 'vszja'],
+          ['Társasági adó', 'tao']
+        ])
     ]
   },
   {
@@ -335,4 +320,8 @@ function cloneSections(ids: string[]): FormSectionDefinition[] {
     .map(id => SECTION_LIBRARY.find(section => section.id === id))
     .filter((section): section is FormSectionDefinition => !!section)
     .map(section => JSON.parse(JSON.stringify(section)));
+}
+
+function choiceField(id: string, label: string, options: Array<[label: string, value: string]>): FormFieldDefinition {
+  return { id, label, type: 'select', options: options.map(([label, value]) => ({ label, value })) };
 }

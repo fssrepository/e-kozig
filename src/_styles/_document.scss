@@ -1,3 +1,4 @@
+:where(app-document, app-invoices) {
 /* Document component styles moved from component inline styles */
 .top-controls { display:flex; align-items:center; justify-content:space-between; gap: 0.75rem; }
 .left-controls { display:flex; align-items:center; }
@@ -256,7 +257,7 @@
 table { width: 100%; }
 
 /* Hide the "Items per page:" label in paginator */
-mat-paginator ::ng-deep .mat-mdc-paginator-page-size-label {
+mat-paginator .mat-mdc-paginator-page-size-label {
   display: none;
 }
 
@@ -2361,4 +2362,6 @@ mat-panel-description {
   .attachment-actions {
     margin-left: auto;
   }
+}
+
 }
