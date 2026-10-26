@@ -6,6 +6,7 @@
 /bazel-out
 /dist
 /dev
+/docs/
 
 # Node
 /node_modules

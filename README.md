@@ -53,7 +53,8 @@ Feedback from both service users and domain specialists is welcome.
 
 ## Source and diagrams
 
-- `src/` contains the Angular prototype; `docs/` contains the GitHub Pages build.
+- `src/` contains the Angular prototype. The permanent `gh-pages` branch holds
+  the generated `docs/` folder used by GitHub Pages; `master` ignores it.
 - English diagram: [PNG](guides/media/process-en.png) · [editable SVG](guides/media/process.en.svg).
 - Original Hungarian diagram: [PNG](src/assets/img/process.png) · [editable SVG](guides/media/process.svg).
 - [Restorable Project history and measurement notes](guides/statistics/README.md).
@@ -83,7 +84,8 @@ the Sonar properties import its test counts, durations and failures. Generate a
 fresh report before scanning. `npm run test:coverage` also generates
 `coverage/e-kozig/lcov.info` using Vitest's V8 coverage provider; the Sonar
 properties import that measured coverage separately from test execution results.
-Run `npm run build:github` to rebuild `docs/` for GitHub Pages.
+Run `npm run build:github` to rebuild `docs/` locally, then commit the generated
+folder to `gh-pages` to publish it. The Pages source is `gh-pages` `/docs`.
 
 <!-- project-effort-summary -->
 
