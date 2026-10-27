@@ -9,7 +9,8 @@ National Tax and Customs Administration (NAV).
 
 [Live prototype](https://fssrepository.github.io/e-kozig/) ·
 [Project and AI usage](https://github.com/users/fssrepository/projects/4) ·
-[Magyar bemutató](README.hu.md)
+[Magyar bemutató](README.hu.md) ·
+[Részletes magyar kézikönyv (PDF)](guides/publication/manuals/E_Kozig_Prototype_Guide_v1.0.0_HU.pdf)
 
 ---
 

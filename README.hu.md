@@ -9,6 +9,9 @@ A prototípus célja, hogy a felhasználók és a szakmai szereplők már a fejl
 korai szakaszában véleményezhessék a tervezett folyamatokat. Így a problémák a
 háttérrendszerek kialakítása előtt felismerhetők és egyszerűbben javíthatók.
 
+A [részletes magyar kézikönyv (PDF)](guides/publication/manuals/E_Kozig_Prototype_Guide_v1.0.0_HU.pdf)
+a felület működését, a helyi adatkezelést és a prototípus korlátait dokumentálja.
+
 Az [élő prototípus](https://fssrepository.github.io/e-kozig/) kipróbálható, a
 [forráskód](https://github.com/fssrepository/e-kozig/) pedig szabadon
 áttekinthető. Észrevétel vagy hibajelzés a
