@@ -2,6 +2,10 @@
 
 Complete Project; 16 tasks. [Live Project](https://github.com/users/fssrepository/projects/4) · [Canonical complete backup](https://github.com/fssrepository/myscoutee-roadmap/tree/master/guides/statistics/e-kozig).
 
+EKO-16 now includes the [detailed Hungarian prototype guide](https://github.com/fssrepository/e-kozig/commit/30dbbcdfdd10834a7bd81769bdd782f8a69563a8). Its cumulative measurement is **8,097,985 tokens**, **0.247052 active / 0.240047 allocated h**, and **$4.61 estimated Standard API equivalent**. The new October 27 work alone contributed 6,572,942 measured tokens and 0.143152 active h. The October 1 estimate remains intact in `measurements.json`; `post_control_task_usage` records the new work, and `current_task_totals` gives the combined EKO-16 figure. The separate AIP-1 allocation retains 25.22 seconds of observed parallel activity.
+
+The current 16-task Project total is **464,348,015 tokens**, **9.602113 allocated h**, and **$262.23 estimated API equivalent**. See [the reproducible October 27 measurement](https://github.com/fssrepository/myscoutee-roadmap/blob/master/guides/statistics/e-kozig/measure-eko16.py) and [method](METHOD.md).
+
 `project.json` preserves full issue bodies, statuses, typed field values and views. `measurements.json` preserves model/token/cost/time components and assumptions. `commit-map.json` links original and task-prefixed commit IDs. CSV/JSON provide convenient presentation exports. Recorded root intervals are retained in compressed JSON for timing reconstruction; there are no private chat texts.
 
 ## Validate offline

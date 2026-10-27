@@ -26,8 +26,8 @@
   },
   "account_control": {
     "account_tokens": 38488016278,
-    "allocated_tokens_estimate": 37996385327,
-    "unassigned_tokens": 491630951
+    "allocated_tokens_estimate": 38003492490,
+    "unassigned_tokens": 484523788
   },
   "valuation_date": "2026-10-01",
   "rates_per_million": {
@@ -590,6 +590,127 @@
         "output_tokens": 119560,
         "reasoning_output_tokens": 36432,
         "total_tokens": 19991868
+      }
+    }
+  },
+  "post_control_task_usage": [
+    {
+      "task_id": "EKO-16",
+      "tokens": 6572942,
+      "cutoff_utc": "2026-10-27T18:46:25.831Z",
+      "unique_response_ids": 59,
+      "token_components": {
+        "input_tokens": 6533056,
+        "cached_input_tokens": 6396416,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 39886,
+        "reasoning_output_tokens": 12547,
+        "total_tokens": 6572942
+      },
+      "models": {
+        "gpt-6-sol|high": {
+          "input_tokens": 6533056,
+          "cached_input_tokens": 6396416,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 39886,
+          "reasoning_output_tokens": 12547,
+          "total_tokens": 6572942
+        }
+      },
+      "started": "2026-10-27",
+      "finished": "2026-10-27",
+      "active_hours": 0.1431522223022249,
+      "allocated_hours": 0.13614666673872206,
+      "previously_allocated_overlap_hours": 0.0,
+      "active_intervals_utc": [
+        [
+          "2026-10-27T18:30:56.899000+00:00",
+          "2026-10-27T18:31:22.119000+00:00"
+        ],
+        [
+          "2026-10-27T18:33:51.622000+00:00",
+          "2026-10-27T18:36:11.828000+00:00"
+        ],
+        [
+          "2026-10-27T18:37:55.623000+00:00",
+          "2026-10-27T18:43:20.448000+00:00"
+        ],
+        [
+          "2026-10-27T18:46:00.734000+00:00",
+          "2026-10-27T18:46:25.831000+00:00"
+        ]
+      ],
+      "api_standard_usd_estimate": 1.95,
+      "valuation_date": "2026-10-01",
+      "rates_per_million": {
+        "gpt-6-sol": [
+          2,
+          0.2,
+          10,
+          2.5
+        ]
+      },
+      "pricing_source": "https://developers.openai.com/api/docs/pricing",
+      "rate_basis": "Frozen existing Standard API-equivalent rates; not an invoice or new price lookup.",
+      "daily_tokens": {
+        "2026-10-27": 6572942
+      },
+      "sources": [
+        {
+          "source_kind": "root",
+          "source_sha256": "cd4232553eb30abc",
+          "selection_windows_utc": [
+            [
+              "2026-10-27T18:30:56.899Z",
+              "2026-10-27T18:46:25.831Z"
+            ]
+          ],
+          "tokens": 6572942,
+          "unique_responses": 59,
+          "first_usage_utc": "2026-10-27T18:31:01.759000+00:00",
+          "last_usage_utc": "2026-10-27T18:46:25.817000+00:00"
+        }
+      ],
+      "note": "E-Kozig PDF guide, detailed Hungarian expansion, verification and the EKO-16 source commit. This later accounting turn is excluded. Unique response IDs and root-turn intervals; cached input is inside input.",
+      "extracted_allocated_hours_before_cross_project_overlap": 0.1431522223022249,
+      "cross_project_overlap_hours": 0.007005555563502842,
+      "cross_project_overlap_basis": "AIP-1 active intervals already allocated in the portfolio"
+    }
+  ],
+  "current_task_totals": {
+    "EKO-16": {
+      "task_id": "EKO-16",
+      "tokens": 8097985,
+      "active_hours": 0.24705222231811946,
+      "allocated_hours": 0.2400466667546166,
+      "api_standard_usd_estimate": 4.61,
+      "prior_allocation_tokens": 1525043,
+      "followup_tokens": 6572942,
+      "followup_unique_response_ids": 59,
+      "cutoff_utc": "2026-10-27T18:46:25.831Z"
+    }
+  },
+  "current_project_totals": {
+    "tasks": 16,
+    "tokens_estimate": 464348015,
+    "api_standard_usd_estimate": 262.23,
+    "allocated_hours_estimate": 9.602112713025674,
+    "manual_effort_unknown": false,
+    "workstreams": {
+      "Administration portal": {
+        "tokens": 453584448,
+        "api_equivalent_usd": 253.52,
+        "hours": 9.19567430552509
+      },
+      "Project administration (AI-assisted)": {
+        "tokens": 2665582,
+        "api_equivalent_usd": 4.1,
+        "hours": 0.16639174074596827
+      },
+      "Documentation (AI-assisted)": {
+        "tokens": 8097985,
+        "api_equivalent_usd": 4.61,
+        "hours": 0.2400466667546166
       }
     }
   }

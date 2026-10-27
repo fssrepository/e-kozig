@@ -211,16 +211,16 @@
   },
   {
     "task_id": "EKO-16",
-    "title": "Publish a clear English introduction and process diagram",
+    "title": "English introduction and detailed Hungarian prototype guide",
     "workstream": "Documentation (AI-assisted)",
     "started": "2026-10-01",
-    "finished": "2026-10-01",
-    "tokens_million": 1.53,
-    "api_equivalent_usd_estimate": 2.66,
-    "active_hours": 0.10390000001589457,
-    "allocated_hours": 0.1,
-    "models": "gpt-6-astra",
+    "finished": "2026-10-27",
+    "tokens_million": 8.097985,
+    "api_equivalent_usd_estimate": 4.61,
+    "active_hours": 0.247052,
+    "allocated_hours": 0.240047,
+    "models": "gpt-6-astra; gpt-6-sol",
     "reasoning": "high",
-    "evidence": "Measured shared documentation-session tokens; estimated allocation 60% E-Kozig, 30% MyScoutee Old, 10% math"
+    "evidence": "Historical English introduction plus 27 October Hungarian guide; 59 measured follow-up responses"
   }
 ]

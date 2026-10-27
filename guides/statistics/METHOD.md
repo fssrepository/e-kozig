@@ -1,5 +1,13 @@
 # Measurement method
 
+## EKO-16 follow-up (27 October 2026)
+
+The original October 1 reconstruction remains in `project_totals` and the `tasks` entry. `post_control_task_usage` adds the later Hungarian PDF documentation work; `current_task_totals` and `current_project_totals` are the cumulative view. The follow-up is reproduced by `measure-eko16.py` from the retained root session, selecting 18:30:56.899–18:46:25.831 UTC. It contains 59 unique responses and 6,572,942 tokens, including cached input, with `gpt-6-sol / high` observed. The fixed cutoff excludes this later accounting turn.
+
+The selected root-turn union is 0.143152 active hours. Its overlap with the already recorded AIP-1 intervals is 25.22 seconds (0.007006 h); that time stays with AIP-1, leaving 0.136147 newly allocated hours for EKO-16. The prior EKO-16 allocation was 1,525,043 tokens and 0.103900 active/allocated hours. The current cumulative task is 8,097,985 tokens, 0.247052 active hours and 0.240047 allocated hours. Distinct response IDs make the additional tokens additive; account totals still overlap these task totals. The $1.95 follow-up and $4.61 cumulative values use the frozen Standard API-equivalent rate card, not billing records.
+
+## Preserved October 1 reconstruction
+
 
 - Local active and archived `.codex` histories are the primary execution evidence. All 649 JSONL files were inventoried, including split conversations; the history database was checked for additional coverage. Local retained conversations start on July 22, while account daily records reach February 4.
 - Reuse the existing production audit method: unique response IDs when available; positive cumulative-counter differences for older records; unchanged counters contribute nothing; an initial partial counter or reset contributes only its recorded last response. Approval-review histories are not counted as extra user work. Cached input is inside input; reasoning output is inside output.
@@ -15,3 +23,5 @@ Model date sources: [GPT-5.3-Codex](https://openai.com/index/introducing-gpt-5-3
 
 - Four independent Projects separate MyScoutee, the manually developed legacy archive, e-kozig and mathematical research. Shared account tokens are allocated once across all four; a Project total is never an additional account total. Historical legacy AI usage is unverified and left blank. The current AI-assisted Project-administration task is measured separately. A final shared maintenance-run measurement is apportioned by snapshot ownership; its overlap with MSC-108 is removed and its net allocation uses the unassigned account allowance, without exact daily billing reconciliation.
 - Mathematical experiments and videos do not establish a solution of the continuous Navier–Stokes problem. The claim withdrawal is a first-class task.
+
+- Combined daily usage is published as anonymous totals only. The original task calibration remains separate: additional measurements may overlap existing task evidence and are not automatically added to task tokens, hours or costs.
